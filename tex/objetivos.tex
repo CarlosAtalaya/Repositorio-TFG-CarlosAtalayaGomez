@@ -1,0 +1,125 @@
+\chapter{Objetivos}
+\label{ch:objetivos}
+
+\avisoLocalizacionArchivo
+
+Este capítulo define los objetivos que guían el desarrollo del presente Trabajo Fin de Grado. Los objetivos se han establecido considerando tanto la relevancia científica y técnica de la investigación, como la viabilidad práctica de su realización en el contexto temporal y de recursos disponibles. Se distingue entre el objetivo general del trabajo y los objetivos específicos que lo articulan, todos ellos fundamentados en las oportunidades de investigación identificadas en el estado del arte.
+
+\section{Objetivo general}
+
+El objetivo general de este Trabajo Fin de Grado es desarrollar y validar un sistema de detección de anomalías en componentes industriales basado en Vision Transformers, aplicando técnicas de transfer learning desde modelos preentrenados y evaluando su rendimiento mediante comparación sistemática con métodos tradicionales de inspección visual automática.
+
+Este objetivo responde a la brecha identificada en el estado del arte respecto a la validación práctica de arquitecturas Vision Transformer en escenarios industriales reales con datos limitados. Mientras que la literatura reciente demuestra el potencial teórico de los transformers para capturar dependencias globales en imágenes y su capacidad de transferir conocimiento desde dominios generales a específicos~\cite{huang2025semiconductor,zhang2025exploring}, existe una carencia de trabajos que validen estas capacidades en componentes electrónicos diversos bajo condiciones realistas de disponibilidad de datos y restricciones computacionales.
+
+El trabajo se fundamenta en la hipótesis, respaldada por evidencia empírica reciente~\cite{huang2025semiconductor}, de que modelos Vision Transformer preentrenados mediante aprendizaje auto-supervisado pueden adaptarse eficazmente a tareas de detección de anomalías industriales con volúmenes limitados de datos etiquetados, potencialmente superando o igualando el rendimiento de arquitecturas convolucionales tradicionales mientras ofrecen ventajas adicionales en términos de interpretabilidad mediante visualización de mecanismos de atención.
+
+
+\section{Objetivos específicos}
+
+Los objetivos específicos articulan el objetivo general en metas concretas y alcanzables que, en su conjunto, constituyen la contribución del trabajo.
+
+\subsection{Implementación de sistema de detección basado en Vision Transformers}
+
+Implementar un sistema funcional de detección de anomalías industriales utilizando arquitecturas Vision Transformer preentrenadas, específicamente explorando modelos basados en aprendizaje auto-supervisado como DINOv2. Este objetivo implica:
+
+\begin{itemize}
+    \item Seleccionar y configurar el modelo base preentrenado más apropiado considerando el balance entre capacidad representacional, eficiencia computacional y facilidad de adaptación a dominios específicos.
+    
+    \item Diseñar e implementar el pipeline de transfer learning, incluyendo estrategias de fine-tuning que permitan adaptar las representaciones visuales generales del modelo preentrenado a las características específicas de componentes industriales.
+    
+    \item Desarrollar la infraestructura de software necesaria, incluyendo carga y preprocesamiento de datos, configuración de hiperparámetros de entrenamiento, y procedimientos de validación que garanticen la reproducibilidad de los experimentos.
+\end{itemize}
+
+La consecución de este objetivo proporcionará un sistema base sobre el cual realizar las evaluaciones comparativas y validaciones prácticas contempladas en objetivos posteriores.
+
+\subsection{Evaluación comparativa con métodos tradicionales}
+
+Realizar un benchmarking sistemático del sistema desarrollado frente a métodos tradicionales de detección de anomalías basados en arquitecturas convolucionales, con el propósito de evaluar objetivamente las ventajas y limitaciones del enfoque transformer en el contexto específico de inspección industrial. Este objetivo comprende:
+
+\begin{itemize}
+    \item Implementar arquitecturas baseline representativas del estado del arte en detección de anomalías, incluyendo modelos basados en ResNet y EfficientNet, garantizando que las comparaciones se realicen bajo condiciones experimentales equivalentes en términos de datos de entrenamiento, procedimientos de validación y métricas de evaluación.
+    
+    \item Evaluar el rendimiento de todos los modelos mediante un conjunto comprehensivo de métricas que capture diferentes aspectos de la capacidad de detección: precisión de clasificación (accuracy), balance entre sensibilidad y especificidad (F1-score), capacidad de discriminación (AUC-ROC), y calidad de localización de anomalías cuando sea aplicable.
+    
+    \item Analizar no solo el rendimiento en términos de precisión, sino también aspectos pragmáticos relevantes para aplicaciones reales: tiempo de inferencia, consumo de memoria, requisitos computacionales de entrenamiento, y facilidad de adaptación a nuevos tipos de componentes o defectos.
+\end{itemize}
+
+Este análisis comparativo proporcionará evidencia empírica sobre las condiciones bajo las cuales Vision Transformers ofrecen ventajas prácticas sobre aproximaciones tradicionales, contribuyendo a orientar decisiones de selección de arquitectura en proyectos industriales futuros.
+
+\subsection{Validación en datasets benchmark estándar}
+
+Validar el sistema desarrollado en datasets de referencia ampliamente utilizados en la literatura de detección de anomalías industriales, particularmente MVTec AD, con el objetivo de situar los resultados obtenidos en el contexto del estado del arte y facilitar la comparación con trabajos previos. Este objetivo incluye:
+
+\begin{itemize}
+    \item Entrenar y evaluar el modelo propuesto en MVTec AD, dataset que constituye el benchmark de facto en detección de anomalías industriales y que permite comparación directa con los numerosos métodos publicados en la literatura~\cite{zhang2025exploring,alber2024evaluating}.
+    
+    \item Analizar el rendimiento del sistema en diferentes categorías de objetos y tipos de defectos presentes en el dataset, identificando fortalezas y debilidades del enfoque transformer en función de las características visuales específicas de cada caso.
+    
+    \item Documentar detalladamente las configuraciones experimentales, procedimientos de entrenamiento y validación, y resultados obtenidos, garantizando reproducibilidad y permitiendo que trabajos futuros puedan extender o contrastar los hallazgos.
+\end{itemize}
+
+La validación en datasets estándar es esencial para establecer la validez científica de los resultados y para posibilitar que la comunidad investigadora pueda contrastar y extender el trabajo realizado.
+
+\subsection{Demostración práctica con componentes electrónicos reales}
+
+Desarrollar un sistema de demostración que valide la aplicabilidad práctica del enfoque propuesto mediante detección de anomalías en componentes electrónicos reales capturados en condiciones no controladas de laboratorio. Este objetivo contempla:
+
+\begin{itemize}
+    \item Crear un dataset específico de componentes electrónicos diversos (placas de circuito impreso, conectores, componentes SMD, carcasas) mediante captura fotográfica, incluyendo tanto ejemplares sin defectos como con anomalías características de uso, manipulación o manufactura.
+    
+    \item Aplicar transfer learning desde el modelo validado en datasets estándar hacia este dataset de componentes reales, evaluando la capacidad del sistema para adaptarse a nuevos dominios con volúmenes limitados de datos, aspecto crítico para aplicabilidad práctica en entornos industriales donde el etiquetado de datos es costoso.
+    
+    \item Desarrollar una interfaz de demostración interactiva que permita visualizar el proceso de detección en tiempo real, incluyendo no solo la clasificación de anomalías sino también la visualización de los mecanismos de atención del modelo, proporcionando interpretabilidad sobre qué regiones de la imagen son relevantes para la decisión del sistema.
+    
+    \item Evaluar la robustez del sistema frente a variaciones en condiciones de captura (iluminación, ángulos de cámara, fondos) que son inevitables en aplicaciones prácticas pero frecuentemente no consideradas en evaluaciones sobre datasets benchmark altamente controlados.
+\end{itemize}
+
+Este objetivo es particularmente relevante porque aborda la brecha entre experimentación en datasets académicos y aplicación en escenarios reales, proporcionando evidencia sobre la viabilidad práctica del enfoque propuesto más allá del rendimiento en benchmarks estándar.
+
+\subsection{Análisis de interpretabilidad mediante visualización de atención}
+
+Explotar los mecanismos de atención inherentes a la arquitectura Vision Transformer para proporcionar interpretabilidad del proceso de detección, aspecto crucial para aceptación y confianza en sistemas de inspección automática en entornos industriales. Este objetivo específico incluye:
+
+\begin{itemize}
+    \item Implementar técnicas de visualización de mapas de atención que permitan identificar qué regiones de la imagen contribuyen a la decisión del modelo, facilitando la comprensión del proceso de inferencia tanto para propósitos de debugging y mejora del sistema como para explicación a usuarios finales.
+    
+    \item Analizar cualitativamente la correspondencia entre las regiones atendidas por el modelo y la localización de defectos reales, evaluando si los mecanismos de atención capturan efectivamente características visuales relevantes para discriminación de anomalías.
+    
+    \item Comparar los patrones de atención del modelo transformer con técnicas de visualización aplicables a redes convolucionales (como GradCAM), caracterizando las diferencias en cómo ambos tipos de arquitecturas procesan información visual para detección de anomalías.
+\end{itemize}
+
+La interpretabilidad no es meramente deseable sino frecuentemente necesaria para deployment de sistemas de machine learning en contextos críticos donde decisiones erróneas tienen consecuencias significativas. Este objetivo aborda esta necesidad práctica.
+
+
+\section{Alcance y limitaciones}
+
+Es importante establecer explícitamente el alcance del trabajo para gestionar expectativas y contextualizar adecuadamente los resultados obtenidos.
+
+\subsection{Alcance del trabajo}
+
+El trabajo se centra en detección y clasificación de anomalías en imágenes individuales de componentes industriales, considerando el problema como tarea de clasificación binaria (normal/anómalo) o multi-clase cuando los tipos de anomalías son conocidos a priori. La localización precisa de defectos mediante segmentación pixel-wise, aunque deseable, se aborda únicamente de forma cualitativa mediante visualización de mapas de atención, no constituyendo objetivo primario de evaluación cuantitativa detallada.
+
+El enfoque metodológico es transfer learning desde modelos preentrenados, no entrenamiento de arquitecturas transformer desde cero. Esta decisión se fundamenta en la evidencia empírica de la literatura~\cite{huang2025semiconductor,khan2024survey} que demuestra la superioridad del transfer learning en escenarios con datos limitados, y en restricciones prácticas de recursos computacionales y temporales.
+
+Los datasets considerados comprenden MVTec AD como benchmark estándar y un conjunto propio de componentes electrónicos capturados específicamente para este trabajo. No se pretende validación exhaustiva en todos los datasets industriales disponibles, sino demostración de aplicabilidad del enfoque en casos representativos.
+
+\subsection{Limitaciones reconocidas}
+
+El trabajo se desarrolla con recursos computacionales limitados (GPU RTX 4070 con 12GB VRAM), lo que restringe el tamaño de los modelos y batch sizes utilizables durante entrenamiento. Consecuentemente, la exploración se centra en variantes ViT-Base o similares, no en modelos transformer de gran escala que podrían ofrecer rendimiento superior pero resultan impracticables con el hardware disponible.
+
+El dataset propio de componentes electrónicos, por razones prácticas, tendrá un tamaño limitado (orden de decenas de imágenes por tipo de componente), suficiente para demostración de transfer learning few-shot pero no para entrenamientos desde cero ni para análisis estadísticos exhaustivos de rendimiento en distribuciones de datos complejas.
+
+El trabajo es primariamente experimental y aplicado, no teórico. No se pretende desarrollo de nuevas arquitecturas transformer ni contribuciones algorítmicas fundamentales, sino aplicación rigurosa y validación práctica de métodos existentes en un contexto específico poco explorado en la literatura.
+
+
+\section{Contribución esperada}
+
+La contribución esperada de este Trabajo Fin de Grado es tanto de naturaleza práctica como metodológica.
+
+Desde la perspectiva práctica, el trabajo proporcionará un sistema funcional de detección de anomalías basado en Vision Transformers, acompañado de código completamente documentado y reproducible que podrá servir como punto de partida para proyectos industriales reales o trabajos de investigación futuros. La demostración práctica con componentes electrónicos reales validará la viabilidad del enfoque más allá de experimentación en datasets académicos.
+
+Desde la perspectiva metodológica, el benchmarking sistemático contribuirá evidencia empírica sobre las condiciones bajo las cuales Vision Transformers ofrecen ventajas prácticas sobre arquitecturas convolucionales en detección de anomalías industriales, particularmente en escenarios de transfer learning con datos limitados. Esta evidencia complementará los hallazgos de trabajos recientes~\cite{huang2025semiconductor,zhang2025exploring,alber2024evaluating} extendiendo su validación a componentes electrónicos diversos.
+
+El análisis de interpretabilidad mediante visualización de mecanismos de atención contribuirá a caracterizar las diferencias cualitativas en cómo transformers y CNNs procesan información visual para esta tarea, aspecto relevante tanto para comprensión fundamental como para consideraciones prácticas de confianza y explicabilidad de sistemas de inspección automática.
+
+Finalmente, la documentación detallada de procedimientos, configuraciones experimentales, y lecciones aprendidas durante el desarrollo constituirá un recurso valioso para estudiantes e investigadores interesados en aplicación práctica de Vision Transformers en dominios industriales.

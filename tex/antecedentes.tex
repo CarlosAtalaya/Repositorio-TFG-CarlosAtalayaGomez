@@ -1,0 +1,169 @@
+\chapter{Motivación y antecedentes}
+\label{ch:antecedentes}
+
+\avisoLocalizacionArchivo 
+
+\section{Introducción}
+
+La detección automática de anomalías en procesos de manufactura industrial constituye uno de los desafíos más relevantes en el ámbito de la visión por computador aplicada. La inspección visual de componentes industriales ha sido tradicionalmente una tarea manual, dependiente de operadores humanos que deben identificar defectos en productos manufacturados bajo condiciones que frecuentemente resultan monótonas y propensas al error~\cite{alber2024evaluating}. Esta dependencia de inspección manual no solo incrementa los costes operativos, sino que introduce variabilidad en los criterios de aceptación y limita la escalabilidad de los procesos de control de calidad.
+
+El advenimiento de técnicas de aprendizaje profundo ha revolucionado el campo de la inspección visual automatizada. Sin embargo, los enfoques tradicionales basados en redes neuronales convolucionales (CNNs) presentan limitaciones inherentes a su arquitectura, particularmente en la capacidad de capturar dependencias globales en las imágenes y de modelar relaciones a largo alcance entre regiones distantes de un componente~\cite{wang2022defect}. Estas limitaciones son especialmente problemáticas en escenarios industriales donde los defectos pueden manifestarse como anomalías sutiles que requieren comprensión del contexto global de la imagen.
+
+En los últimos años, la arquitectura Vision Transformer (ViT) ha emergido como una alternativa prometedora, demostrando capacidades superiores en diversas tareas de visión por computador. A diferencia de las CNNs, los transformers procesan las imágenes mediante mecanismos de atención que permiten capturar relaciones globales de forma explícita, ofreciendo además mayor interpretabilidad a través de la visualización de mapas de atención~\cite{sudarshan2025object}. No obstante, la aplicación exitosa de ViTs en entornos industriales reales enfrenta desafíos particulares: la necesidad de grandes volúmenes de datos etiquetados, la adaptación a dominios específicos con características particulares, y la validación práctica en condiciones de producción.
+
+Este capítulo presenta una revisión sistemática del estado del arte en detección de anomalías industriales mediante Vision Transformers, con especial énfasis en técnicas de transfer learning y aprendizaje auto-supervisado que permiten abordar las limitaciones de datos etiquetados. Se analizan las contribuciones más recientes en el campo, se identifican las arquitecturas y metodologías más prometedoras, y se establecen las bases para justificar la aproximación metodológica propuesta en este trabajo.
+
+
+\section{Fundamentos de Vision Transformers y aprendizaje auto-supervisado}
+
+\subsection{De las redes convolucionales a los transformers en visión por computador}
+
+La arquitectura Vision Transformer, introducida originalmente por Dosovitskiy et al., representa un cambio paradigmático en el procesamiento de imágenes. Mientras que las CNNs procesan información mediante operaciones de convolución local, los ViTs dividen la imagen en parches y los procesan mediante mecanismos de self-attention que capturan relaciones entre todas las regiones de forma simultánea~\cite{sudarshan2025object}. Esta diferencia arquitectural confiere a los transformers ventajas significativas en términos de escalabilidad, flexibilidad en el manejo de imágenes de diferentes resoluciones, y capacidad de transfer learning.
+
+Sudarshan et al.~\cite{sudarshan2025object} destacan que los ViTs superan a las CNNs en precisión cuando se dispone de grandes volúmenes de datos de entrenamiento, alcanzando accuracy del 93\% en tareas de clasificación general de objetos. Más importante aún, demuestran que los transformers preentrenados en grandes corpus de imágenes pueden transferir conocimiento de forma más efectiva a tareas específicas, una característica crucial para aplicaciones industriales donde los datos etiquetados son escasos.
+
+\subsection{Aprendizaje auto-supervisado para Vision Transformers}
+
+Una de las limitaciones más significativas de los modelos de aprendizaje profundo en entornos industriales es su dependencia de grandes cantidades de datos etiquetados manualmente. Khan et al.~\cite{khan2024survey} presentan una revisión exhaustiva de 42 páginas sobre mecanismos de aprendizaje auto-supervisado (Self-Supervised Learning, SSL) específicamente diseñados para Vision Transformers, identificando esta problemática como uno de los desafíos centrales del campo.
+
+El aprendizaje auto-supervisado se fundamenta en la explotación de las relaciones inherentes dentro de los datos, utilizándolas como forma de supervisión sin requerir anotaciones humanas. Khan et al.~\cite{khan2024survey} desarrollan una taxonomía completa de técnicas SSL aplicables a ViTs, clasificándolas según sus representaciones y tareas de pre-entrenamiento. Entre las metodologías más relevantes identificadas se encuentran:
+
+\textbf{Contrastive Learning:} Métodos como SimCLR y MoCo adaptados a arquitecturas transformer, que aprenden representaciones discriminativas mediante la comparación de vistas aumentadas de la misma imagen.
+
+\textbf{Masked Image Modeling:} Inspirado en BERT del procesamiento de lenguaje natural, donde regiones de la imagen se enmascaran y el modelo aprende a predecirlas. Masked Autoencoders (MAE) han demostrado ser particularmente efectivos para ViTs.
+
+\textbf{Self-distillation:} Aproximaciones como DINO y DINOv2, donde el modelo aprende de sus propias predicciones sin etiquetas, generando representaciones visuales robustas.
+
+La relevancia de estos métodos para aplicaciones industriales es crucial. Como señalan Khan et al.~\cite{khan2024survey}, el SSL permite reducir significativamente la dependencia de anotaciones manuales, ofreciendo un enfoque más escalable y eficiente en términos de recursos. Esta característica es especialmente valiosa en escenarios de manufactura donde el etiquetado de defectos requiere expertise técnico especializado y resulta costoso en tiempo y recursos.
+
+
+\section{Vision Transformers aplicados a detección de anomalías industriales}
+
+\subsection{Arquitecturas basadas en ViT puro}
+
+Zhang et al.~\cite{zhang2025exploring} abordan el problema de detección de anomalías multi-clase no supervisada (Multi-class Unsupervised Anomaly Detection, MUAD), un escenario particularmente relevante para aplicaciones industriales donde el sistema debe detectar múltiples tipos de defectos simultáneamente utilizando únicamente imágenes normales durante el entrenamiento. Su trabajo introduce ViTAD, una arquitectura basada en Vision Transformer puro que deliberadamente evita las complejas sub-módulos y técnicas de ingeniería manual características de enfoques previos basados en CNNs.
+
+El diseño de ViTAD se fundamenta en el concepto Meta-AD, una abstracción de los métodos actuales basados en reconstrucción. La arquitectura incorpora un encoder jerárquico que genera representaciones multi-escala en cuatro niveles, cada uno seguido de bloques ViT que incluyen: (1) bloques position-aware para codificación local, (2) self-attention multi-pooling ligero para modelar relaciones contextuales globales multi-escala, y (3) redes convolucionales feed-forward para transformación de características y aprendizaje adicional de información posicional.
+
+Los resultados experimentales de Zhang et al.~\cite{zhang2025exploring} son particularmente relevantes. En el dataset MVTec AD, benchmark estándar para detección de anomalías industriales, ViTAD alcanza 85.4\% de mean Anomaly Detection (mAD), superando al estado del arte anterior (UniAD) en 3.0 puntos porcentuales. Más significativo aún desde el punto de vista práctico, el entrenamiento del modelo requiere únicamente 1.1 horas en una GPU V100 con 2.3GB de memoria, demostrando eficiencia computacional excepcional. La arquitectura fue evaluada comprehensivamente mediante siete métricas diferentes, validándose también en los datasets VisA y Uni-Medical, confirmando su generalización a múltiples dominios.
+
+La contribución de Zhang et al. es doblemente valiosa: por un lado, demuestra que las arquitecturas ViT puras, sin modificaciones complejas, pueden alcanzar rendimiento estado del arte en detección de anomalías; por otro, establece un baseline sólido y eficiente que facilita futuras investigaciones al reducir la complejidad arquitectural.
+
+\subsection{Arquitecturas híbridas: combinando CNNs y Transformers}
+
+Una aproximación alternativa es explorada por Wang et al.~\cite{wang2022defect}, quienes argumentan que tanto las CNNs puras como los Transformers puros presentan limitaciones complementarias. Mientras las CNNs excelen en capturar información estructural local necesaria para localización precisa de defectos, los Transformers sobresalen en modelar dependencias globales. Su propuesta, Defect Transformer (DefT), integra ambas arquitecturas en un modelo unificado diseñado específicamente para detección de defectos superficiales.
+
+La arquitectura DefT incorpora un bloque convolucional inicial (stem) que preserva información espacial detallada, seguido de bloques de agregación de parches que generan representaciones multi-escala en cuatro jerarquías. Los bloques DefT, componente central de la arquitectura, combinan: codificación posicional local mediante operaciones convolucionales, self-attention multi-pooling para capturar relaciones contextuales globales multi-escala de forma computacionalmente eficiente, y redes feed-forward convolucionales para transformación de características.
+
+Wang et al.~\cite{wang2022defect} enfatizan que esta aproximación híbrida es particularmente efectiva en casos complejos característicos de entornos industriales reales: fondos desordenados (cluttered backgrounds) y pseudo-defectos difíciles de distinguir. El decoder, deliberadamente simple, recupera gradualmente los detalles espaciales mediante skip connections desde el encoder, priorizando la eficiencia sobre la complejidad arquitectural.
+
+La validación experimental en tres datasets industriales distintos confirma la efectividad de combinar localidad (CNN) y globalidad (Transformer). Esta línea de trabajo sugiere que, dependiendo de las características específicas del problema de detección, las arquitecturas híbridas pueden ofrecer ventajas sobre aproximaciones puras.
+
+
+\section{Transfer learning y aprendizaje con datos limitados}
+
+\subsection{Validación industrial con aprendizaje few-shot}
+
+Uno de los trabajos más relevantes para aplicaciones industriales prácticas es el de Huang et al.~\cite{huang2025semiconductor}, quienes reportan la implementación exitosa de Vision Transformers para clasificación automática de defectos (Automatic Defect Classification, ADC) en imágenes SEM (Scanning Electron Microscope) de semiconductores en la planta de fabricación de IBM en Albany. Este trabajo es particularmente significativo por tratarse de un caso de aplicación real en un entorno de producción, no de un experimento de laboratorio.
+
+Huang et al.~\cite{huang2025semiconductor} trabajaron con un dataset de más de 7,400 imágenes correspondientes a 11 tipos diferentes de defectos en obleas de semiconductores de 300mm. Lo más notable de sus resultados es la demostración de que, mediante transfer learning utilizando el modelo preentrenado DINOv2, lograron accuracies superiores al 90\% con menos de 15 imágenes por clase de defecto. Este hallazgo tiene implicaciones profundas para aplicaciones industriales, donde el etiquetado manual de defectos nano-escala no solo requiere tiempo y recursos significativos, sino también expertise técnico altamente especializado y está sujeto a sesgos humanos.
+
+La investigación exploró tanto aprendizaje supervisado como semi-supervisado, evaluando el potencial del transfer learning para mejorar la precisión de clasificación y la eficiencia computacional. El modelo DINOv2, basado en aprendizaje auto-supervisado mediante self-distillation, demostró ser particularmente efectivo para transferir conocimiento visual general a este dominio altamente especializado. Los autores destacan que su framework tiene potencial para implementarse como herramienta de clasificación agnóstica a la plataforma, con tiempos de respuesta rápidos y flexibilidad para adaptarse a nuevos tipos de defectos.
+
+\subsection{Evaluación sistemática de modelos ViT para control de calidad industrial}
+
+Alber et al.~\cite{alber2024evaluating} abordan una problemática práctica fundamental: la dificultad que enfrentan los profesionales industriales para seleccionar la combinación óptima de backbone visual y algoritmo de detección de anomalías entre la creciente variedad de opciones disponibles. Su trabajo presenta una evaluación sistemática de modelos Vision Transformer estado del arte combinados con diversos métodos de detección de anomalías, con el objetivo explícito de proporcionar guidelines prácticas para la selección de arquitecturas.
+
+La investigación se centra en el trade-off fundamental entre calidad de detección y tiempo de inferencia, reconociendo que en entornos de manufactura industrial ambos factores son críticos. Alber et al.~\cite{alber2024evaluating} evaluaron múltiples variantes de ViT de diferentes tamaños y configuraciones, combinándolas con varios algoritmos de detección de anomalías, utilizando los datasets MVTec AD y BTAD como benchmarks estándar.
+
+Las contribuciones del trabajo son particularmente valiosas para practitioners: proporcionan guidelines detalladas para seleccionar arquitecturas considerando tanto el caso de uso específico como las restricciones de hardware disponible. Enfatizan la importancia de considerar requisitos de tiempo real, necesidades de accuracy, y limitaciones de memoria y cómputo. Este enfoque pragmático reconoce que el modelo "mejor" en términos académicos puede no ser el más apropiado para un deployment industrial específico.
+
+Los autores identifican que, con el ascenso de los transformers como backbones visuales de elección, existe una gran variedad de combinaciones posibles, y que los profesionales del área frecuentemente deben invertir tiempo considerable investigando la opción adecuada para su caso particular. Su trabajo busca reducir esta carga mediante evaluación sistemática y recomendaciones basadas en evidencia experimental.
+
+
+\section{Técnicas avanzadas y enfoques emergentes}
+
+\subsection{Detección de anomalías zero-shot}
+
+Le-Gia y Ahn~\cite{legia2025consistent} introducen un problema novel en detección de anomalías industriales: el manejo de \textit{anomalías consistentes} (consistent anomalies), definidas como defectos similares que aparecen recurrentemente a través de múltiples imágenes. Este escenario, común en entornos de producción donde ciertos tipos de fallos ocurren sistemáticamente, resulta problemático para métodos de detección zero-shot existentes que comparan características de parches con vecinos más cercanos en imágenes de test sin etiquetar.
+
+Los autores identifican el fenómeno de \textit{neighbor-burnout}: mientras que los parches normales en imágenes industriales exhiben similaridad estable y gradualmente creciente con otras imágenes de test, los parches correspondientes a anomalías consistentes muestran picos abruptos de similaridad tras agotar un conjunto limitado de coincidencias similares. Este insight conduce al desarrollo de CoDeGraph (Consistent-Anomaly Detection Graph), un algoritmo novel que construye un grafo a nivel de imagen donde los nodos representan imágenes y las aristas conectan aquellas con patrones compartidos de anomalías consistentes. Mediante técnicas de detección de comunidades, el algoritmo identifica y filtra estos patrones antes de realizar las comparaciones de similaridad.
+
+Le-Gia y Ahn~\cite{legia2025consistent} proporcionan fundamentación teórica mediante Extreme Value Theory para explicar la efectividad de su aproximación. Los resultados experimentales en MVTec AD son notables: utilizando el backbone ViT-L-14-336, CoDeGraph alcanza 98.3\% AUROC para clasificación de anomalías (AC) y mejoras de +4.2\% en F1 score y +5.4\% en Average Precision para segmentación de anomalías (AS) comparado con métodos zero-shot estado del arte. Experimentos adicionales con el backbone DINOv2 mejoran aún más la segmentación, alcanzando +6.5\% F1 y +9.2\% AP, demostrando robustez a través de diferentes arquitecturas.
+
+\subsection{Robustez adversarial y pseudo-anomalías}
+
+Nafez et al.~\cite{nafez2025patchguard} abordan una dimensión crítica frecuentemente ignorada en detección de anomalías industriales: la robustez adversarial. Su trabajo parte de la observación de que los sistemas de detección y localización de anomalías son inherentemente vulnerables a ataques adversariales debido a las limitaciones en los datos de entrenamiento, que típicamente incluyen únicamente muestras normales sin etiquetar. Esta vulnerabilidad es particularmente preocupante en aplicaciones críticas como imagen médica y monitoreo industrial, donde decisiones erróneas pueden tener consecuencias significativas.
+
+PatchGuard, la solución propuesta, incorpora pseudo-anomalías generadas artificialmente con máscaras de localización dentro de una arquitectura basada en Vision Transformer. Los autores desarrollan una fundamentación teórica sobre las propiedades esenciales que deben poseer las pseudo-anomalías y proporcionan insights sobre los mecanismos de atención necesarios para mejorar la robustez adversarial. Su método utiliza Foreground-Aware Pseudo-Anomalies, diseñadas específicamente para superar las deficiencias de métodos previos que no consideraban adecuadamente el contexto del objeto principal en la imagen.
+
+La arquitectura incorpora estas muestras sintéticas en un framework basado en ViT, con entrenamiento adversarial guiado por una función de pérdida novel diseñada para mejorar la robustez del modelo, soportada por el análisis teórico presentado. Los resultados experimentales en datasets industriales y médicos establecidos demuestran mejoras significativas: PatchGuard supera métodos anteriores en 53.2\% para detección de anomalías y 68.5\% para localización en configuraciones adversariales, mientras mantiene accuracy competitiva en configuraciones no adversariales.
+
+Aunque la robustez adversarial puede parecer un aspecto especializado, Nafez et al.~\cite{nafez2025patchguard} argumentan convincentemente su relevancia práctica. En entornos de producción, donde sistemas de inspección visual pueden estar expuestos a variaciones no previstas en iluminación, posicionamiento, o características de productos, la capacidad de mantener rendimiento robusto bajo condiciones adversas es esencial para deployment confiable.
+
+
+\section{Análisis crítico del estado del arte}
+
+\subsection{Convergencia hacia modelos preentrenados auto-supervisados}
+
+El análisis de la literatura reciente revela una tendencia clara hacia la utilización de modelos Vision Transformer preentrenados mediante técnicas de aprendizaje auto-supervisado, particularmente DINOv2. Esta convergencia no es accidental sino que responde a ventajas prácticas demostradas empíricamente. Huang et al.~\cite{huang2025semiconductor} validaron la efectividad de DINOv2 en un entorno industrial real, mientras que Le-Gia y Ahn~\cite{legia2025consistent} confirmaron su superioridad en configuraciones zero-shot. La capacidad de estos modelos para transferir representaciones visuales generales a dominios específicos con datos limitados los convierte en candidatos ideales para aplicaciones industriales.
+
+La taxonomía de técnicas SSL presentada por Khan et al.~\cite{khan2024survey} proporciona el marco teórico para comprender por qué métodos como DINOv2, basados en self-distillation, resultan particularmente efectivos. Al aprender de sus propias predicciones sin supervisión explícita, estos modelos desarrollan representaciones visuales robustas que capturan características semánticas de alto nivel, precisamente el tipo de información necesaria para discriminar entre componentes normales y anómalos.
+
+\subsection{Trade-off entre simplicidad arquitectural y rendimiento}
+
+Existe una tensión notable en la literatura entre arquitecturas simples basadas en ViT puro, como ViTAD~\cite{zhang2025exploring}, y aproximaciones híbridas que combinan CNNs y Transformers, como DefT~\cite{wang2022defect}. Zhang et al. argumentan convincentemente que las arquitecturas más simples, sin módulos complejos diseñados manualmente, pueden alcanzar rendimiento estado del arte mientras ofrecen ventajas en términos de reproducibilidad, mantenibilidad y eficiencia computacional. Su claim de que "plain Vision Transformers are simpler, more effective, and elegant" desafía la tendencia hacia complejidad arquitectural creciente.
+
+Sin embargo, Wang et al. presentan evidencia de que las arquitecturas híbridas pueden ofrecer ventajas en escenarios específicos, particularmente cuando la localización precisa de defectos pequeños es crítica. La combinación de información local (CNN) y global (Transformer) puede ser beneficiosa en casos de fondos complejos o pseudo-defectos difíciles de distinguir. La elección entre estas aproximaciones probablemente dependerá de las características específicas del problema de detección y los datos disponibles.
+
+\subsection{Brecha entre investigación y aplicación práctica}
+
+A pesar de los avances significativos reportados en la literatura académica, existe una brecha notable entre los resultados experimentales en datasets benchmark y la implementación en entornos industriales reales. El trabajo de Huang et al.~\cite{huang2025semiconductor} es excepcional precisamente porque documenta un caso de deployment real en una planta de fabricación de semiconductores. La mayoría de investigaciones se limitan a evaluación en MVTec AD y otros benchmarks estándar, sin validación en condiciones de producción.
+
+Alber et al.~\cite{alber2024evaluating} reconocen explícitamente esta problemática al enfocarse en proporcionar guidelines prácticas considerando restricciones reales de hardware y requisitos de tiempo de inferencia. Su trabajo sugiere que la comunidad académica debe prestar mayor atención a aspectos pragmáticos del deployment: eficiencia computacional, tiempo de inferencia, consumo de memoria, y facilidad de adaptación a nuevos tipos de defectos.
+
+\subsection{Limitación de datos etiquetados como desafío persistente}
+
+La dependencia de datos etiquetados continúa siendo el desafío más significativo para aplicación industrial de sistemas de detección de anomalías. Aunque técnicas de transfer learning y aprendizaje auto-supervisado mitigan parcialmente esta limitación, la mayoría de métodos aún requieren algún nivel de supervisión para adaptación a dominios específicos. Los resultados de Huang et al.~\cite{huang2025semiconductor}, demostrando accuracy superior al 90\% con menos de 15 imágenes por clase mediante DINOv2, representan un avance significativo hacia few-shot learning práctico.
+
+El enfoque zero-shot de Le-Gia y Ahn~\cite{legia2025consistent} busca eliminar completamente la necesidad de datos etiquetados, pero introduce sus propias limitaciones, particularmente en el manejo de anomalías consistentes. La generación de pseudo-anomalías, explorada por Nafez et al.~\cite{nafez2025patchguard}, ofrece una vía alternativa para aumentar datos de entrenamiento, aunque requiere diseño cuidadoso para garantizar relevancia respecto a defectos reales.
+
+
+\section{Identificación de oportunidades de investigación}
+
+\subsection{Validación en componentes electrónicos diversos}
+
+La revisión del estado del arte revela que, mientras existen validaciones en semiconductores~\cite{huang2025semiconductor} y superficies industriales genéricas~\cite{zhang2025exploring,wang2022defect}, existe una carencia de estudios sistemáticos en componentes electrónicos diversos tales como placas de circuito impreso (PCBs), conectores, carcasas, y componentes SMD. Cada uno de estos elementos presenta características visuales particulares y tipos de defectos específicos que requieren validación experimental independiente.
+
+La aplicación de Vision Transformers preentrenados con DINOv2 a esta variedad de componentes electrónicos representa una oportunidad para extender los hallazgos de Huang et al.~\cite{huang2025semiconductor} más allá del dominio específico de semiconductores. La pregunta de investigación relevante es: ¿mantiene DINOv2 su efectividad few-shot cuando se transfiere a PCBs con patrones de soldadura complejos, o a conectores con geometrías tridimensionales, o a componentes SMD miniaturizados?
+
+\subsection{Benchmarking sistemático de arquitecturas transfer learning}
+
+Aunque Alber et al.~\cite{alber2024evaluating} proporcionan una evaluación comprehensiva de modelos ViT combinados con algoritmos de detección de anomalías, su trabajo se centra en configuraciones específicas. Existe oportunidad para un benchmarking más exhaustivo que compare sistemáticamente: diferentes variantes de ViT preentrenado (DINOv2, ViT-L, modelos más pequeños para edge deployment), estrategias de fine-tuning (full fine-tuning vs. parameter-efficient methods), y métodos de detección de anomalías (reconstruction-based, memory-bank, distribution-based).
+
+Este benchmarking debería incluir no solo métricas de accuracy (AUROC, F1, Average Precision), sino también métricas prácticas como tiempo de inferencia, consumo de memoria, y número de parámetros, reconociendo el trade-off identificado por Alber et al. entre rendimiento y eficiencia computacional.
+
+\subsection{Sistemas de demostración con interpretabilidad visual}
+
+La mayoría de trabajos revisados reportan métricas cuantitativas de rendimiento pero proporcionan análisis limitado de interpretabilidad. Los mecanismos de atención en Vision Transformers ofrecen una oportunidad única para visualización de regiones relevantes para la decisión del modelo. Nafez et al.~\cite{nafez2025patchguard} proporcionan insights teóricos sobre cómo los mecanismos de atención contribuyen a robustez, pero hace falta trabajo aplicado que desarrolle sistemas de demostración interactivos donde los mapas de atención se presenten de forma interpretable para operadores industriales.
+
+Un sistema práctico debería no solo detectar anomalías sino también proporcionar explicaciones visuales comprensibles, indicando qué regiones de la imagen contribuyeron a la decisión. Esta funcionalidad es crítica para aceptación por parte de usuarios finales en entornos industriales, donde la confianza en el sistema depende de la capacidad de comprender y validar sus decisiones.
+
+\subsection{Adaptación a datos extremadamente limitados}
+
+Si bien Huang et al.~\cite{huang2025semiconductor} demuestran que menos de 15 imágenes por clase pueden ser suficientes con DINOv2, la pregunta de cuán bajo puede reducirse este número sin degradación significativa de rendimiento permanece abierta. En contextos educativos o de prototipado rápido, donde la captura de datos puede estar aún más limitada (por ejemplo, 5-10 imágenes por tipo de componente), es relevante investigar técnicas de data augmentation específicas para imágenes industriales, combinadas con transfer learning agresivo.
+
+Esta línea de investigación conecta con el trabajo de Le-Gia y Ahn~\cite{legia2025consistent} sobre detección zero-shot, pero con un enfoque en escenarios one-shot o few-shot extremos donde se dispone de muy pocas muestras etiquetadas pero se busca rendimiento superior al zero-shot puro.
+
+
+\section{Síntesis y justificación del trabajo propuesto}
+
+La revisión sistemática del estado del arte revela un campo en rápida evolución donde Vision Transformers han demostrado superioridad sobre arquitecturas convolucionales tradicionales para detección de anomalías industriales. Los modelos preentrenados mediante aprendizaje auto-supervisado, particularmente DINOv2, han emergido como opción preferente por su capacidad de transferir conocimiento visual general a dominios específicos con datos limitados~\cite{huang2025semiconductor,legia2025consistent,khan2024survey}.
+
+Sin embargo, persisten brechas significativas entre investigación académica y aplicación práctica. La validación en componentes electrónicos diversos es limitada, existiendo pocas demostraciones de sistemas funcionales que integren detección con interpretabilidad visual. El benchmarking sistemático de diferentes estrategias de transfer learning y arquitecturas ViT bajo restricciones prácticas de hardware y datos es insuficiente.
+
+El trabajo propuesto en este \gls{TFG} busca contribuir a cerrar estas brechas mediante: (1) aplicación de Vision Transformers preentrenados con DINOv2 a detección de anomalías en componentes electrónicos diversos (PCBs, conectores, SMD), (2) benchmarking sistemático comparando arquitecturas ViT con métodos tradicionales bajo condiciones de datos limitados realistas, (3) validación práctica con componentes reales capturados en condiciones variables, y (4) desarrollo de un sistema de demostración que integre detección con visualización de mapas de atención para interpretabilidad.
+
+Esta aproximación metodológica se fundamenta directamente en los hallazgos del estado del arte: utiliza DINOv2 motivado por los resultados de Huang et al.~\cite{huang2025semiconductor} en semiconductores y Le-Gia y Ahn~\cite{legia2025consistent} en zero-shot; adopta una arquitectura basada en ViT puro siguiendo la filosofía de simplicidad de Zhang et al.~\cite{zhang2025exploring}; considera cuidadosamente el trade-off entre rendimiento y eficiencia computacional identificado por Alber et al.~\cite{alber2024evaluating}; y se apoya en el marco teórico de aprendizaje auto-supervisado establecido por Khan et al.~\cite{khan2024survey}.
+
+La contribución esperada es tanto práctica como metodológica: demostración de viabilidad de transfer learning few-shot en componentes electrónicos diversos con validación cuantitativa rigurosa, y provisión de un sistema funcional que sirva como referencia para futuras implementaciones en entornos educativos o industriales de pequeña escala donde los datos etiquetados son inherentemente limitados.
