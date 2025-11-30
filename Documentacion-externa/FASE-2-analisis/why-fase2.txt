@@ -1,0 +1,47 @@
+5. Experimentación Fase 2: Exploración de Estrategias Multimodales y Validación de Límites Visuales
+5.1. Motivación y Contexto: La Búsqueda del "Techo" Visual
+La culminación de la Fase 1 de este proyecto de investigación representó un hito significativo en la validación de arquitecturas basadas en Vision Transformers para la inspección industrial. El modelo propuesto, DEIMv2 potenciado por el backbone DINOv3, estableció un rendimiento de referencia (baseline) sobresaliente con un mAP de 0.785 (COCO IoU .50:.95). Este resultado demostró empíricamente la superioridad de los mecanismos de auto-atención frente a las redes convolucionales tradicionales (ResNet, EfficientNet) en la extracción de características complejas.
+
+Sin embargo, el análisis pormenorizado de los errores residuales del modelo planteó una nueva interrogante científica. Se observó una persistencia de fallos de clasificación en defectos topológicamente ambiguos. Específicamente, anomalías como "Roturas/Fracturas" y "Rayones Profundos" presentan firmas visuales de bajo nivel (frecuencias espaciales altas, bordes lineales, bajo contraste) extremadamente similares.
+
+Surge entonces la hipótesis motriz de esta Fase 2: ¿Es posible superar el techo de rendimiento visual mediante la inyección de información semántica externa? Esta fase se planteó no como una sustitución, sino como un intento de desambiguación semántica, bajo la premisa de que una descripción lingüística (e.g., "separación física del material" vs "abrasión superficial") podría aportar una señal ortogonal que el análisis de píxeles por sí solo no logra capturar.
+
+5.2. Análisis Estratégico de Implementación
+Tal y como se documentó en el informe técnico FASE2_Estrategias_Implementacion.md, el abordaje de la multimodalidad en un entorno de Small Data (datasets industriales limitados) presenta riesgos severos de sobreajuste (overfitting) y olvido catastrófico. Para mitigar estos riesgos, se evaluaron tres estrategias de implementación distintas antes de proceder:
+
+5.2.1. Opciones Descartadas
+Opción 1: Entrenamiento Multimodal Conjunto (Joint Training from Scratch)
+
+Descripción: Esta estrategia implicaba entrenar tanto el backbone visual (DINOv3) como el encoder textual y las cabeceras de fusión simultáneamente desde cero o con pesos aleatorios.
+
+Motivo del Descarte: Esta opción fue rechazada categóricamente debido a la escasez de datos. Los modelos de visión-lenguaje (VLM) requieren millones de pares imagen-texto para aprender una alineación latente robusta. Aplicar esto a un dataset industrial de unos pocos miles de imágenes habría resultado en un modelo incapaz de generalizar, memorizando ruido en lugar de características. Además, habría invalidado el valioso pre-entrenamiento auto-supervisado de DINOv3.
+
+Opción 2: Fusión Temprana o Concatenación de Características (Early Fusion)
+
+Descripción: Consistía en concatenar los embeddings de texto directamente al vector de características visuales antes de entrar al Transformer Encoder de DEIMv2.
+
+Motivo del Descarte: Se consideró una estrategia invasiva y destructiva. Al alterar la dimensionalidad y la distribución estadística de la entrada que recibe el encoder, se rompería la compatibilidad con los pesos pre-entrenados en la Fase 1. Esto obligaría a re-entrenar gran parte de la red para "adaptarla" a la nueva entrada híbrida, incurriendo en un alto riesgo de Olvido Catastrófico (degradación de la capacidad de detección visual básica).
+
+5.2.2. Opción Seleccionada: Refinamiento Progresivo (Residual Learning)
+Basándonos en el análisis anterior, se seleccionó la Opción 3, descrita como "Fine-tuning Progresivo con Fusión Residual".
+
+Fundamento Técnico: Esta estrategia respeta el principio de Curriculum Learning. Se asume que el modelo visual ya es un "experto". Por tanto, la multimodalidad se implementa como un módulo aditivo ligero que solo interviene para corregir o refinar los logits de salida.
+
+Mecanismo Matemático:
+$$Logits_{final} = Logits_{visual} + \alpha \cdot f(V, T)$$
+Donde $\alpha$ es un parámetro de control (gating). Esta arquitectura garantiza teóricamente la estabilidad: si la información textual es irrelevante o ruidosa, el modelo puede aprender a hacer $\alpha \to 0$, colapsando al baseline visual original y preservando el rendimiento de la Fase 1.
+
+5.3. Ejecución Experimental y MetodologíaPara validar la opción seleccionada, se implementó un riguroso protocolo experimental diseñado para favorecer la integración multimodal:Arquitectura de Fusión Latente: Se desarrolló el módulo MultimodalFusionModule, que proyecta los embeddings visuales al espacio semántico de un encoder CLIP congelado, calculando la afinidad mediante similitud coseno.Inicialización "Zero-Start": Para evitar el "choque" inicial de introducir una nueva modalidad, se inicializó el parámetro de mezcla $\alpha$ en 0.0 y los pesos de proyección con varianza mínima. Esto aseguró que el entrenamiento comenzara exactamente en el punto de rendimiento máximo de la Fase 1 (mAP 0.785).Protocolo de Evaluación Híbrida: Se diseñó una métrica compuesta ($0.7 \cdot mAP + 0.3 \cdot Recall_{crítico}$) para guiar el Early Stopping, priorizando la mejora en defectos difíciles sobre la precisión global.
+
+5.4. Resultados y Discusión: La Paradoja MultimodalTras la ejecución de múltiples ciclos de entrenamiento con hiperparámetros ajustados (paciencia extendida, learning rates conservadores), los resultados empíricos contradijeron la hipótesis de mejora.Se observó un fenómeno consistente de Interferencia Semántica:Saturación del Baseline: En ningún momento del entrenamiento el modelo multimodal logró superar el mAP de 0.785 del modelo puramente visual.Degradación por Ruido: A medida que el optimizador forzaba al modelo a atender a la señal textual (aumentando $\alpha$), el rendimiento en validación descendía progresivamente hacia valores de ~0.67 mAP.Overfitting Multimodal: Los logs mostraron una caída drástica en la función de pérdida de entrenamiento (Training Loss), mientras que las métricas de validación se estancaban o empeoraban. Esto indica que el modelo estaba utilizando los embeddings de texto para "memorizar" los ejemplos de entrenamiento, en lugar de aprender características generalizables.Interpretación Científica del Resultado Negativo
+Estos resultados permiten extraer una conclusión técnica de alto valor para la línea de investigación: La Hipótesis de Ortogonalidad Semántica no se cumple en este dominio específico.
+
+La información contenida en los prompts textuales (e.g., "bordes irregulares") no aporta una señal independiente o complementaria que el backbone DINOv3 no haya captado ya. Por el contrario, al forzar la fusión de estas dos modalidades, se introduce ruido en un espacio latente que ya estaba altamente optimizado. El modelo visual ha demostrado ser suficiente y completo para la tarea; la "ambigüedad" entre defectos no es un problema de falta de contexto semántico, sino una limitación intrínseca de la resolución visual o del etiquetado del dataset.
+
+5.5. Conclusión Final de la Fase 2
+La fase exploratoria de refinamiento multimodal concluye con la validación, por vía negativa, de la robustez de la arquitectura propuesta en la Fase 1.
+
+Se determina que la estrategia óptima para el despliegue industrial es la arquitectura Unimodal (DEIMv2 + DINOv3). Esta configuración ofrece el equilibrio ideal entre precisión (mAP 0.785), eficiencia computacional (sin la sobrecarga de encoders de texto) y capacidad de generalización. La experimentación realizada en esta Fase 2, aunque no resultó en un aumento de métricas, fue crucial para descartar la complejidad innecesaria y confirmar que el "techo" de rendimiento actual está limitado por los datos, no por la arquitectura del modelo.
+
+Por consiguiente, se da por cerrada la investigación multimodal, consolidando el modelo visual de la Fase 1 como la contribución final y definitiva de este trabajo.
+

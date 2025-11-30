@@ -1,0 +1,5 @@
+Falta muuuucha documentacion de como ha sido el proceso de curacion de dataset.
+Intentar seguir una direccion organizada de como ha isdo el flujo del proceso completo.
+
+Explicacion de los datasets original, contextualizacion, analisis de los mismos con scripts de python para ver cómo son.
+Explicacion de todas las fases que han sido implementadas para llegar a la curación completa del dataset.
