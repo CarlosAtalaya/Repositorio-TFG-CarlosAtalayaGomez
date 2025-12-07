@@ -1,0 +1,33 @@
+# Archivos auxiliares de LaTeX (basura generada al compilar)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.lot
+*.lof
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.acn
+*.glo
+*.ist
+*.w18
+*.pyg
+
+# Archivos generados por minted (coloreado de código)
+_minted*
+*.pyg
+
+# Archivos PDF generados (el resultado final no se suele subir, se genera)
+*.pdf
+
+# Archivos convertidos automáticamente (imágenes)
+*-eps-converted-to.pdf
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+
