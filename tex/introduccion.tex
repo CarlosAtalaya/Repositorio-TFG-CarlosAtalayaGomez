@@ -1,37 +1,56 @@
 \chapter{Introducción} 
 \label{ch:introduccion}
 
-\avisoLocalizacionArchivo 
+La inspección visual de componentes manufacturados constituye una etapa crítica en los procesos de control de calidad industrial. Tradicionalmente, esta tarea ha dependido de operadores humanos que examinan productos en busca de defectos superficiales, anomalías estructurales o desviaciones respecto a especificaciones de diseño. Sin embargo, la inspección manual presenta limitaciones inherentes: fatiga del operador, variabilidad en los criterios de aceptación, dificultad para detectar defectos sutiles, y restricciones de escalabilidad que resultan incompatibles con los volúmenes de producción de la industria moderna~\cite{alber2024evaluating}.
 
-En este capítulo debes introducir el problema sin divagar, sin copiar de otros documentos y sin utilizar un lenguaje excesivamente técnico.  Tampoco utilices un lenguaje informal.  Este capítulo debería convencer al cliente de que el proyecto merece la pena.  Es decir, es un problema real y no está resuelto completamente.
+El advenimiento del aprendizaje profundo ha transformado radicalmente el campo de la visión por computador, posibilitando sistemas de inspección automática capaces de igualar o superar el rendimiento humano en tareas específicas de detección. Las Redes Neuronales Convolucionales (\acrshort{CNN}) han dominado este ámbito durante la última década, demostrando eficacia en la extracción de características visuales relevantes para discriminación de defectos~\cite{wang2022defect}. No obstante, las arquitecturas convolucionales presentan una limitación fundamental: su capacidad para capturar dependencias globales está restringida por el tamaño del campo receptivo, lo que dificulta la detección de anomalías cuya identificación requiere comprensión del contexto global de la imagen.
 
-Debe tenerse siempre presente que el cliente es el que paga.  En el TFG el que paga es el tribunal, en forma de calificación.  Así que a quien hay que convencer es a los miembros del tribunal.  El tribunal no lo conocerás a priori.  Por eso la memoria debe estar escrita para que la entienda alguien que no es especialista en el campo de aplicación.  Pero eso no implica que se toleren la falta de rigor o la falta de argumentación técnica.  Solo implica que los argumentos específicos hay que explicarlos o citar la fuente que los explica.
+En paralelo, el paradigma del aprendizaje supervisado tradicional enfrenta un obstáculo práctico significativo en entornos industriales: la escasez de datos etiquetados de defectos. Los procesos de manufactura optimizados generan productos defectuosos con baja frecuencia, resultando en conjuntos de datos altamente desbalanceados donde las muestras anómalas son escasas. Además, el etiquetado manual de defectos requiere expertise técnico especializado y resulta costoso en tiempo y recursos~\cite{huang2025semiconductor}. Esta problemática ha impulsado el desarrollo de aproximaciones que reduzcan la dependencia de supervisión explícita.
 
-Redacta la introducción al final del TFG, cuando tengas elaborado el capítulo de antecedentes, los resultados y su discusión.  De esta forma podrás evitar repetir argumentos que ya están en esos capítulos.  La introducción debe introducir también el contexto en el que se desarrolla el TFG.  Divide el documento en secciones y subsecciones para organizar el contenido del capítulo.  Utiliza preferentemente frases cortas.
+
+\section{Vision Transformers y aprendizaje auto-supervisado}
+\label{sec:vit-ssl}
+
+La arquitectura \acrfull{ViT}, introducida por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. A diferencia de las \acrshort{CNN}, los transformers procesan las imágenes mediante mecanismos de atención que capturan relaciones entre todas las regiones de forma simultánea, sin las restricciones de localidad inherentes a las operaciones de convolución. Esta capacidad de modelar dependencias globales resulta particularmente valiosa para detección de anomalías, donde defectos sutiles pueden manifestarse en patrones que requieren comprensión del contexto completo de la imagen.
+
+El \acrfull{SSL} ha emergido como solución a la dependencia de datos etiquetados. Técnicas como DINOv2~\cite{oquab2024dinov2} permiten entrenar modelos que aprenden representaciones visuales robustas directamente de imágenes sin anotaciones, explotando las relaciones inherentes dentro de los datos como forma de supervisión. Los modelos preentrenados mediante \acrshort{SSL} pueden posteriormente adaptarse a tareas específicas mediante transfer learning, alcanzando rendimientos competitivos con volúmenes reducidos de datos etiquetados.
+
+Investigaciones recientes han validado la efectividad de este enfoque en contextos industriales reales. Huang et al.~\cite{huang2025semiconductor} demostraron que, utilizando DINOv2 como backbone, es posible alcanzar accuracies superiores al 90\% en clasificación de defectos de semiconductores con menos de 15 imágenes por clase. Este hallazgo tiene implicaciones profundas para la aplicabilidad práctica de sistemas de inspección automática en entornos donde el etiquetado de datos es inherentemente limitado.
+
+
+\section{Motivación y alcance del trabajo}
+\label{sec:motivacion}
+
+El presente \gls{TFG} se enmarca en la confluencia de estas dos tendencias: la adopción de arquitecturas \acrshort{ViT} para tareas de visión por computador industrial, y la explotación de modelos preentrenados mediante \acrshort{SSL} para mitigar las limitaciones de datos etiquetados. El objetivo principal es desarrollar y validar un sistema de detección de anomalías en componentes electrónicos basado en Vision Transformers, aplicando técnicas de transfer learning desde modelos preentrenados y evaluando su rendimiento mediante comparación sistemática con métodos tradicionales.
+
+La elección de componentes electrónicos como dominio de aplicación responde a su relevancia práctica y a la diversidad de tipos de defectos que presentan: soldaduras defectuosas en \acrlong{PCB}, corrosión en conectores, grietas en carcasas, o posicionamiento incorrecto de componentes \acrlong{SMD}. Esta variedad permite evaluar la capacidad de generalización del enfoque propuesto a través de diferentes categorías de anomalías.
+
+El trabajo se desarrolla con restricciones realistas de recursos computacionales (\acrshort{GPU} RTX 4070 con 12GB de \acrshort{VRAM}), lo que garantiza que las soluciones propuestas sean reproducibles y aplicables en contextos académicos o industriales de pequeña escala. Se prioriza la validación práctica sobre la complejidad arquitectural, siguiendo la filosofía de Zhang et al.~\cite{zhang2025exploring} de que arquitecturas \acrshort{ViT} simples, sin módulos complejos diseñados manualmente, pueden alcanzar rendimiento estado del arte en detección de anomalías.
 
 
 \section{Organización de la memoria} 
 \label{sec:organizacion-memoria}
 
-La organización de este documento responde a un documento científico-técnico. Se descompone en los siguientes capítulos.
+La organización de este documento responde a un documento científico-técnico. Se estructura en los siguientes capítulos:
 
 \begin{description}
-    \item[\autoref{ch:objetivos}] Enumera y justifica los objetivos del proyecto y establece los límites intrínsecos y extrínsecos de ejecución del TFG.
-    \item[\autoref{ch:antecedentes}] Analiza los antecedentes y estado del arte en relación al tema del proyecto.
-    \item[\autoref{ch:desarrollo}] Describe todo el proceso de desarrollo del TFG.  Esto incluye la metodología de trabajo empleada y las diferentes etapas o iteraciones que se han llevado a cabo.  No dudes en descomponer el capítulo en varios si aglutina demasiado material.
-    \item[\autoref{ch:resultados}] Describe en detalle los resultados obtenidos y las pruebas realizadas. Discute los resultados en relación a los objetivos del proyecto.
-    \item[\autoref{ch:conclusiones}] Recopila las principales conclusiones del proyecto y comenta las líneas de trabajo futuro, en caso de que se contemplen.
-    \item[\deschyperlink{ch:anexos}{Anexos}] Complementan la información del cuerpo del documento con información técnica útil para reproducir los resultados, pero innecesaria para comprender en su totalidad el TFG realizado.
+    \item[\autoref{ch:objetivos}] Define los objetivos general y específicos del proyecto, estableciendo el alcance y las limitaciones reconocidas del trabajo. Se justifica cada objetivo en relación a las oportunidades identificadas en el estado del arte.
+    
+    \item[\autoref{ch:antecedentes}] Presenta una revisión sistemática del estado del arte en detección de anomalías industriales mediante Vision Transformers. Se analizan las arquitecturas más relevantes, las técnicas de aprendizaje auto-supervisado, y se identifican las brechas de investigación que motivan este trabajo.
+    
+    \item[\autoref{ch:desarrollo}] Describe el proceso de desarrollo del sistema, incluyendo la metodología de trabajo empleada, la selección y configuración de arquitecturas, el diseño del pipeline de entrenamiento, y las diferentes iteraciones experimentales realizadas.
+    
+    \item[\autoref{ch:resultados}] Presenta los resultados experimentales obtenidos en los diferentes datasets utilizados, incluyendo el benchmarking comparativo con métodos tradicionales. Se discuten los resultados en relación a los objetivos planteados y al estado del arte.
+    
+    \item[\autoref{ch:conclusiones}] Sintetiza las principales conclusiones del trabajo, valora el grado de cumplimiento de los objetivos, y propone líneas de trabajo futuro para extensión de la investigación.
+    
+    \item[\deschyperlink{ch:anexos}{Anexos}] Complementan la información del cuerpo del documento con detalles técnicos de implementación, configuraciones experimentales, y material adicional para reproducibilidad de resultados.
+    
     \item[\deschyperlink{ch:bibliografia}{Bibliografía}] Recopila las referencias bibliográficas utilizadas en este documento.
 \end{description}
 
-\warning{La normativa de la EIIA no te obliga a usar una estructura fija.  Adáptala como quieras a tu TFG.  Puedes reordenar capítulos, mezclarlos, dividirlos, etc.  Por ejemplo, es frecuente poner unos antecedentes antes de los objetivos, que definen el contexto del TFG, y desarrollar el estado de la cuestión después de los objetivos.}
-
-\warning{Al finalizar el resto de los capítulos revisa esta descripción del documento para que coincida con lo que realmente contiene la memoria.  Por ejemplo, es frecuente fusionar varios capítulos en uno cuando son muy pequeños.  También es frecuente lo contrario, dividir un capítulo en varios cuando es muy extenso.}
 
 \section{Repositorio de información}
 \label{sec:repositorio}
 
-\warning{Es muy útil tanto para la ejecución como para la evaluación disponer de un repositorio para almacenar las sucesivas versiones del documento y de todo el material generado durante el proyecto.  La UCLM incorpora \href{https://github.com}{GitHub} como servicio institucional. Si no utilizas un repositorio quita esta sección.}
-
-Todo el material generado durante la ejecución de este proyecto está disponible en el repositorio \thegitrepo{}.  El material incluye el código \LaTeX{} del presente documento, el código fuente de los programas realizados o modificados, y todos los datos generados en la evaluación de resultados.
+Todo el material generado durante la ejecución de este proyecto está disponible en el repositorio \thegitrepo{}. El material incluye el código \LaTeX{} del presente documento, el código fuente de los programas desarrollados para entrenamiento y evaluación de modelos, los scripts de preprocesamiento de datos, y todos los resultados experimentales generados durante la investigación. Se ha priorizado la documentación exhaustiva del código y los procedimientos para facilitar la reproducibilidad de los experimentos y posibilitar extensiones futuras del trabajo.

@@ -119,33 +119,135 @@
 }
 
 % ============================================================================
-% REFERENCIAS ADICIONALES RECOMENDADAS (para futuras inclusiones)
+% ARQUITECTURAS FUNDACIONALES
 % ============================================================================
 
-% Nota: Estas referencias son mencionadas en tu planning original pero no
-% están en el JSON actual. Deberías buscarlas y añadirlas cuando las necesites.
+@inproceedings{dosovitskiy2021vit,
+  title     = {An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
+  author    = {Dosovitskiy, Alexey and Beyer, Lucas and Kolesnikov, Alexander and Weissenborn, Dirk and Zhai, Xiaohua and Unterthiner, Thomas and Dehghani, Mostafa and Minderer, Matthias and Heigold, Georg and Gelly, Sylvain and Uszkoreit, Jakob and Houlsby, Neil},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2010.11929},
+  keywords  = {ViT, vision transformer, original paper}
+}
 
-% @inproceedings{roth2022patchcore,
-%   title     = {Towards Total Recall in Industrial Anomaly Detection},
-%   author    = {Roth, Karsten and Pemula, Latha and Zepeda, Joaquin and Schölkopf, Bernhard and Brox, Thomas and Gehler, Peter},
-%   booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-%   pages     = {14318--14328},
-%   year      = {2022},
-%   keywords  = {PatchCore, memory bank, GOLD STANDARD baseline}
-% }
+@inproceedings{he2016resnet,
+  title     = {Deep Residual Learning for Image Recognition},
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {770--778},
+  year      = {2016},
+  doi       = {10.1109/CVPR.2016.90},
+  keywords  = {ResNet, residual learning, CNN}
+}
 
-% @article{dosovitskiy2021vit,
-%   title   = {An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
-%   author  = {Dosovitskiy, Alexey and Beyer, Lucas and Kolesnikov, Alexander and others},
-%   journal = {ICLR},
-%   year    = {2021},
-%   keywords = {ViT original paper}
-% }
+@inproceedings{tan2019efficientnet,
+  title     = {EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks},
+  author    = {Tan, Mingxing and Le, Quoc V.},
+  booktitle = {Proceedings of the 36th International Conference on Machine Learning (ICML)},
+  pages     = {6105--6114},
+  year      = {2019},
+  url       = {https://arxiv.org/abs/1905.11946},
+  keywords  = {EfficientNet, model scaling, CNN}
+}
 
-% @article{oquab2024dinov2,
-%   title   = {DINOv2: Learning Robust Visual Features without Supervision},
-%   author  = {Oquab, Maxime and Darcet, Timothée and others},
-%   journal = {arXiv preprint},
-%   year    = {2024},
-%   keywords = {DINOv2 original, self-supervised}
-% }
+% ============================================================================
+% APRENDIZAJE AUTO-SUPERVISADO (SSL)
+% ============================================================================
+
+@article{oquab2024dinov2,
+  title     = {DINOv2: Learning Robust Visual Features without Supervision},
+  author    = {Oquab, Maxime and Darcet, Timothée and Moutakanni, Théo and Vo, Huy and Szafraniec, Marc and Khalidov, Vasil and Fernandez, Pierre and Haziza, Daniel and Massa, Francisco and El-Nouby, Alaaeldin and Assran, Mahmoud and Ballas, Nicolas and Galuba, Wojciech and Howes, Russell and Huang, Po-Yao and Li, Shang-Wen and Misra, Ishan and Rabbat, Michael and Sharma, Vasu and Synnaeve, Gabriel and Xu, Hu and Jégou, Hervé and Mairal, Julien and Labatut, Patrick and Joulin, Armand and Bojanowski, Piotr},
+  journal   = {Transactions on Machine Learning Research},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2304.07193},
+  keywords  = {DINOv2, self-supervised, vision features}
+}
+
+@inproceedings{caron2021dino,
+  title     = {Emerging Properties in Self-Supervised Vision Transformers},
+  author    = {Caron, Mathilde and Touvron, Hugo and Misra, Ishan and Jégou, Hervé and Mairal, Julien and Bojanowski, Piotr and Joulin, Armand},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  pages     = {9650--9660},
+  year      = {2021},
+  doi       = {10.1109/ICCV48922.2021.00951},
+  keywords  = {DINO, self-distillation, vision transformers}
+}
+
+@inproceedings{chen2020simclr,
+  title     = {A Simple Framework for Contrastive Learning of Visual Representations},
+  author    = {Chen, Ting and Kornblith, Simon and Norouzi, Mohammad and Hinton, Geoffrey},
+  booktitle = {Proceedings of the 37th International Conference on Machine Learning (ICML)},
+  pages     = {1597--1607},
+  year      = {2020},
+  url       = {https://arxiv.org/abs/2002.05709},
+  keywords  = {SimCLR, contrastive learning, self-supervised}
+}
+
+@inproceedings{he2020moco,
+  title     = {Momentum Contrast for Unsupervised Visual Representation Learning},
+  author    = {He, Kaiming and Fan, Haoqi and Wu, Yuxin and Xie, Saining and Girshick, Ross},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {9729--9738},
+  year      = {2020},
+  doi       = {10.1109/CVPR42600.2020.00975},
+  keywords  = {MoCo, momentum contrast, self-supervised}
+}
+
+@inproceedings{he2022mae,
+  title     = {Masked Autoencoders Are Scalable Vision Learners},
+  author    = {He, Kaiming and Chen, Xinlei and Xie, Saining and Li, Yanghao and Dollár, Piotr and Girshick, Ross},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {16000--16009},
+  year      = {2022},
+  doi       = {10.1109/CVPR52688.2022.01553},
+  keywords  = {MAE, masked autoencoder, self-supervised}
+}
+
+@inproceedings{devlin2019bert,
+  title     = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author    = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  booktitle = {Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics (NAACL-HLT)},
+  pages     = {4171--4186},
+  year      = {2019},
+  doi       = {10.18653/v1/N19-1423},
+  keywords  = {BERT, language model, transformer}
+}
+
+% ============================================================================
+% INTERPRETABILIDAD Y VISUALIZACIÓN
+% ============================================================================
+
+@inproceedings{selvaraju2017gradcam,
+  title     = {Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Class Activation Mapping},
+  author    = {Selvaraju, Ramprasaath R. and Cogswell, Michael and Das, Abhishek and Vedantam, Ramakrishna and Parikh, Devi and Batra, Dhruv},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision (ICCV)},
+  pages     = {618--626},
+  year      = {2017},
+  doi       = {10.1109/ICCV.2017.74},
+  keywords  = {GradCAM, explainability, visualization}
+}
+
+% ============================================================================
+% DATASETS Y BENCHMARKS
+% ============================================================================
+
+@inproceedings{bergmann2019mvtec,
+  title     = {MVTec AD -- A Comprehensive Real-World Dataset for Unsupervised Anomaly Detection},
+  author    = {Bergmann, Paul and Fauser, Michael and Sattlegger, David and Steger, Carsten},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {9592--9600},
+  year      = {2019},
+  doi       = {10.1109/CVPR.2019.00982},
+  keywords  = {MVTec AD, anomaly detection, benchmark, industrial}
+}
+
+@inproceedings{roth2022patchcore,
+  title     = {Towards Total Recall in Industrial Anomaly Detection},
+  author    = {Roth, Karsten and Pemula, Latha and Zepeda, Joaquin and Schölkopf, Bernhard and Schiele, Bernt and Brox, Thomas and Gehler, Peter},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {14318--14328},
+  year      = {2022},
+  doi       = {10.1109/CVPR52688.2022.01392},
+  keywords  = {PatchCore, memory bank, anomaly detection}
+}

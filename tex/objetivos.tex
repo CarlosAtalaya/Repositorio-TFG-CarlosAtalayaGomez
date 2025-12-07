@@ -20,7 +20,7 @@ Los objetivos específicos articulan el objetivo general en metas concretas y al
 
 \subsection{Implementación de sistema de detección basado en Vision Transformers}
 
-Implementar un sistema funcional de detección de anomalías industriales utilizando arquitecturas Vision Transformer preentrenadas, específicamente explorando modelos basados en aprendizaje auto-supervisado como DINOv2. Este objetivo implica:
+Implementar un sistema funcional de detección de anomalías industriales utilizando arquitecturas \acrlong{ViT} preentrenadas, específicamente explorando modelos basados en aprendizaje auto-supervisado como DINOv2~\cite{oquab2024dinov2}. Este objetivo implica:
 
 \begin{itemize}
     \item Seleccionar y configurar el modelo base preentrenado más apropiado considerando el balance entre capacidad representacional, eficiencia computacional y facilidad de adaptación a dominios específicos.
@@ -37,7 +37,7 @@ La consecución de este objetivo proporcionará un sistema base sobre el cual re
 Realizar un benchmarking sistemático del sistema desarrollado frente a métodos tradicionales de detección de anomalías basados en arquitecturas convolucionales, con el propósito de evaluar objetivamente las ventajas y limitaciones del enfoque transformer en el contexto específico de inspección industrial. Este objetivo comprende:
 
 \begin{itemize}
-    \item Implementar arquitecturas baseline representativas del estado del arte en detección de anomalías, incluyendo modelos basados en ResNet y EfficientNet, garantizando que las comparaciones se realicen bajo condiciones experimentales equivalentes en términos de datos de entrenamiento, procedimientos de validación y métricas de evaluación.
+    \item Implementar arquitecturas baseline representativas del estado del arte en detección de anomalías, incluyendo modelos basados en ResNet~\cite{he2016resnet} y EfficientNet~\cite{tan2019efficientnet}, garantizando que las comparaciones se realicen bajo condiciones experimentales equivalentes en términos de datos de entrenamiento, procedimientos de validación y métricas de evaluación.
     
     \item Evaluar el rendimiento de todos los modelos mediante un conjunto comprehensivo de métricas que capture diferentes aspectos de la capacidad de detección: precisión de clasificación (accuracy), balance entre sensibilidad y especificidad (F1-score), capacidad de discriminación (AUC-ROC), y calidad de localización de anomalías cuando sea aplicable.
     
@@ -51,7 +51,7 @@ Este análisis comparativo proporcionará evidencia empírica sobre las condicio
 Validar el sistema desarrollado en datasets de referencia ampliamente utilizados en la literatura de detección de anomalías industriales, particularmente MVTec AD, con el objetivo de situar los resultados obtenidos en el contexto del estado del arte y facilitar la comparación con trabajos previos. Este objetivo incluye:
 
 \begin{itemize}
-    \item Entrenar y evaluar el modelo propuesto en MVTec AD, dataset que constituye el benchmark de facto en detección de anomalías industriales y que permite comparación directa con los numerosos métodos publicados en la literatura~\cite{zhang2025exploring,alber2024evaluating}.
+    \item Entrenar y evaluar el modelo propuesto en MVTec AD~\cite{bergmann2019mvtec}, dataset que constituye el benchmark de facto en detección de anomalías industriales y que permite comparación directa con los numerosos métodos publicados en la literatura~\cite{zhang2025exploring,alber2024evaluating}.
     
     \item Analizar el rendimiento del sistema en diferentes categorías de objetos y tipos de defectos presentes en el dataset, identificando fortalezas y debilidades del enfoque transformer en función de las características visuales específicas de cada caso.
     
@@ -65,7 +65,7 @@ La validación en datasets estándar es esencial para establecer la validez cien
 Desarrollar un sistema de demostración que valide la aplicabilidad práctica del enfoque propuesto mediante detección de anomalías en componentes electrónicos reales capturados en condiciones no controladas de laboratorio. Este objetivo contempla:
 
 \begin{itemize}
-    \item Crear un dataset específico de componentes electrónicos diversos (placas de circuito impreso, conectores, componentes SMD, carcasas) mediante captura fotográfica, incluyendo tanto ejemplares sin defectos como con anomalías características de uso, manipulación o manufactura.
+    \item Crear un dataset específico de componentes electrónicos diversos (\acrlong{PCB}, conectores, componentes \acrlong{SMD}, carcasas) mediante captura fotográfica, incluyendo tanto ejemplares sin defectos como con anomalías características de uso, manipulación o manufactura.
     
     \item Aplicar transfer learning desde el modelo validado en datasets estándar hacia este dataset de componentes reales, evaluando la capacidad del sistema para adaptarse a nuevos dominios con volúmenes limitados de datos, aspecto crítico para aplicabilidad práctica en entornos industriales donde el etiquetado de datos es costoso.
     
@@ -85,7 +85,7 @@ Explotar los mecanismos de atención inherentes a la arquitectura Vision Transfo
     
     \item Analizar cualitativamente la correspondencia entre las regiones atendidas por el modelo y la localización de defectos reales, evaluando si los mecanismos de atención capturan efectivamente características visuales relevantes para discriminación de anomalías.
     
-    \item Comparar los patrones de atención del modelo transformer con técnicas de visualización aplicables a redes convolucionales (como GradCAM), caracterizando las diferencias en cómo ambos tipos de arquitecturas procesan información visual para detección de anomalías.
+    \item Comparar los patrones de atención del modelo transformer con técnicas de visualización aplicables a redes convolucionales (como GradCAM~\cite{selvaraju2017gradcam}), caracterizando las diferencias en cómo ambos tipos de arquitecturas procesan información visual para detección de anomalías.
 \end{itemize}
 
 La interpretabilidad no es meramente deseable sino frecuentemente necesaria para deployment de sistemas de machine learning en contextos críticos donde decisiones erróneas tienen consecuencias significativas. Este objetivo aborda esta necesidad práctica.
@@ -105,7 +105,7 @@ Los datasets considerados comprenden MVTec AD como benchmark estándar y un conj
 
 \subsection{Limitaciones reconocidas}
 
-El trabajo se desarrolla con recursos computacionales limitados (GPU RTX 4070 con 12GB VRAM), lo que restringe el tamaño de los modelos y batch sizes utilizables durante entrenamiento. Consecuentemente, la exploración se centra en variantes ViT-Base o similares, no en modelos transformer de gran escala que podrían ofrecer rendimiento superior pero resultan impracticables con el hardware disponible.
+El trabajo se desarrolla con recursos computacionales limitados (\acrshort{GPU} RTX 4070 con 12GB de \acrshort{VRAM}), lo que restringe el tamaño de los modelos y batch sizes utilizables durante entrenamiento. Consecuentemente, la exploración se centra en variantes ViT-Base o similares, no en modelos transformer de gran escala que podrían ofrecer rendimiento superior pero resultan impracticables con el hardware disponible.
 
 El dataset propio de componentes electrónicos, por razones prácticas, tendrá un tamaño limitado (orden de decenas de imágenes por tipo de componente), suficiente para demostración de transfer learning few-shot pero no para entrenamientos desde cero ni para análisis estadísticos exhaustivos de rendimiento en distribuciones de datos complejas.
 
