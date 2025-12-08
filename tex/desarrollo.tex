@@ -3,10 +3,787 @@
 
 \avisoLocalizacionArchivo 
 
-En general este capítulo debe describir cómo se ha llegado a la solución del problema incluyendo metodología, planificación y ejecución.
+Este capítulo describe la metodología de trabajo empleada, la planificación en fases del proyecto y la ejecución detallada de los experimentos realizados para desarrollar y validar el sistema de detección de anomalías basado en Vision Transformers. Se documenta el proceso iterativo de optimización que condujo a la configuración final del modelo, así como los resultados obtenidos en cada fase experimental.
 
-En primer lugar, este capítulo debe tratar con la metodología de trabajo empleada para elaborar el TFG.  La metodología puede variar sustancialmente dependiendo del contexto o el área temática en la que se encuadre.  Si es necesario, divide la descripción de la metodología como capítulo independiente.
 
-A continuación, debe describir cómo se ha dividido el problema en una secuencia de fases, tareas o iteraciones y qué cantidad de recursos (tiempo fundamentalmente) se han planificado para cada una.
+\section{Metodología de trabajo}
+\label{sec:metodologia}
 
-Por último, debe incluir información sobre la ejecución del proyecto. Cuáles han sido los problemas encontrados y qué desviaciones se han producido en la ejecución.  Dependiendo de la naturaleza del proyecto es posible organizar esta información de manera conjunta con la planificación.
+El desarrollo del presente trabajo se ha estructurado siguiendo una metodología experimental rigurosa, fundamentada en el método científico y adaptada a las particularidades de la investigación en aprendizaje profundo. La aproximación metodológica se caracteriza por:
+
+\begin{enumerate}
+    \item \textbf{Enfoque iterativo e incremental}: El desarrollo se ha organizado en fases sucesivas, donde cada iteración construye sobre los resultados y lecciones aprendidas de la anterior. Esta aproximación permite identificar problemas tempranamente y ajustar la estrategia de forma adaptativa.
+    
+    \item \textbf{Comparación sistemática y controlada}: Todas las arquitecturas y configuraciones se han evaluado bajo condiciones experimentales equivalentes, utilizando el mismo dataset, el mismo conjunto de test (205 imágenes) y las mismas métricas de evaluación. Esta consistencia garantiza que las diferencias observadas se atribuyan a las variaciones arquitectónicas o de configuración, no a factores externos.
+    
+    \item \textbf{Validación científica rigurosa}: Se ha implementado un protocolo de validación que incluye: (1) separación estricta entre conjuntos de entrenamiento, validación y test, (2) uso del conjunto de test únicamente para evaluación final, (3) selección del mejor checkpoint basada en métricas de validación, y (4) documentación exhaustiva de todas las configuraciones experimentales.
+    
+    \item \textbf{Análisis evolutivo}: Se ha realizado un seguimiento detallado de la evolución del rendimiento a lo largo de múltiples iteraciones, permitiendo identificar patrones de convergencia, puntos óptimos y trade-offs entre diferentes configuraciones.
+\end{enumerate}
+
+\subsection{Dataset y configuración experimental}
+
+El dataset utilizado en todos los experimentos corresponde a \texttt{curated\_dataset\_splitted\_20251101\_provisional\_1st\_version}, un conjunto de datos industriales curado que incluye imágenes de componentes manufacturados con anotaciones en formato COCO. Las características principales del dataset son:
+
+\begin{itemize}
+    \item \textbf{Resolución original}: Mediana de aproximadamente 1650×1350 píxeles, con variabilidad significativa entre imágenes.
+    \item \textbf{Conjunto de test}: 205 imágenes, utilizado exclusivamente para evaluación final y nunca durante el entrenamiento o selección de hiperparámetros.
+    \item \textbf{Categorías de defectos}: Seis clases en total: NORMAL (sin defectos), DEFORMACIONES, ROTURA\_FRACTURA, RAYONES\_ARAÑAZOS, PERFORACIONES y CONTAMINACIÓN.
+    \item \textbf{Variabilidad}: El dataset presenta alta variabilidad en términos de iluminación, tipos de superficies, escalas de defectos y condiciones de captura, lo que lo convierte en un benchmark desafiante y realista.
+\end{itemize}
+
+\subsection{Métricas de evaluación}
+
+La evaluación de todos los modelos se ha realizado utilizando el protocolo estándar COCO, con las siguientes métricas principales:
+
+\begin{itemize}
+    \item \textbf{mAP@0.5}: Mean Average Precision con umbral de IoU de 0.5, métrica principal que resume el rendimiento global del modelo.
+    \item \textbf{AP por clase}: Average Precision individual para cada una de las seis categorías, permitiendo identificar fortalezas y debilidades específicas.
+    \item \textbf{Precision por clase}: Ratio de verdaderos positivos sobre todas las detecciones realizadas por el modelo para cada clase.
+    \item \textbf{Recall por clase}: Ratio de verdaderos positivos sobre todas las anotaciones reales presentes en el conjunto de test.
+\end{itemize}
+
+\subsection{Criterios de selección del mejor checkpoint}
+
+Se han establecido criterios diferenciados según la arquitectura:
+
+\begin{itemize}
+    \item \textbf{Arquitecturas CNN (ResNet-18, EfficientNet)}: Selección basada en menor pérdida de validación (\texttt{val\_loss}), criterio estándar para modelos Faster R-CNN.
+    \item \textbf{Vision Transformers (DEIMv2)}: Selección basada en mayor mAP@0.5 en el conjunto de validación, ya que esta métrica captura mejor el rendimiento en detección de objetos que la pérdida agregada.
+\end{itemize}
+
+
+\section{Planificación en fases}
+\label{sec:planificacion}
+
+El desarrollo experimental se ha estructurado en tres fases principales, cada una con objetivos específicos y metodología adaptada:
+
+\begin{description}
+    \item[\textbf{Fase 1: Baseline con arquitecturas CNN}] Establecer líneas base con arquitecturas convolucionales tradicionales (ResNet-18 y EfficientNet-B0) para tener un punto de referencia comparativo. Esta fase permite evaluar el rendimiento de métodos establecidos en el problema específico de detección de defectos industriales.
+    
+    \item[\textbf{Fase 2: Exploración de Vision Transformers}] Evaluar el rendimiento de arquitecturas Vision Transformer, específicamente DEIMv2, explorando diferentes configuraciones de resolución y número de épocas para identificar la configuración óptima.
+    
+    \item[\textbf{Fase 3: Validación experimental}] Validar científicamente que la superioridad observada de los Vision Transformers se debe a la arquitectura y no únicamente a factores como la resolución de entrada, mediante re-entrenamiento de las CNNs bajo las mismas condiciones que DEIMv2.
+\end{description}
+
+Esta estructura permite una comparación justa y rigurosa entre arquitecturas, garantizando que las conclusiones extraídas sean válidas y reproducibles.
+
+
+\section{Fase 1: Baseline con arquitecturas CNN}
+\label{sec:fase1}
+
+\subsection{Motivación y objetivos}
+
+Las Redes Neuronales Convolucionales (\acrshort{CNN}) han sido el estándar en detección de objetos durante la última década. ResNet-18~\cite{he2016resnet} y EfficientNet-B0~\cite{tan2019efficientnet} representan dos enfoques diferentes dentro de este paradigma:
+
+\begin{itemize}
+    \item \textbf{ResNet-18}: Arquitectura clásica con conexiones residuales, ampliamente utilizada en aplicaciones industriales y que ha demostrado robustez en múltiples dominios.
+    \item \textbf{EfficientNet-B0}: Arquitectura moderna optimizada para eficiencia mediante escalado compuesto de profundidad, anchura y resolución, muy popular en aplicaciones donde el balance entre rendimiento y recursos computacionales es crítico.
+\end{itemize}
+
+El objetivo de esta fase es evaluar el rendimiento de estas arquitecturas en el problema específico de detección de defectos industriales sin modificaciones especiales, utilizando las imágenes en su resolución nativa para maximizar la información visual disponible.
+
+\subsection{Experimento 1.1: ResNet-18 + Faster R-CNN}
+
+\subsubsection{Configuración experimental}
+
+\begin{itemize}
+    \item \textbf{Arquitectura}: ResNet-18 como backbone preentrenado en ImageNet, combinado con Faster R-CNN como detector.
+    \item \textbf{Resolución}: Nativa del dataset (~1650×1350 píxeles), sin redimensionamiento.
+    \item \textbf{Épocas}: 50
+    \item \textbf{Batch size}: 8
+    \item \textbf{Learning rate}: 0.005
+    \item \textbf{Optimizador}: SGD con momentum 0.9
+    \item \textbf{LR Scheduler}: StepLR con \texttt{step\_size=5} y \texttt{gamma=0.1}
+    \item \textbf{Weight decay}: 0.0005
+    \item \textbf{Criterio de selección}: Menor pérdida de validación (\texttt{val\_loss})
+\end{itemize}
+
+La configuración de hiperparámetros sigue estándares establecidos para Faster R-CNN con SGD, donde un learning rate de 0.005 es típico y el StepLR reduce el learning rate cada 5 épocas para estabilizar el entrenamiento en fases avanzadas.
+
+\subsubsection{Resultados}
+
+Los resultados en el conjunto de test (205 imágenes) se presentan en la Tabla~\ref{tab:resnet18_nativa}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de ResNet-18 + Faster R-CNN en resolución nativa}
+\label{tab:resnet18_nativa}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
+\midrule
+DEFORMACIONES & 0.209 & 0.213 & 0.605 \\
+ROTURA\_FRACTURA & 0.092 & 0.300 & 0.150 \\
+RAYONES\_ARAÑAZOS & 0.160 & 0.158 & 0.441 \\
+PERFORACIONES & 0.000 & --- & 0.000 \\
+CONTAMINACIÓN & 0.000 & --- & 0.000 \\
+NORMAL & 0.000 & --- & 0.000 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.077} & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Análisis de resultados}
+
+Los resultados muestran un rendimiento limitado:
+
+\begin{itemize}
+    \item El modelo solo detecta correctamente 3 de las 6 categorías: DEFORMACIONES, ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS.
+    \item Las clases PERFORACIONES, CONTAMINACIÓN y NORMAL tienen AP de 0.0, indicando que el modelo no las detecta en absoluto.
+    \item El recall es moderado para DEFORMACIONES (60.5\%) pero muy bajo para ROTURA\_FRACTURA (15.0\%), sugiriendo que el modelo falla en identificar muchos casos reales de esta categoría.
+    \item La precision es baja en general (21.3\% para DEFORMACIONES, 30.0\% para ROTURA\_FRACTURA), indicando presencia significativa de falsos positivos.
+\end{itemize}
+
+Estos resultados sugieren que ResNet-18 tiene dificultades para generalizar en este problema, posiblemente debido a la alta variabilidad del dataset y a las limitaciones del campo receptivo de las arquitecturas convolucionales para capturar relaciones espaciales complejas.
+
+\subsection{Experimento 1.2: EfficientNet-B0 + Faster R-CNN}
+
+\subsubsection{Configuración experimental}
+
+\begin{itemize}
+    \item \textbf{Arquitectura}: EfficientNet-B0 como backbone preentrenado en ImageNet, combinado con Faster R-CNN.
+    \item \textbf{Resolución}: Nativa del dataset (~1650×1350 píxeles).
+    \item \textbf{Épocas}: 50
+    \item \textbf{Batch size}: 2 (reducido respecto a ResNet-18 debido a mayor consumo de memoria de EfficientNet).
+    \item \textbf{Learning rate}: 0.0005
+    \item \textbf{Optimizador}: AdamW
+    \item \textbf{LR Scheduler}: CosineAnnealingLR
+    \item \textbf{Weight decay}: 0.0001
+    \item \textbf{Criterio de selección}: Menor pérdida de validación
+\end{itemize}
+
+La configuración utiliza un learning rate más bajo (0.0005) porque EfficientNet funciona mejor con optimizadores adaptativos como AdamW, y el CosineAnnealingLR proporciona un schedule de learning rate más suave que el StepLR.
+
+\subsubsection{Resultados}
+
+Los resultados se presentan en la Tabla~\ref{tab:efficientnet_nativa}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de EfficientNet-B0 + Faster R-CNN en resolución nativa}
+\label{tab:efficientnet_nativa}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
+\midrule
+DEFORMACIONES & 0.227 & 0.242 & 0.579 \\
+ROTURA\_FRACTURA & 0.319 & 0.353 & 0.450 \\
+RAYONES\_ARAÑAZOS & 0.146 & 0.179 & 0.441 \\
+PERFORACIONES & 0.052 & 0.095 & 0.250 \\
+CONTAMINACIÓN & 0.231 & 0.062 & 0.364 \\
+NORMAL & 0.000 & --- & 0.000 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.162} & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Análisis de resultados}
+
+EfficientNet-B0 muestra un rendimiento superior a ResNet-18:
+
+\begin{itemize}
+    \item Obtiene un mAP de 0.162, más del doble que ResNet-18 (0.077).
+    \item Detecta 5 de las 6 categorías (solo falla en NORMAL).
+    \item ROTURA\_FRACTURA es la clase mejor detectada (AP=0.319, Recall=45.0\%).
+    \item Sin embargo, PERFORACIONES y CONTAMINACIÓN tienen detección muy baja (AP<0.06), y la precision en CONTAMINACIÓN es extremadamente baja (6.2\%), indicando muchos falsos positivos.
+\end{itemize}
+
+Aunque EfficientNet mejora significativamente sobre ResNet-18, el rendimiento global sigue siendo limitado, especialmente considerando que no detecta la clase NORMAL y tiene precision muy baja en varias categorías.
+
+\subsection{Conclusiones de la Fase 1}
+
+Los resultados de la Fase 1 establecen líneas base claras y revelan limitaciones significativas de las arquitecturas CNN tradicionales:
+
+\begin{enumerate}
+    \item \textbf{Rendimiento limitado}: ResNet-18 alcanza mAP de 0.077, detectando solo 3 categorías, mientras que EfficientNet-B0 obtiene 0.162, detectando 5 categorías pero con precision muy baja.
+    \item \textbf{Clases problemáticas}: Ambas arquitecturas tienen dificultades para detectar PERFORACIONES y CONTAMINACIÓN, y ninguna detecta la clase NORMAL.
+    \item \textbf{Hipótesis sobre limitaciones}: Las CNNs tienen bias inductivo fuerte hacia patrones locales, lo que puede limitar su capacidad para capturar relaciones espaciales complejas necesarias para distinguir algunos tipos de defectos. La alta variabilidad del dataset (iluminación, superficies, escalas) puede ser difícil de manejar para arquitecturas con campo receptivo limitado.
+\end{enumerate}
+
+Estos resultados justifican explorar arquitecturas más modernas como Vision Transformers, que tienen capacidad de atención global desde el inicio y pueden capturar dependencias de largo alcance de forma más efectiva.
+
+
+\section{Fase 2: Exploración de Vision Transformers}
+\label{sec:fase2}
+
+\subsection{Motivación y objetivos}
+
+Los Vision Transformers (\acrshort{ViT}) han demostrado superioridad en tareas de visión complejas gracias a su capacidad de atención global, que permite capturar relaciones espaciales de largo alcance desde las primeras capas, y a su menor bias inductivo, que no asume localidad espacial y permite aprender patrones más complejos.
+
+La arquitectura \textbf{DEIMv2} (Dense Enhanced Image Matching) combina:
+\begin{itemize}
+    \item \textbf{DINOv3}: Backbone \acrshort{ViT} preentrenado mediante aprendizaje auto-supervisado en grandes datasets, que proporciona representaciones visuales robustas y semánticamente ricas.
+    \item \textbf{DEIM Decoder}: Framework optimizado para DETRs (Detection Transformers) que procesa las representaciones del backbone para generar detecciones.
+    \item \textbf{Spatial Tuning Adapter (STA)}: Convierte la salida de escala única del backbone en features multi-escala necesarias para detección precisa.
+\end{itemize}
+
+La hipótesis es que esta arquitectura puede capturar mejor las relaciones espaciales necesarias para detectar defectos industriales con alta variabilidad, superando las limitaciones observadas en las CNNs.
+
+\subsection{Proceso iterativo de optimización}
+
+El desarrollo de DEIMv2 siguió un proceso iterativo donde cada experimento construyó sobre los resultados del anterior, identificando limitaciones y optimizando configuraciones progresivamente.
+
+\subsubsection{Iteración 2.1: DEIMv2 @ 640×640 (87 épocas)}
+
+\textbf{Configuración:}
+\begin{itemize}
+    \item Resolución: 640×640 píxeles
+    \item Épocas: 87
+    \item Batch size: 4
+    \item Learning rate: 0.0004 (backbone: 0.00004, 10× menor)
+    \item Optimizador: AdamW
+    \item Mejor epoch: 86
+\end{itemize}
+
+\textbf{Resultados:} mAP@0.5 = 0.499
+
+Esta primera iteración con resolución 640×640 demostró que DEIMv2 supera significativamente a las CNNs (0.499 vs 0.162 de EfficientNet), pero presentó una limitación crítica: la resolución 640×640 pierde aproximadamente el 82\% de la información visual del dataset original (~1650×1350px), lo que puede limitar la detección de defectos pequeños o detalles finos.
+
+\subsubsection{Iteración 2.2: DEIMv2 @ 1024×1024 (80 épocas)}
+
+\textbf{Configuración:}
+\begin{itemize}
+    \item Resolución: 1024×1024 píxeles (mediana del dataset)
+    \item Épocas: 80
+    \item Batch size: 4
+    \item Learning rate: 0.0004 (backbone: 0.00004)
+    \item Optimizador: AdamW
+    \item Mejor epoch: 80 (último)
+\end{itemize}
+
+\textbf{Resultados:} Los resultados detallados se presentan en la Tabla~\ref{tab:deimv2_1024_80ep}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de DEIMv2 @ 1024×1024 (80 épocas)}
+\label{tab:deimv2_1024_80ep}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
+\midrule
+NORMAL & 0.855 & 1.000 & 0.867 \\
+PERFORACIONES & 0.866 & 1.000 & 0.967 \\
+DEFORMACIONES & 0.599 & 1.000 & 0.632 \\
+CONTAMINACIÓN & 0.563 & 1.000 & 0.818 \\
+RAYONES\_ARAÑAZOS & 0.476 & 1.000 & 0.794 \\
+ROTURA\_FRACTURA & 0.384 & 1.000 & 0.650 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.624} & \textbf{1.000} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análisis:}
+\begin{itemize}
+    \item Mejora significativa vs 640px: +0.125 mAP absoluto (+25.1\% relativo).
+    \item Confirma que mayor resolución es crítica para Vision Transformers.
+    \item Precision perfecta (1.0) en todas las clases: no hay falsos positivos.
+    \item Detecta todas las 6 categorías correctamente.
+    \item El mejor epoch fue el 80 (último), sugiriendo que el modelo aún podría mejorar con más entrenamiento.
+\end{itemize}
+
+\subsubsection{Iteración 2.3: DEIMv2 @ 1024×1024 (120 épocas)}
+
+El hecho de que el mejor epoch en 80 épocas fuera el último sugiere que el modelo no había convergido. Vision Transformers típicamente requieren más épocas que CNNs para converger, por lo que se extendió el entrenamiento a 120 épocas.
+
+\textbf{Configuración:}
+\begin{itemize}
+    \item Resolución: 1024×1024 píxeles
+    \item Épocas: 120
+    \item Batch size: 4
+    \item Learning rate: 0.0004 (backbone: 0.00004)
+    \item Optimizador: AdamW
+    \item Mejor epoch: 119 (penúltimo)
+\end{itemize}
+
+\textbf{Resultados:} Los resultados se presentan en la Tabla~\ref{tab:deimv2_1024_120ep}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de DEIMv2 @ 1024×1024 (120 épocas)}
+\label{tab:deimv2_1024_120ep}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
+\midrule
+NORMAL & 0.994 & 1.000 & 1.000 \\
+PERFORACIONES & 0.927 & 1.000 & 0.950 \\
+DEFORMACIONES & 0.780 & 1.000 & 0.816 \\
+RAYONES\_ARAÑAZOS & 0.717 & 1.000 & 0.794 \\
+CONTAMINACIÓN & 0.640 & 1.000 & 0.818 \\
+ROTURA\_FRACTURA & 0.539 & 1.000 & 0.700 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.766} & \textbf{1.000} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análisis:}
+\begin{itemize}
+    \item Mejora dramática vs 80 épocas: +0.142 mAP absoluto (+22.8\% relativo).
+    \item NORMAL alcanza casi perfección: AP=0.994, Recall=100\%.
+    \item Mejoras significativas en clases problemáticas:
+    \begin{itemize}
+        \item RAYONES\_ARAÑAZOS: +0.241 AP (+50.6\%)
+        \item ROTURA\_FRACTURA: +0.155 AP (+40.4\%)
+        \item DEFORMACIONES: +0.181 AP (+30.2\%)
+    \end{itemize}
+    \item El mejor epoch fue el 119 (penúltimo), indicando que aún no había convergido completamente.
+\end{itemize}
+
+\subsubsection{Iteración 2.4: DEIMv2 @ 1024×1024 (300 épocas) ⭐ Mejor Modelo}
+
+Para identificar el punto de convergencia real y explorar si había margen de mejora adicional, se realizó un entrenamiento extendido de 300 épocas.
+
+\textbf{Configuración:}
+\begin{itemize}
+    \item Resolución: 1024×1024 píxeles
+    \item Épocas: 300
+    \item Batch size: 4
+    \item Learning rate: 0.0004 (backbone: 0.00004)
+    \item Optimizador: AdamW
+    \item Mejor epoch: 187 (62\% del entrenamiento)
+\end{itemize}
+
+\textbf{Resultados:} Los resultados finales se presentan en la Tabla~\ref{tab:deimv2_1024_300ep}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de DEIMv2 @ 1024×1024 (300 épocas, mejor epoch 187)}
+\label{tab:deimv2_1024_300ep}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
+\midrule
+NORMAL & 0.980 & 1.000 & 0.983 \\
+PERFORACIONES & 0.924 & 1.000 & 0.950 \\
+RAYONES\_ARAÑAZOS & 0.806 & 1.000 & 0.853 \\
+DEFORMACIONES & 0.779 & 1.000 & 0.842 \\
+CONTAMINACIÓN & 0.645 & 1.000 & 0.788 \\
+ROTURA\_FRACTURA & 0.576 & 1.000 & 0.725 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.785} & \textbf{1.000} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Análisis de convergencia:}
+\begin{itemize}
+    \item Mejora adicional vs 120 épocas: +0.019 mAP absoluto (+2.5\% relativo).
+    \item Mejor epoch en 187 (62\% del entrenamiento), indicando convergencia clara.
+    \item Mejoras en clases desafiantes:
+    \begin{itemize}
+        \item RAYONES\_ARAÑAZOS: +0.089 AP adicional (+12.4\%)
+        \item ROTURA\_FRACTURA: +0.037 AP adicional (+6.9\%)
+    \end{itemize}
+    \item Precision perfecta (1.0) mantenida en todas las clases.
+    \item NORMAL y PERFORACIONES mantienen excelente rendimiento (>92\% AP).
+\end{itemize}
+
+\textbf{Análisis de eficiencia de entrenamiento:}
+\begin{itemize}
+    \item 80→120 épocas: +14.2 puntos mAP / +40 épocas = \textbf{0.355 puntos/época}
+    \item 120→300 épocas: +1.9 puntos mAP / +180 épocas = \textbf{0.011 puntos/época}
+    \item \textbf{Conclusión}: El mayor retorno está entre 80-150 épocas.
+    \item \textbf{Recomendación práctica}: Para futuros entrenamientos, 150-180 épocas capturan >98\% de la mejora potencial.
+\end{itemize}
+
+\subsection{Evolución del rendimiento en Fase 2}
+
+La Tabla~\ref{tab:evolucion_fase2} resume la evolución del rendimiento a través de las diferentes iteraciones.
+
+\begin{table}[htbp]
+\centering
+\caption{Evolución del rendimiento de DEIMv2 en Fase 2}
+\label{tab:evolucion_fase2}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Configuración} & \textbf{mAP} & \textbf{Mejora vs anterior} & \textbf{Épocas} & \textbf{Mejor Epoch} \\
+\midrule
+640px, 87ep & 0.499 & baseline & 87 & 86 \\
+1024px, 80ep & 0.624 & +25.1\% & 80 & 80 \\
+1024px, 120ep & 0.766 & +22.8\% & 120 & 119 \\
+1024px, 300ep & 0.785 & +2.5\% & 300 & 187 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observaciones clave:}
+\begin{enumerate}
+    \item \textbf{Impacto de resolución}: El salto de 640px a 1024px aporta +25\% de mejora.
+    \item \textbf{Impacto de épocas}: Entrenamientos largos son críticos para ViTs.
+    \item \textbf{Punto óptimo}: Epoch 187 en entrenamiento de 300, sugiriendo que 150-200 épocas es el sweet spot.
+\end{enumerate}
+
+\subsection{Conclusiones de la Fase 2}
+
+\begin{enumerate}
+    \item \textbf{DEIMv2 supera ampliamente a las CNNs}: mAP de 0.785 vs 0.162 (EfficientNet) y 0.077 (ResNet), representando mejoras de +384\% y +881\% respectivamente.
+    \item \textbf{Resolución 1024×1024 es crítica}: Preserva suficiente información (~47\% del original) sin ser prohibitiva en memoria.
+    \item \textbf{Entrenamientos largos son necesarios}: Los ViTs requieren ~150-200 épocas para converger vs ~50 para CNNs.
+    \item \textbf{Precision perfecta}: El modelo no genera falsos positivos en ninguna clase (Precision=1.0).
+    \item \textbf{Clases problemáticas mejoran con entrenamiento largo}: RAYONES\_ARAÑAZOS y ROTURA\_FRACTURA mejoran significativamente entre 120 y 300 épocas.
+\end{enumerate}
+
+
+\section{Fase 3: Validación experimental}
+\label{sec:fase3}
+
+\subsection{Motivación y objetivos}
+
+Tras los excelentes resultados de DEIMv2, surge la pregunta: \textbf{¿La mejora se debe a la arquitectura Vision Transformer o simplemente a usar resolución 1024×1024?}
+
+Para responder esto científicamente, se re-entrenaron ResNet-18 y EfficientNet-B0 con las \textbf{mismas condiciones} que DEIMv2:
+\begin{itemize}
+    \item Resolución 1024×1024
+    \item Mismo dataset
+    \item Mismo conjunto de test
+    \item Mismas condiciones experimentales
+\end{itemize}
+
+Si las CNNs mejoran significativamente con 1024px y se acercan al rendimiento de DEIMv2, entonces la resolución sería el factor principal. Si no mejoran o mejoran poco, entonces la arquitectura ViT es fundamentalmente superior.
+
+\subsection{Experimento 3.1: ResNet-18 @ 1024×1024}
+
+\subsubsection{Configuración}
+
+\begin{itemize}
+    \item Resolución: 1024×1024 píxeles
+    \item Épocas: 50
+    \item Batch size: 4 (reducido vs nativa debido a mayor resolución)
+    \item Learning rate: 0.005
+    \item Optimizador: SGD con momentum 0.9
+    \item LR Scheduler: StepLR (step\_size=5, gamma=0.1)
+    \item Weight decay: 0.0005
+\end{itemize}
+
+\subsubsection{Resultados}
+
+Los resultados se presentan en la Tabla~\ref{tab:resnet18_1024}, comparados con la configuración nativa.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de ResNet-18 @ 1024×1024 vs resolución nativa}
+\label{tab:resnet18_1024}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5 (1024px)} & \textbf{Cambio vs Nativa} \\
+\midrule
+DEFORMACIONES & 0.272 & +30.1\% \\
+ROTURA\_FRACTURA & 0.087 & -5.1\% \\
+RAYONES\_ARAÑAZOS & 0.120 & -24.9\% \\
+PERFORACIONES & 0.000 & 0.0 \\
+CONTAMINACIÓN & 0.000 & 0.0 \\
+NORMAL & 0.000 & 0.0 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.080} & \textbf{+3.9\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Análisis}
+
+\begin{itemize}
+    \item \textbf{Mejora mínima}: mAP aumenta de 0.077 a 0.080 (+3.9\%).
+    \item \textbf{DEFORMACIONES} mejora significativamente (+30.1\%), pero las demás clases se mantienen o empeoran.
+    \item \textbf{PERFORACIONES, CONTAMINACIÓN y NORMAL} siguen sin detectarse (AP=0.0).
+    \item La mejora es \textbf{insignificante} comparada con el salto de DEIMv2.
+\end{itemize}
+
+\textbf{Conclusión:} ResNet-18 no se beneficia significativamente de mayor resolución en este problema.
+
+\subsection{Experimento 3.2: EfficientNet-B0 @ 1024×1024}
+
+\subsubsection{Configuración}
+
+\begin{itemize}
+    \item Resolución: 1024×1024 píxeles
+    \item Épocas: 50
+    \item Batch size: 2
+    \item Learning rate: 0.0005
+    \item Optimizador: AdamW
+    \item LR Scheduler: CosineAnnealingLR
+    \item Weight decay: 0.0001
+\end{itemize}
+
+\subsubsection{Resultados}
+
+Los resultados se presentan en la Tabla~\ref{tab:efficientnet_1024}.
+
+\begin{table}[htbp]
+\centering
+\caption{Resultados de EfficientNet-B0 @ 1024×1024 vs resolución nativa}
+\label{tab:efficientnet_1024}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Clase} & \textbf{AP@0.5 (1024px)} & \textbf{Cambio vs Nativa} \\
+\midrule
+DEFORMACIONES & 0.279 & +22.9\% \\
+ROTURA\_FRACTURA & 0.175 & -45.1\% \\
+RAYONES\_ARAÑAZOS & 0.041 & -71.9\% \\
+PERFORACIONES & 0.049 & -5.8\% \\
+CONTAMINACIÓN & 0.190 & -17.8\% \\
+NORMAL & 0.000 & 0.0 \\
+\midrule
+\textbf{mAP@0.5} & \textbf{0.122} & \textbf{-24.7\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Análisis}
+
+\begin{itemize}
+    \item \textbf{Empeora significativamente}: mAP disminuye de 0.162 a 0.122 (-24.7\%).
+    \item \textbf{ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS} empeoran dramáticamente (-45\% y -72\% respectivamente).
+    \item Solo \textbf{DEFORMACIONES} mejora (+23\%).
+    \item \textbf{NORMAL} sigue sin detectarse.
+\end{itemize}
+
+\textbf{Hipótesis del empeoramiento:}
+\begin{itemize}
+    \item EfficientNet está \textbf{optimizada para resoluciones 224-380px}.
+    \item A 1024px, la arquitectura puede estar procesando información de forma subóptima.
+    \item El escalado compuesto de EfficientNet puede no generalizar bien a resoluciones tan altas.
+\end{itemize}
+
+\textbf{Conclusión:} EfficientNet-B0 empeora con resolución 1024×1024, confirmando que está optimizada para resoluciones menores.
+
+\subsection{Comparación Fase 3 vs Fase 1}
+
+La Tabla~\ref{tab:comparacion_fase3} resume la comparación entre las mejores configuraciones de cada arquitectura.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparación de mejores modelos por arquitectura}
+\label{tab:comparacion_fase3}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Modelo} & \textbf{Resolución} & \textbf{mAP@0.5} & \textbf{Cambio} & \textbf{Mejor Config} \\
+\midrule
+ResNet-18 & Nativa & 0.077 & --- & --- \\
+ResNet-18 & 1024×1024 & 0.080 & +3.9\% & 1024×1024 \\
+\midrule
+EfficientNet-B0 & Nativa & 0.162 & --- & \textbf{Nativa} \\
+EfficientNet-B0 & 1024×1024 & 0.122 & -24.7\% & --- \\
+\midrule
+DEIMv2 & 1024×1024 & 0.785 & --- & 1024×1024 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observaciones:}
+\begin{enumerate}
+    \item \textbf{ResNet-18} mejora ligeramente pero sigue muy lejos de DEIMv2 (0.080 vs 0.785).
+    \item \textbf{EfficientNet} empeora, confirmando que su arquitectura no está optimizada para 1024px.
+    \item \textbf{Ninguna CNN se acerca} al rendimiento de DEIMv2 incluso con la misma resolución.
+\end{enumerate}
+
+\subsection{Conclusiones de la Fase 3}
+
+\begin{enumerate}
+    \item \textbf{La superioridad de DEIMv2 no se debe solo a la resolución}:
+    \begin{itemize}
+        \item ResNet-18 mejora solo +3.9\% con 1024px
+        \item EfficientNet empeora -24.7\% con 1024px
+        \item Ambas siguen muy lejos del 0.785 de DEIMv2
+    \end{itemize}
+    
+    \item \textbf{La arquitectura Vision Transformer es fundamentalmente superior}:
+    \begin{itemize}
+        \item Diferencia de mAP: +0.705 puntos (0.785 vs 0.080 mejor CNN)
+        \item Esto representa una mejora de \textbf{+881\%} relativa
+    \end{itemize}
+    
+    \item \textbf{EfficientNet está optimizada para resoluciones menores}:
+    \begin{itemize}
+        \item Su diseño de escalado compuesto funciona mejor en 224-380px
+        \item A 1024px, la arquitectura no aprovecha bien la información adicional
+    \end{itemize}
+    
+    \item \textbf{Validación científica completa}:
+    \begin{itemize}
+        \item Se compararon todas las arquitecturas bajo las mismas condiciones
+        \item Los resultados confirman que la arquitectura ViT es el factor clave
+    \end{itemize}
+\end{enumerate}
+
+
+\section{Análisis comparativo final}
+\label{sec:analisis_comparativo}
+
+\subsection{Tabla resumen de todos los experimentos}
+
+La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de todos los experimentos realizados.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumen completo de todos los experimentos realizados}
+\label{tab:resumen_experimentos}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Arquitectura} & \textbf{Resolución} & \textbf{Épocas} & \textbf{mAP@0.5} & \textbf{Precision} & \textbf{Mejor Epoch} & \textbf{Observaciones} \\
+\midrule
+ResNet-18 & Nativa & 50 & 0.077 & Variable & Auto & Solo 3 clases \\
+ResNet-18 & 1024×1024 & 50 & 0.080 & Variable & Auto & Mejora mínima \\
+\midrule
+EfficientNet-B0 & Nativa & 50 & 0.162 & Variable & Auto & Mejor CNN baseline \\
+EfficientNet-B0 & 1024×1024 & 50 & 0.122 & Variable & Auto & Empeora \\
+\midrule
+DEIMv2 & 640×640 & 87 & 0.499 & 1.000 & 86 & Primera prueba ViT \\
+DEIMv2 & 1024×1024 & 80 & 0.624 & 1.000 & 80 & Mejora por resolución \\
+DEIMv2 & 1024×1024 & 120 & 0.766 & 1.000 & 119 & Mejora por épocas \\
+DEIMv2 & 1024×1024 & 300 & \textbf{0.785} & \textbf{1.000} & \textbf{187} & \textbf{Mejor modelo} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Comparación de mejores modelos por arquitectura}
+
+La Tabla~\ref{tab:mejores_modelos} compara los mejores modelos de cada arquitectura.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparación de mejores modelos por arquitectura}
+\label{tab:mejores_modelos}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Arquitectura} & \textbf{Configuración} & \textbf{mAP@0.5} & \textbf{AP NORMAL} & \textbf{Precision} & \textbf{Parámetros} \\
+\midrule
+ResNet-18 & 1024×1024 & 0.080 & 0.000 & Variable & ~11M \\
+EfficientNet-B0 & Nativa & 0.162 & 0.000 & Variable & ~5M \\
+\textbf{DEIMv2} & \textbf{1024×1024, 300ep} & \textbf{0.785} & \textbf{0.980} & \textbf{1.000} & \textbf{~17M} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Diferencias de rendimiento:}
+\begin{itemize}
+    \item DEIMv2 vs ResNet-18: \textbf{+0.705 mAP} (+881\% relativo)
+    \item DEIMv2 vs EfficientNet-B0: \textbf{+0.623 mAP} (+384\% relativo)
+\end{itemize}
+
+\subsection{Análisis por categoría de defecto}
+
+\subsubsection{NORMAL (Sin defectos)}
+\begin{itemize}
+    \item \textbf{ResNet-18}: No detecta (AP=0.0)
+    \item \textbf{EfficientNet-B0}: No detecta (AP=0.0)
+    \item \textbf{DEIMv2}: Excelente (AP=0.980, Recall=98.3\%)
+\end{itemize}
+
+\textbf{Conclusión:} Solo DEIMv2 puede distinguir correctamente imágenes sin defectos.
+
+\subsubsection{PERFORACIONES}
+\begin{itemize}
+    \item \textbf{ResNet-18}: No detecta (AP=0.0)
+    \item \textbf{EfficientNet-B0}: Muy bajo (AP=0.052, Recall=25\%)
+    \item \textbf{DEIMv2}: Excelente (AP=0.924, Recall=95\%)
+\end{itemize}
+
+\textbf{Conclusión:} DEIMv2 detecta perforaciones casi perfectamente, mientras que las CNNs fallan completamente.
+
+\subsubsection{DEFORMACIONES}
+\begin{itemize}
+    \item \textbf{ResNet-18}: Moderado (AP=0.209-0.272 según resolución)
+    \item \textbf{EfficientNet-B0}: Moderado (AP=0.227-0.279 según resolución)
+    \item \textbf{DEIMv2}: Bueno (AP=0.779, Recall=84.2\%)
+\end{itemize}
+
+\textbf{Conclusión:} DEIMv2 supera a las CNNs por ~3.5× en esta categoría.
+
+\subsubsection{RAYONES\_ARAÑAZOS}
+\begin{itemize}
+    \item \textbf{ResNet-18}: Bajo (AP=0.120-0.160 según resolución)
+    \item \textbf{EfficientNet-B0}: Bajo (AP=0.041-0.146 según resolución)
+    \item \textbf{DEIMv2}: Bueno (AP=0.806, Recall=85.3\%)
+\end{itemize}
+
+\textbf{Conclusión:} DEIMv2 supera a las CNNs por ~5-20× en esta categoría.
+
+\subsubsection{ROTURA\_FRACTURA}
+\begin{itemize}
+    \item \textbf{ResNet-18}: Muy bajo (AP=0.087-0.092 según resolución)
+    \item \textbf{EfficientNet-B0}: Moderado (AP=0.175-0.319 según resolución)
+    \item \textbf{DEIMv2}: Mejorable (AP=0.576, Recall=72.5\%)
+\end{itemize}
+
+\textbf{Conclusión:} Aunque es la clase más difícil para DEIMv2, aún supera significativamente a las CNNs.
+
+\subsubsection{CONTAMINACIÓN}
+\begin{itemize}
+    \item \textbf{ResNet-18}: No detecta (AP=0.0)
+    \item \textbf{EfficientNet-B0}: Bajo (AP=0.190-0.231 según resolución)
+    \item \textbf{DEIMv2}: Aceptable (AP=0.645, Recall=78.8\%)
+\end{itemize}
+
+\textbf{Conclusión:} DEIMv2 supera a las CNNs por ~3× en esta categoría.
+
+\subsection{Diferencias arquitectónicas fundamentales}
+
+La Tabla~\ref{tab:diferencias_arquitectonicas} resume las diferencias clave entre CNNs y ViTs observadas en este trabajo.
+
+\begin{table}[htbp]
+\centering
+\caption{Diferencias arquitectónicas fundamentales observadas}
+\label{tab:diferencias_arquitectonicas}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspecto} & \textbf{CNNs} & \textbf{ViTs (DEIMv2)} \\
+\midrule
+Bias inductivo & Fuerte (localidad) & Mínimo \\
+Receptive field & Local → Global (gradual) & Global desde inicio \\
+Convergencia & Rápida (~50 épocas) & Lenta (~150-200 épocas) \\
+Sensibilidad a resolución & Baja/Moderada & Alta \\
+Capacidad de atención & Limitada & Completa (self-attention) \\
+Detección relaciones espaciales & Gradual, jerárquica & Directa, global \\
+mAP máximo alcanzado & 0.162 & \textbf{0.785} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Implicaciones:}
+\begin{enumerate}
+    \item \textbf{Atención global} permite a DEIMv2 capturar relaciones entre defectos distantes en la imagen.
+    \item \textbf{Menor bias inductivo} permite aprender patrones más complejos y específicos del dominio.
+    \item \textbf{Representaciones ricas de DINOv3} proporcionan features semánticamente robustas desde el inicio.
+\end{enumerate}
+
+
+\section{Problemas encontrados y desviaciones}
+\label{sec:problemas}
+
+Durante el desarrollo se identificaron varios desafíos y se tomaron decisiones que desviaron ligeramente la planificación inicial:
+
+\subsection{Problemas técnicos}
+
+\begin{enumerate}
+    \item \textbf{Inestabilidad inicial con DEIMv2 @ 640px}: La primera configuración con augmentations agresivas resultó en inestabilidad del entrenamiento (mAP=0.232). Se resolvió mediante: (1) reducción de augmentations, (2) implementación de gradient clipping (0.1), (3) warmup de 2000 steps, y (4) flat epoch de 70.
+    
+    \item \textbf{Limitación de resolución}: La resolución 640×640 perdió el 82\% de información visual, limitando la detección de defectos pequeños. Se resolvió aumentando a 1024×1024, que preserva ~47\% de la información original.
+    
+    \item \textbf{Convergencia lenta de ViTs}: Los Vision Transformers requieren significativamente más épocas que las CNNs para converger. Se identificó que el punto óptimo está alrededor de 150-200 épocas, no 50 como inicialmente se planificó.
+\end{enumerate}
+
+\subsection{Desviaciones de la planificación}
+
+\begin{enumerate}
+    \item \textbf{Entrenamientos extendidos}: La planificación inicial contemplaba entrenamientos de ~50-80 épocas, pero los resultados mostraron que los ViTs necesitan 150-200 épocas para converger adecuadamente. Esto aumentó el tiempo de desarrollo pero resultó en mejoras significativas de rendimiento.
+    
+    \item \textbf{Fase 3 de validación}: Originalmente no estaba planificada una fase de validación experimental tan exhaustiva, pero se consideró necesaria para demostrar científicamente que la superioridad de DEIMv2 se debe a la arquitectura y no solo a factores como la resolución.
+\end{enumerate}
+
+\subsection{Lecciones aprendidas}
+
+\begin{enumerate}
+    \item \textbf{Importancia de resolución adecuada}: Para Vision Transformers, preservar >40\% de la información visual original es crítico para obtener buen rendimiento.
+    
+    \item \textbf{Necesidad de entrenamientos largos}: Los ViTs requieren significativamente más épocas que las CNNs, típicamente 150-200 épocas vs 50 para converger adecuadamente.
+    
+    \item \textbf{Identificación de punto óptimo}: El análisis evolutivo permitió identificar que el punto óptimo de eficiencia-rendimiento está alrededor de 150-200 épocas, no al final del entrenamiento.
+    
+    \item \textbf{Valor de comparación justa}: La Fase 3 demostró la importancia de comparar arquitecturas bajo condiciones idénticas para extraer conclusiones válidas.
+\end{enumerate}

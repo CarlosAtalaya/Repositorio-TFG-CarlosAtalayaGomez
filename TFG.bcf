@@ -2445,19 +2445,21 @@
     <bcf:citekey order="68" intorder="1">zhang2025exploring</bcf:citekey>
     <bcf:citekey order="69" intorder="1">alber2024evaluating</bcf:citekey>
     <bcf:citekey order="70" intorder="1">khan2024survey</bcf:citekey>
-    <bcf:citekey order="71" intorder="1">ernestoaranda2013</bcf:citekey>
-    <bcf:citekey order="72" intorder="1">gastonsimone2002</bcf:citekey>
-    <bcf:citekey order="73" intorder="1">leslielamport1994</bcf:citekey>
-    <bcf:citekey order="74" intorder="1">latexcompanion2004</bcf:citekey>
-    <bcf:citekey order="75" intorder="1">andrewroberts2004</bcf:citekey>
-    <bcf:citekey order="76" intorder="1">armas2011estimation</bcf:citekey>
-    <bcf:citekey order="77" intorder="1">castillo2010design</bcf:citekey>
+    <bcf:citekey order="71" intorder="1">he2016resnet</bcf:citekey>
+    <bcf:citekey order="72" intorder="1">tan2019efficientnet</bcf:citekey>
+    <bcf:citekey order="73" intorder="1">ernestoaranda2013</bcf:citekey>
+    <bcf:citekey order="74" intorder="1">gastonsimone2002</bcf:citekey>
+    <bcf:citekey order="75" intorder="1">leslielamport1994</bcf:citekey>
+    <bcf:citekey order="76" intorder="1">latexcompanion2004</bcf:citekey>
+    <bcf:citekey order="77" intorder="1">andrewroberts2004</bcf:citekey>
     <bcf:citekey order="78" intorder="1">armas2011estimation</bcf:citekey>
-    <bcf:citekey order="79" intorder="1">armas2011estimation</bcf:citekey>
+    <bcf:citekey order="79" intorder="1">castillo2010design</bcf:citekey>
     <bcf:citekey order="80" intorder="1">armas2011estimation</bcf:citekey>
     <bcf:citekey order="81" intorder="1">armas2011estimation</bcf:citekey>
     <bcf:citekey order="82" intorder="1">armas2011estimation</bcf:citekey>
     <bcf:citekey order="83" intorder="1">armas2011estimation</bcf:citekey>
+    <bcf:citekey order="84" intorder="1">armas2011estimation</bcf:citekey>
+    <bcf:citekey order="85" intorder="1">armas2011estimation</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
