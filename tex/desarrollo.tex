@@ -6,6 +6,230 @@
 Este capítulo describe la metodología de trabajo empleada, la planificación en fases del proyecto y la ejecución detallada de los experimentos realizados para desarrollar y validar el sistema de detección de anomalías basado en Vision Transformers. Se documenta el proceso iterativo de optimización que condujo a la configuración final del modelo, así como los resultados obtenidos en cada fase experimental.
 
 
+\section{Fase 0: Preparación y Curación del Dataset}
+\label{sec:fase0}
+
+\subsection{Motivación y objetivos}
+
+La calidad del conjunto de datos constituye un factor determinante en el rendimiento de los sistemas de aprendizaje profundo. En tareas de detección de defectos industriales, este aspecto resulta especialmente crítico debido a la alta variabilidad del dominio (condiciones de iluminación, texturas, escalas y geometrías), así como a la necesidad de contar con anotaciones consistentes y una taxonomía de defectos coherente.
+
+Con este objetivo, se ha desarrollado un \textbf{pipeline de curación reproducible} para construir un dataset unificado, en formato COCO, equilibrado entre clases y con validaciones cuantitativas que aseguran su idoneidad para entrenamiento y evaluación de modelos detectores. De forma resumida, los objetivos de esta fase han sido:
+
+\begin{itemize}
+    \item \textbf{Unificación de fuentes heterogéneas}: combinar datasets públicos con formatos de anotación distintos (cajas delimitadoras y segmentación) en un formato común.
+    \item \textbf{Normalización semántica}: diseñar una taxonomía de defectos de 6 categorías, mapeando etiquetas originales de manera consistente.
+    \item \textbf{Mitigación de sesgos}: reducir desbalances severos mediante estrategias de under/over-sampling con augmentación conservadora.
+    \item \textbf{Validación científica}: verificar la estratificación de splits, la ausencia de leakage y la integridad del dataset final mediante métricas y tests estadísticos.
+\end{itemize}
+
+\subsection{Datasets originales}
+
+El dataset final se construyó a partir de la combinación de dos fuentes públicas: \textbf{VISION-Datasets}~\cite{bai2023visiondatasets} (con anotaciones supervisadas en formato COCO, disponibles a través de Hugging Face~\cite{visiondatasets_huggingface}) y \textbf{MVTec AD} (benchmark de anomalías industriales)~\cite{bergmann2019mvtec}. Ambos repositorios presentan filosofías y formatos de anotación diferentes, lo que motivó la necesidad de un proceso de curación y normalización previo.
+
+\subsubsection{VISION-Datasets}
+
+VISION-Datasets~\cite{bai2023visiondatasets} proporciona imágenes de componentes industriales con anotaciones de defectos en formato COCO (cajas delimitadoras). En el análisis exploratorio se identificaron:
+\begin{itemize}
+    \item \textbf{Total de imágenes}: 3{,}788 (train: 1{,}760, val: 2{,}028).
+    \item \textbf{Diversidad del dominio}: 14 tipos de componentes.
+    \item \textbf{Etiquetas}: 44 categorías de defectos (alta fragmentación semántica).
+\end{itemize}
+
+\subsubsection{MVTec AD}
+
+MVTec AD~\cite{bergmann2019mvtec} es un benchmark ampliamente utilizado en detección de anomalías industriales. Su formato original se basa en máscaras a nivel de píxel y una organización semi-supervisada (train con muestras normales, test con mezcla de normales y anomalías). En el análisis exploratorio se identificaron:
+\begin{itemize}
+    \item \textbf{Total de imágenes}: 5{,}354 (train: 3{,}629, test: 1{,}725).
+    \item \textbf{Categorías}: 15 tipos de objetos industriales.
+    \item \textbf{Tipos de defectos}: 49, anotados principalmente como segmentación.
+\end{itemize}
+
+\subsection{Metodología de curación y preparación}
+
+La preparación del dataset se articuló en cinco etapas, desde la exploración de las fuentes hasta la validación final. La Tabla~\ref{tab:fase0_evolucion_dataset} resume la evolución cuantitativa del conjunto de datos a lo largo del pipeline.
+
+\subsubsection{Etapa 1: Exploración y análisis de datasets originales}
+
+Se realizó un análisis exploratorio para comprender la estructura de datos, los formatos de anotación y la distribución de defectos en cada fuente. Este análisis permitió identificar correspondencias semánticas entre etiquetas y definir criterios de selección de categorías/objetos relevantes para el dominio de componentes industriales.
+
+\subsubsection{Etapa 2: Curación inicial}
+
+Se implementó un curador que filtra categorías y defectos relevantes, homogeneiza el formato de imágenes (PNG) y genera una primera versión unificada en COCO. Tras esta etapa se obtuvo un dataset de 1{,}907 imágenes y 15 etiquetas (aún fragmentadas), con desbalance severo entre clases (ratio máx/mín $\sim$24.5:1).
+
+\subsubsection{Etapa 3: Análisis exhaustivo de calidad}
+
+Sobre el dataset curado inicial se ejecutó un análisis de calidad orientado a:
+\begin{itemize}
+    \item detectar duplicados (49 pares detectados),
+    \item verificar integridad (0 imágenes corruptas),
+    \item identificar inconsistencias de anotación (3 incidencias menores),
+    \item y caracterizar la variabilidad de resolución (rango 262$\times$192 a 3840$\times$3620 píxeles).
+\end{itemize}
+
+\subsubsection{Etapa 4: Recuración final}
+
+La preparación final se realizó mediante cuatro subetapas:
+\begin{itemize}
+    \item \textbf{Subetapa 4.1 (recuración)}: eliminación de componentes fuera de alcance (p.\ ej., \texttt{hazelnut}) y eliminación de duplicados, resultando en 1{,}393 imágenes.
+    \item \textbf{Subetapa 4.2 (unificación)}: mapeo de 15 etiquetas originales a 6 categorías unificadas.
+    \item \textbf{Subetapa 4.3 (balanceo)}: estrategia híbrida de under/over-sampling con augmentación conservadora, reduciendo el ratio máx/mín a 2.08:1.
+    \item \textbf{Subetapa 4.4 (splits)}: creación de particiones train/val/test (70/10/20) con estratificación dual (categoría y origen).
+\end{itemize}
+
+\subsubsection{Etapa 5: Validación final y análisis estadístico}
+
+Finalmente, se validó la consistencia del dataset final mediante:
+\begin{itemize}
+    \item \textbf{Estratificación} validada con test Chi-cuadrado (en todas las particiones: $p=0.999$).
+    \item \textbf{Leakage} verificado: 0 imágenes compartidas entre splits.
+    \item \textbf{Integridad} completa: 100\% de archivos presentes en las particiones.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Evolución del dataset a través del pipeline de curación}
+\label{tab:fase0_evolucion_dataset}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Etapa} & \textbf{Operación} & \textbf{Imágenes} & \textbf{Categorías} \\
+\midrule
+Original & Datasets combinados & $\sim$9{,}142 & 64 \\
+Etapa 2 & Filtrado inicial & 1{,}907 & 15 \\
+Etapa 4.1 & Recuración (sin \texttt{hazelnut} y duplicados) & 1{,}393 & 15 \\
+Etapa 4.2 & Unificación de taxonomía & 1{,}393 & 6 \\
+Etapa 4.3--4.4 & Balanceo + splits & 1{,}022 & 6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Taxonomía unificada de defectos}
+
+Para garantizar coherencia semántica y facilitar la evaluación comparativa, se definió una taxonomía unificada de 6 categorías. La Tabla~\ref{tab:fase0_taxonomia} resume la definición y ejemplos de etiquetas originales mapeadas.
+
+\begin{table}[htbp]
+\centering
+\caption{Taxonomía unificada de defectos y ejemplos de etiquetas originales mapeadas}
+\label{tab:fase0_taxonomia}
+\begin{tabular}{cllp{6.6cm}}
+\toprule
+\textbf{ID} & \textbf{Categoría} & \textbf{Criticidad} & \textbf{Ejemplos de etiquetas originales} \\
+\midrule
+0 & NORMAL & --- & \texttt{good}, \texttt{normal} \\
+1 & DEFORMACIONES & Alta & \texttt{bent}, \texttt{bent\_lead}, \texttt{bent\_wire}, \texttt{short}, \texttt{spur} \\
+2 & ROTURA\_FRACTURA & Crítica & \texttt{crack}, \texttt{break}, \texttt{broken}, \texttt{broken\_large}, \texttt{defect} \\
+3 & RAYONES\_ARAÑAZOS & Media & \texttt{scratch}, \texttt{Scratch}, \texttt{s\_scratch}, \texttt{scratch\_head} \\
+4 & PERFORACIONES & Crítica & \texttt{hole}, \texttt{Hole}, \texttt{missing\_hole}, \texttt{cut}, \texttt{cut\_lead} \\
+5 & CONTAMINACIÓN & Alta & \texttt{contamination}, \texttt{metal\_contamination}, \texttt{Dirty} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Análisis del dataset final}
+
+\subsubsection{Resumen global y particiones}
+
+La versión final del dataset curado contiene 1{,}022 imágenes y 1{,}354 anotaciones en formato COCO. La Tabla~\ref{tab:fase0_resumen_dataset_final} resume las métricas principales, mientras que la Tabla~\ref{tab:fase0_splits} detalla el reparto train/val/test y la proporción de imágenes augmentadas.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumen del dataset final curado}
+\label{tab:fase0_resumen_dataset_final}
+\begin{tabular}{lc}
+\toprule
+\textbf{Característica} & \textbf{Valor} \\
+\midrule
+Total de imágenes & 1{,}022 \\
+Total de anotaciones & 1{,}354 \\
+Categorías unificadas & 6 \\
+Ratio máx/mín (anotaciones por clase) & 2.08:1 \\
+Resolución media (train/val/test) & 1647$\times$1347 / 1735$\times$1457 / 1704$\times$1415 px \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Distribución del dataset por split y proporción de augmentación}
+\label{tab:fase0_splits}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Split} & \textbf{Imágenes} & \textbf{Anotaciones} & \textbf{\%} & \textbf{\% Augmentadas} \\
+\midrule
+Train & 715 & 944 & 70\% & 35.94\% \\
+Val & 102 & 145 & 10\% & 38.24\% \\
+Test & 205 & 265 & 20\% & 35.12\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Distribución por categorías y origen}
+
+La Figura~\ref{fig:fase0_category_distribution} muestra la distribución de anotaciones por clase y split tras el balanceo. Además, el dataset final integra un aporte similar de ambas fuentes: 517 imágenes proceden de MVTec AD y 505 de VISION-Datasets (Figura~\ref{fig:fase0_source_dataset_distribution}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase0_category_distribution.png}
+\caption{Distribución de anotaciones por categoría y split en el dataset final balanceado.}
+\label{fig:fase0_category_distribution}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase0_source_dataset_distribution.png}
+\caption{Distribución del número de imágenes por dataset de origen (MVTec AD vs VISION-Datasets) en el dataset final.}
+\label{fig:fase0_source_dataset_distribution}
+\end{figure}
+
+\subsubsection{Características de resolución y escalas}
+
+El dataset presenta alta variabilidad en tamaño de imagen (Figura~\ref{fig:fase0_image_size_distributions}), lo que motivó la selección de resoluciones de entrenamiento que preservan información relevante sin exceder las limitaciones computacionales. La Figura~\ref{fig:fase0_width_vs_height_scatter} ilustra la dispersión ancho--alto, evidenciando la heterogeneidad inter-split.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase0_image_size_distributions.png}
+\caption{Distribuciones de tamaños de imagen (ancho, alto, lado corto y relación de aspecto) en el dataset final.}
+\label{fig:fase0_image_size_distributions}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase0_width_vs_height_scatter.png}
+\caption{Dispersión ancho vs alto de las imágenes del dataset final, mostrando la variabilidad de resolución.}
+\label{fig:fase0_width_vs_height_scatter}
+\end{figure}
+
+\subsubsection{Características de las anotaciones (bounding boxes)}
+
+El análisis de las cajas delimitadoras (Figura~\ref{fig:fase0_bbox_distribution}) muestra la existencia de una fracción relevante de bboxes pequeñas. En el split de entrenamiento, el 23.41\% de las cajas presenta anchura menor de 32 píxeles y el 22.25\% presenta altura menor de 32 píxeles (en validación y test estos porcentajes se sitúan entre el 16\% y el 20\%). Esta observación resulta relevante para modelos basados en \textit{Region Proposal Networks} (RPN) y configuraciones de anchors por defecto, y se tuvo en cuenta en la fase de experimentación.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase0_bbox_distribution.png}
+\caption{Distribución de tamaños y relaciones de aspecto de las bounding boxes en el dataset final.}
+\label{fig:fase0_bbox_distribution}
+\end{figure}
+
+\subsubsection{Balanceo mediante augmentación}
+
+Para mitigar el desbalance entre categorías se aplicó una estrategia híbrida de under/over-sampling complementada con augmentación conservadora. La Figura~\ref{fig:fase0_augmentation_distribution} muestra la proporción de imágenes originales y augmentadas en cada split, manteniéndose en torno al 36\% a nivel global.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase0_augmentation_distribution.png}
+\caption{Proporción de imágenes originales y augmentadas por split en el dataset final.}
+\label{fig:fase0_augmentation_distribution}
+\end{figure}
+
+\subsection{Conclusiones de la Fase 0}
+
+El pipeline de curación permitió transformar dos fuentes heterogéneas en un dataset único, trazable y listo para experimentación:
+\begin{itemize}
+    \item Se obtuvo un dataset final de 1{,}022 imágenes y 1{,}354 anotaciones, con 6 categorías unificadas.
+    \item El balance entre clases se estabilizó hasta un ratio máx/mín de 2.08:1, adecuado para entrenamiento supervisado.
+    \item Se validó estadísticamente la estratificación de splits ($p=0.999$) y la ausencia de leakage entre particiones.
+    \item El análisis de escalas evidenció la presencia de bboxes pequeñas y alta variabilidad de resolución, aspectos que influyeron en las decisiones de configuración del entrenamiento.
+\end{itemize}
+
 \section{Metodología de trabajo}
 \label{sec:metodologia}
 
@@ -23,7 +247,7 @@ El desarrollo del presente trabajo se ha estructurado siguiendo una metodología
 
 \subsection{Dataset y configuración experimental}
 
-El dataset utilizado en todos los experimentos corresponde a \texttt{curated\_dataset\_splitted\_20251101\_provisional\_1st\_version}, un conjunto de datos industriales curado que incluye imágenes de componentes manufacturados con anotaciones en formato COCO. Las características principales del dataset son:
+El dataset utilizado en todos los experimentos corresponde a \texttt{curated\_dataset\_splitted\_20251101\_provisional\_1st\_version}, un conjunto de datos industriales curado que incluye imágenes de componentes manufacturados con anotaciones en formato COCO. El proceso de preparación y curación del conjunto de datos se detalla en la Sección~\ref{sec:fase0}. Las características principales del dataset son:
 
 \begin{itemize}
     \item \textbf{Resolución original}: Mediana de aproximadamente 1650×1350 píxeles, con variabilidad significativa entre imágenes.
@@ -56,9 +280,11 @@ Se han establecido criterios diferenciados según la arquitectura:
 \section{Planificación en fases}
 \label{sec:planificacion}
 
-El desarrollo experimental se ha estructurado en tres fases principales, cada una con objetivos específicos y metodología adaptada:
+El desarrollo del proyecto se ha estructurado en cuatro fases principales, cada una con objetivos específicos y metodología adaptada:
 
 \begin{description}
+    \item[\textbf{Fase 0: Preparación y curación del dataset}] Construir un conjunto de datos unificado en formato COCO, con taxonomía coherente, balance de clases y particiones estratificadas, garantizando su calidad mediante validaciones cuantitativas.
+    
     \item[\textbf{Fase 1: Baseline con arquitecturas CNN}] Establecer líneas base con arquitecturas convolucionales tradicionales (ResNet-18 y EfficientNet-B0) para tener un punto de referencia comparativo. Esta fase permite evaluar el rendimiento de métodos establecidos en el problema específico de detección de defectos industriales.
     
     \item[\textbf{Fase 2: Exploración de Vision Transformers}] Evaluar el rendimiento de arquitecturas Vision Transformer, específicamente DEIMv2, explorando diferentes configuraciones de resolución y número de épocas para identificar la configuración óptima.
@@ -203,7 +429,7 @@ Los resultados de la Fase 1 establecen líneas base claras y revelan limitacione
     \item \textbf{Hipótesis sobre limitaciones}: Las CNNs tienen bias inductivo fuerte hacia patrones locales, lo que puede limitar su capacidad para capturar relaciones espaciales complejas necesarias para distinguir algunos tipos de defectos. La alta variabilidad del dataset (iluminación, superficies, escalas) puede ser difícil de manejar para arquitecturas con campo receptivo limitado.
 \end{enumerate}
 
-Estos resultados justifican explorar arquitecturas más modernas como Vision Transformers, que tienen capacidad de atención global desde el inicio y pueden capturar dependencias de largo alcance de forma más efectiva.
+Estos resultados justifican explorar arquitecturas más modernas como Vision Transformers, que tienen capacidad de atención global desde el inicio y pueden capturar dependencias de largo alcance de forma más efectiva. La evidencia gráfica completa del proceso de entrenamiento de esta fase (curvas de pérdida, \textit{learning rate} y descomposición por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase1}.
 
 
 \section{Fase 2: Exploración de Vision Transformers}
@@ -383,6 +609,22 @@ ROTURA\_FRACTURA & 0.576 & 1.000 & 0.725 \\
     \item NORMAL y PERFORACIONES mantienen excelente rendimiento (>92\% AP).
 \end{itemize}
 
+Las Figuras~\ref{fig:fase2_deimv2_val_map_300ep} y~\ref{fig:fase2_deimv2_val_metrics_300ep} ilustran la evolución de las métricas de validación durante este entrenamiento. Se observa claramente cómo el mAP crece de forma sostenida hasta la época 187, momento a partir del cual las curvas se estabilizan. Esta visualización es clave para entender por qué 150--200 épocas capturan la mayor parte de la mejora potencial.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase2_deimv2_1024_300ep_val_map.png}
+\caption{Evolución de la métrica mAP de validación (\textit{COCO mAP@0.5:0.95}) durante el entrenamiento de DEIMv2 (1024$\times$1024, 300 épocas). El máximo se alcanza en la época 187, tras lo cual las métricas se estabilizan con oscilaciones menores.}
+\label{fig:fase2_deimv2_val_map_300ep}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{fig/fase2_deimv2_1024_300ep_val_metrics.png}
+\caption{Comparativa de métricas de validación durante el entrenamiento de DEIMv2 (1024$\times$1024, 300 épocas): mAP@0.5:0.95, AP@0.5 y AP@0.75. Las tres métricas muestran patrones de convergencia similares, lo que indica un comportamiento consistente del modelo bajo diferentes umbrales de IoU.}
+\label{fig:fase2_deimv2_val_metrics_300ep}
+\end{figure}
+
 \textbf{Análisis de eficiencia de entrenamiento:}
 \begin{itemize}
     \item 80→120 épocas: +14.2 puntos mAP / +40 épocas = \textbf{0.355 puntos/época}
@@ -420,6 +662,8 @@ La Tabla~\ref{tab:evolucion_fase2} resume la evolución del rendimiento a travé
 
 \subsection{Conclusiones de la Fase 2}
 
+Los resultados de esta fase demuestran de forma contundente la superioridad de los \textit{Vision Transformers} para el problema de detección de defectos industriales:
+
 \begin{enumerate}
     \item \textbf{DEIMv2 supera ampliamente a las CNNs}: mAP de 0.785 vs 0.162 (EfficientNet) y 0.077 (ResNet), representando mejoras de +384\% y +881\% respectivamente.
     \item \textbf{Resolución 1024×1024 es crítica}: Preserva suficiente información (~47\% del original) sin ser prohibitiva en memoria.
@@ -427,6 +671,8 @@ La Tabla~\ref{tab:evolucion_fase2} resume la evolución del rendimiento a travé
     \item \textbf{Precision perfecta}: El modelo no genera falsos positivos en ninguna clase (Precision=1.0).
     \item \textbf{Clases problemáticas mejoran con entrenamiento largo}: RAYONES\_ARAÑAZOS y ROTURA\_FRACTURA mejoran significativamente entre 120 y 300 épocas.
 \end{enumerate}
+
+La evidencia gráfica completa de las cuatro iteraciones de DEIMv2 (curvas de pérdida, \textit{learning rate} y métricas de validación) se presenta en la Sección~\ref{subsec:evidencia_fase2}, donde se analiza en detalle el proceso de convergencia de cada configuración.
 
 
 \section{Fase 3: Validación experimental}
@@ -574,6 +820,22 @@ DEIMv2 & 1024×1024 & 0.785 & --- & 1024×1024 \\
 \end{tabular}
 \end{table}
 
+La Figura~\ref{fig:fase3_total_loss_1024} muestra las curvas de pérdida para ambas arquitecturas CNN entrenadas a 1024$\times$1024. Es notable que ambos modelos convergen de forma aparentemente correcta (la pérdida de entrenamiento decrece y la de validación se estabiliza), pero esto no se traduce en mejoras significativas de mAP. Este fenómeno subraya una limitación fundamental de las CNNs: \textbf{la reducción de la pérdida no garantiza mejor rendimiento en detección} cuando la arquitectura no puede capturar las relaciones espaciales necesarias.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_total_loss.png}
+\end{minipage}
+\caption{Evolución de la pérdida total (train y validación) en la Fase 3 para ResNet-18 (izquierda) y EfficientNet-B0 (derecha) entrenadas a 1024$\times$1024. Ambas convergen de forma estable, pero el mAP final no mejora sustancialmente, evidenciando limitaciones arquitectónicas.}
+\label{fig:fase3_total_loss_1024}
+\end{figure}
+
 \textbf{Observaciones:}
 \begin{enumerate}
     \item \textbf{ResNet-18} mejora ligeramente pero sigue muy lejos de DEIMv2 (0.080 vs 0.785).
@@ -582,6 +844,8 @@ DEIMv2 & 1024×1024 & 0.785 & --- & 1024×1024 \\
 \end{enumerate}
 
 \subsection{Conclusiones de la Fase 3}
+
+Esta fase de validación experimental permite responder de forma definitiva a la pregunta planteada: \textbf{la superioridad de DEIMv2 se debe a la arquitectura \textit{Vision Transformer}, no a la resolución de entrada}.
 
 \begin{enumerate}
     \item \textbf{La superioridad de DEIMv2 no se debe solo a la resolución}:
@@ -610,13 +874,17 @@ DEIMv2 & 1024×1024 & 0.785 & --- & 1024×1024 \\
     \end{itemize}
 \end{enumerate}
 
+La evidencia gráfica adicional de los entrenamientos de esta fase (evolución del \textit{learning rate} y descomposición de la pérdida por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase3}.
+
 
 \section{Análisis comparativo final}
 \label{sec:analisis_comparativo}
 
+Tras completar las tres fases experimentales, esta sección consolida los resultados obtenidos y ofrece una visión integrada del rendimiento de cada arquitectura. El objetivo es facilitar al lector una comparación directa que permita extraer conclusiones claras sobre la idoneidad de cada enfoque para el problema de detección de defectos industriales.
+
 \subsection{Tabla resumen de todos los experimentos}
 
-La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de todos los experimentos realizados.
+La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de los ocho experimentos realizados a lo largo de las tres fases. Para cada configuración se indica la arquitectura, resolución de entrada, número de épocas de entrenamiento, mAP@0.5 obtenido en el conjunto de test, precision media y época del mejor checkpoint. Las observaciones destacan aspectos relevantes de cada experimento que contextualizan los resultados numéricos.
 
 \begin{table}[htbp]
 \centering
@@ -751,6 +1019,237 @@ mAP máximo alcanzado & 0.162 & \textbf{0.785} \\
     \item \textbf{Menor bias inductivo} permite aprender patrones más complejos y específicos del dominio.
     \item \textbf{Representaciones ricas de DINOv3} proporcionan features semánticamente robustas desde el inicio.
 \end{enumerate}
+
+Los resultados presentados en esta sección sintetizan las conclusiones principales de la experimentación. A continuación, la Sección~\ref{sec:evidencia_grafica} ofrece un compendio de la evidencia gráfica del proceso de entrenamiento de cada experimento, que permite al lector auditar los patrones de convergencia y verificar la consistencia de los resultados.
+
+\clearpage
+\section{Evidencia gráfica del proceso de entrenamiento}
+\label{sec:evidencia_grafica}
+
+A lo largo de las Fases 1--3 se ha generado un conjunto extenso de métricas de monitorización que permiten auditar el comportamiento de cada modelo durante el entrenamiento. En esta sección se recopila dicho material de forma estructurada, con el objetivo de que el lector pueda:
+
+\begin{enumerate}
+    \item \textbf{Verificar la convergencia} de cada experimento mediante las curvas de pérdida (train vs.\ validación).
+    \item \textbf{Comprender la dinámica de optimización} a través de la evolución del \textit{learning rate} y la descomposición de la función de pérdida en sus componentes (clasificación, regresión de cajas, \textit{objectness} y términos RPN).
+    \item \textbf{Contrastar el comportamiento de CNNs y ViTs}: mientras que en las CNNs el criterio de selección del mejor checkpoint es la menor pérdida de validación, en DEIMv2 se utiliza directamente el mAP de validación, lo que justifica la inclusión de curvas de métricas adicionales para esta arquitectura.
+\end{enumerate}
+
+Cada panel agrupa las visualizaciones más relevantes para un experimento concreto. Las referencias cruzadas a los resultados cuantitativos (tablas de mAP, AP por clase, etc.) se encuentran en las secciones correspondientes de las Fases 1, 2 y 3.
+
+%------------------------------------------------------------------------------
+\subsection{Fase 1: Entrenamiento de las líneas base CNN}
+\label{subsec:evidencia_fase1}
+
+Los modelos CNN de la Fase 1 (ResNet-18 y EfficientNet-B0 con Faster R-CNN) fueron entrenados durante 50 épocas con resolución nativa del dataset. En ambos casos se observa una convergencia rápida de la pérdida de entrenamiento (primeras 10--15 épocas), seguida de una estabilización con ligero \textit{overfitting} en las épocas finales, evidenciado por el incremento de la pérdida de validación mientras la de entrenamiento continúa descendiendo.
+
+\paragraph{ResNet-18 + Faster R-CNN (resolución nativa).}
+La Figura~\ref{fig:trace_fase1_resnet18_nativa} muestra el panel de monitorización completo. Se aprecia cómo el \textit{learning rate} (configurado con \texttt{StepLR}, \texttt{step\_size=5}, \texttt{gamma=0.1}) decrece de forma escalonada, provocando reducciones bruscas en la pérdida de entrenamiento. El mejor checkpoint se seleccionó en la época con menor \texttt{val\_loss}. La descomposición por componentes revela que la pérdida RPN (\textit{objectness} y regresión de propuestas) domina en las primeras épocas, mientras que la pérdida de clasificación converge más lentamente.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_learning_rate.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_loss_components.png}
+\end{minipage}
+\caption{Panel de monitorización para ResNet-18 + Faster R-CNN (resolución nativa, 50 épocas). De izquierda a derecha: (1) pérdida total de entrenamiento y validación, (2) evolución del \textit{learning rate}, y (3) descomposición de la pérdida en sus componentes. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:resnet18_nativa}.}
+\label{fig:trace_fase1_resnet18_nativa}
+\end{figure}
+
+\paragraph{EfficientNet-B0 + Faster R-CNN (resolución nativa).}
+La Figura~\ref{fig:trace_fase1_efficientnet_nativa} presenta el panel equivalente para EfficientNet-B0. El \textit{scheduler} \texttt{CosineAnnealingLR} proporciona una reducción suave del \textit{learning rate}, lo que se traduce en una convergencia más gradual. Se observa que EfficientNet alcanza valores de pérdida de entrenamiento inferiores a ResNet-18 (convergencia más ajustada), pero la pérdida de validación presenta mayor variabilidad, indicando una generalización menos estable. La descomposición por componentes muestra un patrón similar al de ResNet-18, con dominio inicial de los términos RPN.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_learning_rate.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_loss_components.png}
+\end{minipage}
+\caption{Panel de monitorización para EfficientNet-B0 + Faster R-CNN (resolución nativa, 50 épocas). De izquierda a derecha: pérdida total, \textit{learning rate} y componentes de pérdida. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:efficientnet_nativa}.}
+\label{fig:trace_fase1_efficientnet_nativa}
+\end{figure}
+
+%------------------------------------------------------------------------------
+\subsection{Fase 2: Evolución iterativa de DEIMv2}
+\label{subsec:evidencia_fase2}
+
+A diferencia de las CNNs, en DEIMv2 el criterio de selección del mejor checkpoint es el \textbf{mAP@0.5 en validación}, no la pérdida. Por ello, además de las curvas de pérdida y \textit{learning rate}, se incluyen las métricas de validación (mAP@0.5:0.95, AP@0.5 y AP@0.75), que permiten identificar el punto óptimo de convergencia.
+
+\paragraph{Iteración 2.1: DEIMv2 @ 640$\times$640 (87 épocas).}
+La Figura~\ref{fig:trace_fase2_deimv2_640_87ep} muestra la primera configuración de DEIMv2. Se observa una convergencia progresiva del mAP de validación, con el mejor checkpoint en la época 86 (prácticamente la última). Esto sugirió que el modelo no había convergido completamente, motivando las iteraciones posteriores. La pérdida total presenta el patrón típico de los \textit{Transformers}: descenso lento pero sostenido, sin los picos de \textit{overfitting} observados en CNNs.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_learning_rate.png}
+\end{minipage}
+\vspace{0.3cm}
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_val_map.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_val_metrics.png}
+\end{minipage}
+\caption{Panel de monitorización para DEIMv2 (640$\times$640, 87 épocas). Fila superior: pérdida total y \textit{learning rate}. Fila inferior: evolución del mAP de validación y comparativa de métricas (mAP@0.5:0.95, AP@0.5, AP@0.75). El mejor checkpoint (época 86) indica convergencia incompleta.}
+\label{fig:trace_fase2_deimv2_640_87ep}
+\end{figure}
+
+\paragraph{Iteración 2.2: DEIMv2 @ 1024$\times$1024 (80 épocas).}
+El aumento de resolución a 1024$\times$1024 (Figura~\ref{fig:trace_fase2_deimv2_1024_80ep}) produce un salto cualitativo en las métricas de validación. Sin embargo, el mejor checkpoint vuelve a coincidir con la última época (80), confirmando la necesidad de entrenamientos más largos para los \textit{Vision Transformers}.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_learning_rate.png}
+\end{minipage}
+\vspace{0.3cm}
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_val_map.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_val_metrics.png}
+\end{minipage}
+\caption{Panel de monitorización para DEIMv2 (1024$\times$1024, 80 épocas). El mAP de validación muestra una tendencia ascendente sin saturación clara, con mejor checkpoint en la época 80. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:deimv2_1024_80ep}.}
+\label{fig:trace_fase2_deimv2_1024_80ep}
+\end{figure}
+
+\paragraph{Iteración 2.3: DEIMv2 @ 1024$\times$1024 (120 épocas).}
+La extensión a 120 épocas (Figura~\ref{fig:trace_fase2_deimv2_1024_120ep}) confirma la hipótesis: el mAP de validación sigue mejorando y el mejor checkpoint se sitúa en la época 119. La curva de mAP muestra una pendiente positiva sostenida, indicando que aún existía margen de mejora.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_learning_rate.png}
+\end{minipage}
+\vspace{0.3cm}
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_val_map.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_val_metrics.png}
+\end{minipage}
+\caption{Panel de monitorización para DEIMv2 (1024$\times$1024, 120 épocas). El mejor checkpoint (época 119) sugiere que el modelo aún no había convergido. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:deimv2_1024_120ep}.}
+\label{fig:trace_fase2_deimv2_1024_120ep}
+\end{figure}
+
+\paragraph{Iteración 2.4: DEIMv2 @ 1024$\times$1024 (300 épocas) --- Mejor modelo.}
+El entrenamiento extendido a 300 épocas (Figura~\ref{fig:trace_fase2_deimv2_1024_300ep}) permite identificar el \textbf{punto de convergencia real}: el mejor checkpoint se alcanza en la \textbf{época 187} (62\% del entrenamiento total). A partir de ese punto, las métricas de validación se estabilizan y comienzan a mostrar ligeras oscilaciones, indicando que entrenamientos más largos no aportan mejoras significativas. Esta observación fundamenta la recomendación práctica de 150--200 épocas para futuros entrenamientos con \textit{Vision Transformers} en este dominio.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_total_loss.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_learning_rate.png}
+\end{minipage}
+\vspace{0.3cm}
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_val_map.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_val_metrics.png}
+\end{minipage}
+\caption{Panel de monitorización para DEIMv2 (1024$\times$1024, 300 épocas). El mejor checkpoint (época 187) indica convergencia completa. La estabilización del mAP tras esta época confirma que 150--200 épocas capturan $>$98\% de la mejora potencial. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:deimv2_1024_300ep}.}
+\label{fig:trace_fase2_deimv2_1024_300ep}
+\end{figure}
+
+%------------------------------------------------------------------------------
+\subsection{Fase 3: Validación con CNNs a 1024$\times$1024}
+\label{subsec:evidencia_fase3}
+
+Para validar que la superioridad de DEIMv2 no se debe únicamente a la resolución de entrada, se re-entrenaron las arquitecturas CNN con resolución 1024$\times$1024. Las Figuras~\ref{fig:trace_fase3_resnet18_1024} y~\ref{fig:trace_fase3_efficientnet_1024} muestran las curvas de optimización correspondientes.
+
+\paragraph{ResNet-18 @ 1024$\times$1024.}
+La Figura~\ref{fig:trace_fase3_resnet18_1024} muestra que ResNet-18 converge de forma similar a la configuración con resolución nativa. El \textit{learning rate} escalonado produce reducciones bruscas en la pérdida, pero el rendimiento final (mAP=0.080, Tabla~\ref{tab:resnet18_1024}) apenas mejora respecto a la resolución nativa (+3.9\%), confirmando que la arquitectura CNN no aprovecha eficazmente la información adicional.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_learning_rate.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_loss_components.png}
+\end{minipage}
+\caption{Panel de monitorización para ResNet-18 a 1024$\times$1024: evolución del \textit{learning rate} (izquierda) y descomposición de la pérdida por componentes (derecha). La convergencia es similar a la configuración nativa, pero el mAP final apenas mejora (véase Tabla~\ref{tab:resnet18_1024}).}
+\label{fig:trace_fase3_resnet18_1024}
+\end{figure}
+
+\paragraph{EfficientNet-B0 @ 1024$\times$1024.}
+La Figura~\ref{fig:trace_fase3_efficientnet_1024} revela un comportamiento inesperado: a pesar de una convergencia aparentemente correcta de la pérdida, el rendimiento final (mAP=0.122, Tabla~\ref{tab:efficientnet_1024}) es \textbf{inferior} al de la configuración nativa (-24.7\%). La descomposición por componentes no muestra anomalías evidentes, lo que sugiere que la limitación es arquitectónica: EfficientNet-B0 está optimizada para resoluciones 224--380px y su escalado compuesto no generaliza bien a 1024px.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_learning_rate.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_loss_components.png}
+\end{minipage}
+\caption{Panel de monitorización para EfficientNet-B0 a 1024$\times$1024: evolución del \textit{learning rate} (izquierda) y descomposición de la pérdida por componentes (derecha). A pesar de una convergencia normal, el mAP final empeora respecto a la resolución nativa (véase Tabla~\ref{tab:efficientnet_1024}).}
+\label{fig:trace_fase3_efficientnet_1024}
+\end{figure}
+
+%------------------------------------------------------------------------------
+\subsection{Síntesis: patrones de convergencia CNN vs.\ ViT}
+
+El análisis comparativo de las curvas de entrenamiento revela diferencias fundamentales entre arquitecturas:
+
+\begin{itemize}
+    \item \textbf{Velocidad de convergencia}: Las CNNs convergen en 15--20 épocas y comienzan a mostrar \textit{overfitting} a partir de la época 30. DEIMv2 requiere 150--200 épocas para alcanzar su rendimiento óptimo, sin signos claros de \textit{overfitting}.
+    
+    \item \textbf{Estabilidad}: Las curvas de pérdida de validación de las CNNs presentan mayor variabilidad (picos y oscilaciones), mientras que las de DEIMv2 muestran una tendencia descendente más suave y estable.
+    
+    \item \textbf{Criterio de selección}: El uso de \texttt{val\_loss} como criterio en CNNs y mAP de validación en ViTs refleja la diferente relación entre pérdida y rendimiento en detección para cada familia arquitectónica.
+    
+    \item \textbf{Respuesta a resolución}: Las CNNs no mejoran (o empeoran) con resolución 1024$\times$1024, mientras que DEIMv2 experimenta ganancias sustanciales (+25\% mAP al pasar de 640 a 1024px).
+\end{itemize}
+
+Estas observaciones refuerzan la conclusión de que la superioridad de los \textit{Vision Transformers} en este dominio no es un artefacto de la configuración experimental, sino una consecuencia de sus propiedades arquitectónicas fundamentales.
 
 
 \section{Problemas encontrados y desviaciones}
