@@ -1,0 +1,30 @@
+En introduccion:
+quitar subsecciones, texto comlpeto unico
+
+Apartado 3.3
+Introduccion al principio para dar paso a cada subsecciones
+
+3.4 Introduccion para dar paso a subsecciones
+
+3.5 lo mismo
+
+3.6 Introduccion y alguna tabla o esquema, algoritmos, convergencias
+Esquemas, parece que las subsecciones son muy cortas, ir viendo con calma
+
+3.6: Introduccion con breve parrafo
+Eliminar alguna subsecciones porque parece un poco cargado de divisiones
+
+Siempre muchas subsecciones
+
+
+Cuidao en resumen de introducciones
+
+
+Otra cosa, anglicismos. Anexo o seccion con referencias
+
+Al principio de la memoria, aclarar que hay muchos tecniccismos porque no hay una traduccion clara al español. ejemplo: accuracy
+
+
+
+
+Apartado experimentacion. Muy poco entendible

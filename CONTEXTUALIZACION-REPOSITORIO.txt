@@ -1,0 +1,328 @@
+================================================================================
+CONTEXTUALIZACIÓN DEL REPOSITORIO — MEMORIA TFG Y PAPER CIENTÍFICO
+================================================================================
+Repositorio: Trabajo Fin de Grado (TFG) + artículo para revista IEEE TII
+Tema: Vision Transformers para detección de anomalías/defectos industriales
+Uso: Plantilla de ayuda y ejemplo proporcionada por la universidad (UCLM-EIIA)
+Fecha de referencia: 2025
+
+Este documento sirve como base de apoyo para cualquier agente o IA que deba
+ayudar con correcciones, redacción académica avanzada, léxico científico-técnico
+y calidad de memorias científico-técnicas y papers. Incluye la estructura del
+repositorio, la ubicación de recursos (bibliografía, figuras) y referencias
+a ejemplos LaTeX (tablas, ecuaciones, figuras, citas) para mantener coherencia.
+
+================================================================================
+1) ESTRUCTURA GLOBAL: DOS PARTES DISTINTAS
+================================================================================
+
+El repositorio se divide en DOS BLOQUES CLARAMENTE SEPARADOS:
+
+  A) TFG — MEMORIA TÉCNICA
+     Todo el repositorio EXCEPTO la carpeta:
+       IEEE_TII_Vision_Transformers/
+
+  B) PAPER CIENTÍFICO PARA REVISTA
+     Contenido exclusivo de la carpeta:
+       IEEE_TII_Vision_Transformers/
+
+No mezclar convenciones ni estilos entre ambos: la memoria sigue norma académica
+española (UNE, clase eiiatfg) y el paper sigue plantilla IEEE (inglés, formato
+journal). La bibliografía (bib/) y parte de las figuras (fig/) son compartidas
+conceptualmente, pero el paper puede tener su propio manejo de referencias
+según la plantilla IEEE.
+
+================================================================================
+2) PARTE A — MEMORIA TÉCNICA DEL TFG (todo salvo IEEE_TII_Vision_Transformers/)
+================================================================================
+
+2.1 Descripción y objetivo
+---------------------------
+Memoria científico-técnica en LaTeX de un Trabajo Fin de Grado sobre detección
+automática de anomalías en componentes industriales usando Vision Transformers
+(ViT) y aprendizaje auto-supervisado (SSL). Incluye: motivación, objetivos,
+estado del arte (antecedentes), desarrollo (metodología, dataset, experimentos
+con CNN y ViT), resultados, conclusiones y anexos. El documento está pensado
+para cumplir con los requisitos de la Escuela de Ingeniería Industrial y
+Aeroespacial (UCLM) y usa una plantilla oficial de la universidad.
+
+2.2 Estructura de carpetas y ficheros principales (TFG)
+------------------------------------------------------
+
+  Raíz del repositorio (TFG):
+  - TFG.tex                    → Documento principal; incluye portada, índices,
+                                  capítulos y anexos. Carga datos-tfg.tex,
+                                  acrónimos, bib y los .tex de cada capítulo.
+  - datos-tfg.tex              → Metadatos del TFG (título, autor, grado,
+                                  expediente, tutor, email, repositorio git, etc.).
+                                  Debe editarse con los datos reales del alumno.
+
+  tex/                         → Cuerpo de la memoria (capítulos)
+  - introduccion.tex           → Cap. 1: Introducción (inspección industrial,
+                                  limitaciones CNN, ViT y SSL, motivación y alcance).
+  - objetivos.tex              → Cap. 2: Objetivos general y específicos, alcance,
+                                  limitaciones, contribución esperada.
+  - antecedentes.tex           → Cap. 3: Motivación y antecedentes (estado del arte:
+                                  fundamentos ViT/SSL, ViT en detección industrial,
+                                  transfer learning, técnicas avanzadas, análisis
+                                  crítico, oportunidades de investigación, síntesis).
+  - desarrollo.tex             → Cap. 4: Desarrollo (Fase 0: dataset; Fase 1: CNN
+                                  baseline; Fase 2: ViT DEIMv2; Fase 3: validación
+                                  experimental; análisis comparativo; evidencia gráfica;
+                                  problemas y desviaciones).
+  - resultados.tex             → Cap. 5: Resultados (si se usa como capítulo aparte).
+  - conclusiones.tex           → Cap. 6: Conclusiones.
+  - resumen.tex                → Resumen (abstract) del TFG.
+  - dedicatoria.tex            → Dedicatoria.
+  - agradecimientos.tex        → Agradecimientos.
+  - acronimos.tex              → Definiciones de acrónimos (glosario).
+  - simbolos.tex               → Lista de símbolos (opcional).
+  - latex.tex                  → Anexo "Chuleta de LaTeX": punto de entrada a
+                                  ejemplos de texto, figuras, tablas, ecuaciones,
+                                  citas y referencias, hojas de datos, código fuente.
+
+  tex/latex/                   → Anexo con ejemplos LaTeX (referencia para redacción)
+  - texto.tex                  → Ejemplos de formato de texto, listas, descripciones.
+  - figuras.tex                → Ejemplos de figure, includegraphics, caption,
+                                  label, subfiguras (subcaptionbox), posiciones [htbp].
+  - tablas.tex                 → Ejemplos de table, tabular, longtable, multicolumn,
+                                  multirow, caption, label.
+  - ecuaciones.tex             → Ejemplos de equation, fórmulas en línea y bloque,
+                                  referencias a ecuaciones.
+  - citas-referencias.tex      → Uso de biblatex, cite, parencite, textcite,
+                                  estilo IEEE; buenas prácticas de referencias.
+  - hojas-datos.tex            → Inclusión de PDF (includepdf, includegraphics).
+  - codigo-fuente.tex          → Listados de código (lstlisting, lstinputlisting).
+
+  sty/                         → Estilos y clase del documento (no modificar salvo necesidad)
+  - eiiatfg.cls                → Clase principal del TFG (UCLM). NO usar paquetes
+                                  que la clase ya gestione (p. ej. geometry, fancyhdr).
+  - portada.sty, indices.sty, code.sty, admonition.sty, metadata.sty, licencia.sty,
+    entornos.sty                → Soporte de portada, índices, código, avisos, etc.
+
+  bib/                         → BIBLIOGRAFÍA (ver sección 4)
+  - main.bib                   → Referencias principales del TFG y del paper.
+                                  Todas las citas deben usar claves definidas aquí.
+  - how.bib, ejemplos.bib      → Archivos auxiliares (pueden estar vacíos).
+
+  fig/                         → FIGURAS (ver sección 4)
+  - Imágenes del TFG: fase0_*, fase1_*, fase2_*, fase3_* (gráficas de análisis,
+    curvas de entrenamiento, métricas).
+  - Ejemplos de plantilla: ejemplo.eps, ejemplo2.jpg, etc.
+
+  Documentacion-externa/       → Documentación auxiliar del proyecto (datos de
+  (opcional para compilación)    experimentos, análisis de dataset, scripts).
+                                  No es parte obligatoria del PDF; se usa como
+                                  contexto para redactar con datos reales (JSON, CSV).
+
+  .cursorrules                 → Reglas globales del proyecto: clase LaTeX, citas
+                                  solo desde bib/main.bib, idioma español formal,
+                                  voz impersonal o plural mayestático, evidencia
+                                  respaldada por datos.
+  .cursor/rules/tfg_writing.mdc → Reglas específicas para .tex: clase, figuras en fig/,
+                                  análisis de datos desde Documentacion-externa.
+
+2.3 Normas de redacción de la memoria (TFG)
+------------------------------------------
+- Idioma: español de España (formal, académico).
+- Voz: impersonal ("Se ha realizado...", "Se observa...") o plural mayestático
+  ("Hemos analizado..."). Evitar primera persona singular.
+- Citas: exclusivamente \cite{clave} con claves existentes en bib/main.bib.
+- Figuras: entorno figure con \centering, \caption y \label; rutas a fig/ o
+  Documentacion-externa/ según corresponda.
+- Matemáticas: $...$ en línea, \[...\] en bloque.
+- Cualquier afirmación sobre resultados (accuracy, loss, mAP, etc.) debe
+  poder respaldarse con datos de archivos JSON/CSV del contexto (p. ej. en
+  Documentacion-externa/).
+
+================================================================================
+3) PARTE B — PAPER CIENTÍFICO (IEEE_TII_Vision_Transformers/)
+================================================================================
+
+3.1 Descripción y objetivo
+--------------------------
+Artículo de investigación para la revista IEEE Transactions on Industrial
+Informatics (TII), derivado del mismo TFG. Sintetiza el estudio comparativo
+sistemático entre Vision Transformers (DEIMv2, con pre-entrenamiento auto-
+supervisado) y redes convolucionales (ResNet-18, EfficientNet-B0) en detección
+de defectos industriales. Incluye contribuciones sobre sensibilidad a resolución,
+convergencia y validación de que la superioridad del ViT es arquitectónica.
+
+3.2 Estructura de la carpeta del paper
+--------------------------------------
+
+  IEEE_TII_Vision_Transformers/
+  - paper_vit_defect_detection.tex   → Documento principal del artículo.
+                                        Usa clase ieeecolor y generic de la
+                                        plantilla IEEE. Secciones: Abstract,
+                                        Introduction, Related Work, Methodology,
+                                        Experiments, Discussion, Conclusion,
+                                        References. Idioma: inglés.
+
+  - TII-Articles-LaTeX-template/      → Plantilla oficial IEEE para TII
+    - tii-articles-template.tex      → Plantilla de ejemplo (instrucciones y formato).
+    - ieeecolor.cls                  → Clase para journal.
+    - generic.sty                    → Estilos genéricos IEEE.
+    - a1.eps                         → Figura de ejemplo (si aplica).
+
+3.3 Normas de redacción del paper
+---------------------------------
+- Idioma: inglés (estilo IEEE, formal).
+- Estructura: Title, Abstract (150–250 palabras), Keywords, Introduction
+  (con contribuciones), Related Work, Methodology, Experiments/Results,
+  Discussion, Conclusion, References.
+- Citas y referencias según formato IEEE (cite, numerado).
+- Coherencia científica con la memoria: mismos experimentos, mismos datos;
+  el paper condensa y enfatiza contribuciones y hallazgos clave para la revista.
+
+Documento de apoyo para redacción del paper desde la memoria:
+  PROMPT_PAPER_CIENTIFICO.md  → Indica qué archivos .tex de la memoria leer,
+  qué hallazgos usar para Abstract/Conclusions y restricciones de estilo.
+
+================================================================================
+4) BIBLIOGRAFÍA (bib/) Y FIGURAS (fig/)
+================================================================================
+
+4.1 Bibliografía
+----------------
+  - Ubicación: bib/
+  - Archivo principal: bib/main.bib
+  - Contiene las referencias citadas tanto en la memoria como en el paper
+    (ViT, CNN, SSL, DINOv2, MVTec AD, trabajos de defect detection, etc.).
+  - Regla obligatoria: NUNCA inventar claves de cita; usar solo las definidas
+    en main.bib. Si se necesita una cita nueva, debe añadirse primero la entrada
+    en main.bib y luego usarse \cite{clave} (memoria) o el comando de cita
+    que use la plantilla IEEE (paper).
+  - En TFG.tex se cargan: \addbibresource{bib/main.bib}, how.bib, ejemplos.bib.
+
+4.2 Figuras
+-----------
+  - Ubicación principal: fig/
+  - La memoria referencia figuras con rutas relativas desde el directorio del
+    documento (p. ej. fig/fase0_category_distribution.png). En desarrollo.tex
+    se usan muchas figuras de experimentos (fase0_*, fase1_*, fase2_*, fase3_*).
+  - Otras figuras pueden estar en Documentacion-externa/; en ese caso la ruta
+    en \includegraphics debe ajustarse (p. ej. Documentacion-externa/.../archivo.png).
+  - Para el paper: si las figuras se reutilizan, copiarlas o referenciar según
+    permita la plantilla IEEE (a menudo se colocan en la misma carpeta del .tex
+    del paper o en un subdirectorio indicado en la plantilla).
+
+================================================================================
+5) REFERENCIAS A EJEMPLOS LaTeX (para tablas, ecuaciones, figuras, etc.)
+================================================================================
+
+La plantilla del TFG incluye un anexo "Chuleta de LaTeX" que sirve de referencia
+para mantener formato y estilo. Está en tex/latex.tex e incluye:
+
+  - tex/latex/texto.tex
+    → Formato de texto (textbf, textit, listas enumerate/itemize, description).
+
+  - tex/latex/figuras.tex
+    → figure, \centering, \includegraphics (scale, width, height, angle),
+      \caption, \label, posiciones [htbp], subfiguras con subcaptionbox.
+      Ejemplos de pies de figura y atribución.
+
+  - tex/latex/tablas.tex
+    → table, tabular (|c|c|, \hline, cabecera doble), \caption, \label,
+      multicolumn, multirow, longtable para tablas multipágina.
+
+  - tex/latex/ecuaciones.tex
+    → equation, \label, \ref para ecuaciones, vectores, fracciones, integrales,
+      matrices (entorno array dentro de matemáticas).
+
+  - tex/latex/citas-referencias.tex
+    → cite, parencite, textcite; biblatex; estilo IEEE; requisitos de una
+      referencia (autor, título, fecha).
+
+  - tex/latex/hojas-datos.tex
+    → Inclusión de PDF (includepdf, includegraphics con page=).
+
+  - tex/latex/codigo-fuente.tex
+    → lstlisting, lstinputlisting para listados de código.
+
+Además, en el cuerpo de la memoria hay muchos ejemplos reales:
+  - tex/desarrollo.tex: numerosas tablas (booktabs: \toprule, \midrule,
+    \bottomrule) y figuras (includegraphics con width=0.95\textwidth, caption,
+    label). Usar como modelo para nuevas tablas/figuras en resultados o desarrollo.
+
+Cuando una IA deba generar tablas, ecuaciones o figuras nuevas, debe:
+  1) Respetar la clase eiiatfg.cls y no añadir paquetes redundantes.
+  2) Revisar los ejemplos en tex/latex/*.tex y en tex/desarrollo.tex.
+  3) Usar \caption y \label en todos los elementos referenciables.
+  4) Mantener nomenclatura de labels (p. ej. tab:nombre, fig:nombre, eq:nombre).
+
+================================================================================
+6) INSTRUCCIONES PARA AGENTES / IA — CORRECCIONES Y REDACCIÓN AVANZADA
+================================================================================
+
+Objetivo: Apoyar correcciones y técnicas de redacción con alto nivel de
+calidad (léxico académico, coherencia científico-técnica, normas de memoria
+y de paper).
+
+6.1 Antes de proponer cambios
+-----------------------------
+- Identificar si el cambio afecta a la MEMORIA (tex/, TFG.tex, sty/, bib/, fig/)
+  o al PAPER (IEEE_TII_Vision_Transformers/). No mezclar estilos.
+- Para la memoria: leer .cursorrules y, si aplica, .cursor/rules/tfg_writing.mdc.
+- Para datos numéricos o resultados: buscar en Documentacion-externa/ (JSON, CSV)
+  y en tex/desarrollo.tex los valores ya documentados; no inventar cifras.
+
+6.2 Calidad de redacción
+------------------------
+- Léxico: preferir términos precisos del dominio (visión por computador,
+  detección de anomalías, aprendizaje auto-supervisado, transfer learning,
+  backbone, mAP, etc.) y evitar vaguedades.
+- Coherencia: encadenamiento lógico entre párrafos y secciones; que las
+  conclusiones se apoyen en resultados descritos; que las citas respalden
+  afirmaciones.
+- Evitar repeticiones innecesarias y frases redundantes.
+- En español (memoria): evitar anglicismos innecesarios cuando exista
+  equivalente aceptado (p. ej. "entrenamiento" en lugar de "training" en
+  texto narrativo; acrónimos como ViT, CNN, SSL sí se usan).
+
+6.3 Memorias científico-técnicas (TFG)
+--------------------------------------
+- Estructura típica: introducción → objetivos → antecedentes → desarrollo
+  → resultados → conclusiones → anexos → bibliografía.
+- Cada capítulo debe tener una breve introducción o encabezado que anuncie
+  el contenido (en antecedentes.tex se han añadido introducciones a cada
+  sección para evitar transiciones bruscas).
+- Tablas y figuras: siempre con caption descriptivo y label para \ref.
+- Ecuaciones: numeradas y referenciadas cuando se usen en el texto.
+
+6.4 Papers científicos (IEEE)
+------------------------------
+- Respetar la estructura y límites de la plantilla (abstract 150–250 palabras,
+  secciones estándar).
+- Contribuciones claras y enumeradas; resultados cuantitativos con números
+  exactos (mAP, %, épocas) alineados con la memoria.
+- Tono objetivo; evitar promoción excesiva; mencionar limitaciones cuando
+  corresponda.
+
+6.5 Citas y referencias
+-----------------------
+- Solo claves existentes en bib/main.bib. Si falta una referencia, indicar
+  que debe añadirse la entrada BibTeX antes de usar \cite{clave}.
+- Comprobar que autor, título y año estén completos en las entradas usadas.
+
+================================================================================
+7) RESUMEN RÁPIDO PARA IA
+================================================================================
+
+- Memoria TFG: raíz + tex/ + sty/ + bib/ + fig/ (+ Documentacion-externa como
+  contexto). Clase sty/eiiatfg.cls. Español. Citas en bib/main.bib.
+- Paper: IEEE_TII_Vision_Transformers/paper_vit_defect_detection.tex + plantilla
+  TII. Inglés. Mismo contenido científico que la memoria, formato IEEE.
+- Ejemplos LaTeX: tex/latex.tex y archivos en tex/latex/ (tablas, figuras,
+  ecuaciones, citas); también tex/desarrollo.tex para tablas y figuras reales.
+- Reglas: .cursorrules (global), tfg_writing.mdc (para .tex). No inventar
+  citas; no añadir paquetes que la clase ya gestione; evidencia respaldada
+  por datos.
+
+Con esta contextualización, un agente o IA puede orientar correcciones y
+redacción avanzada con coherencia respecto a la estructura, el estilo y los
+recursos del repositorio.
+
+================================================================================
+Fin del documento de contextualización
+================================================================================

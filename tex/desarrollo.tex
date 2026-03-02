@@ -613,14 +613,14 @@ Las Figuras~\ref{fig:fase2_deimv2_val_map_300ep} y~\ref{fig:fase2_deimv2_val_met
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{fig/fase2_deimv2_1024_300ep_val_map.png}
+\includegraphics[width=0.95\textwidth]{fig/fase2_deimv2_1024_300ep_val_map.pdf}
 \caption{Evolución de la métrica mAP de validación (\textit{COCO mAP@0.5:0.95}) durante el entrenamiento de DEIMv2 (1024$\times$1024, 300 épocas). El máximo se alcanza en la época 187, tras lo cual las métricas se estabilizan con oscilaciones menores.}
 \label{fig:fase2_deimv2_val_map_300ep}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{fig/fase2_deimv2_1024_300ep_val_metrics.png}
+\includegraphics[width=0.95\textwidth]{fig/fase2_deimv2_1024_300ep_val_metrics.pdf}
 \caption{Comparativa de métricas de validación durante el entrenamiento de DEIMv2 (1024$\times$1024, 300 épocas): mAP@0.5:0.95, AP@0.5 y AP@0.75. Las tres métricas muestran patrones de convergencia similares, lo que indica un comportamiento consistente del modelo bajo diferentes umbrales de IoU.}
 \label{fig:fase2_deimv2_val_metrics_300ep}
 \end{figure}
@@ -826,11 +826,11 @@ La Figura~\ref{fig:fase3_total_loss_1024} muestra las curvas de pérdida para am
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_total_loss.pdf}
 \end{minipage}
 \caption{Evolución de la pérdida total (train y validación) en la Fase 3 para ResNet-18 (izquierda) y EfficientNet-B0 (derecha) entrenadas a 1024$\times$1024. Ambas convergen de forma estable, pero el mAP final no mejora sustancialmente, evidenciando limitaciones arquitectónicas.}
 \label{fig:fase3_total_loss_1024}
@@ -1049,15 +1049,15 @@ La Figura~\ref{fig:trace_fase1_resnet18_nativa} muestra el panel de monitorizaci
 \centering
 \begin{minipage}{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_learning_rate.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_loss_components.png}
+\includegraphics[width=\textwidth]{fig/fase1_resnet18_nativa_loss_components.pdf}
 \end{minipage}
 \caption{Panel de monitorización para ResNet-18 + Faster R-CNN (resolución nativa, 50 épocas). De izquierda a derecha: (1) pérdida total de entrenamiento y validación, (2) evolución del \textit{learning rate}, y (3) descomposición de la pérdida en sus componentes. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:resnet18_nativa}.}
 \label{fig:trace_fase1_resnet18_nativa}
@@ -1070,15 +1070,15 @@ La Figura~\ref{fig:trace_fase1_efficientnet_nativa} presenta el panel equivalent
 \centering
 \begin{minipage}{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_learning_rate.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_loss_components.png}
+\includegraphics[width=\textwidth]{fig/fase1_efficientnet_nativa_loss_components.pdf}
 \end{minipage}
 \caption{Panel de monitorización para EfficientNet-B0 + Faster R-CNN (resolución nativa, 50 épocas). De izquierda a derecha: pérdida total, \textit{learning rate} y componentes de pérdida. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:efficientnet_nativa}.}
 \label{fig:trace_fase1_efficientnet_nativa}
@@ -1097,20 +1097,20 @@ La Figura~\ref{fig:trace_fase2_deimv2_640_87ep} muestra la primera configuració
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_learning_rate.pdf}
 \end{minipage}
 \vspace{0.3cm}
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_val_map.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_val_map.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_val_metrics.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_640_87ep_val_metrics.pdf}
 \end{minipage}
 \caption{Panel de monitorización para DEIMv2 (640$\times$640, 87 épocas). Fila superior: pérdida total y \textit{learning rate}. Fila inferior: evolución del mAP de validación y comparativa de métricas (mAP@0.5:0.95, AP@0.5, AP@0.75). El mejor checkpoint (época 86) indica convergencia incompleta.}
 \label{fig:trace_fase2_deimv2_640_87ep}
@@ -1123,20 +1123,20 @@ El aumento de resolución a 1024$\times$1024 (Figura~\ref{fig:trace_fase2_deimv2
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_learning_rate.pdf}
 \end{minipage}
 \vspace{0.3cm}
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_val_map.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_val_map.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_val_metrics.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_80ep_val_metrics.pdf}
 \end{minipage}
 \caption{Panel de monitorización para DEIMv2 (1024$\times$1024, 80 épocas). El mAP de validación muestra una tendencia ascendente sin saturación clara, con mejor checkpoint en la época 80. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:deimv2_1024_80ep}.}
 \label{fig:trace_fase2_deimv2_1024_80ep}
@@ -1149,20 +1149,20 @@ La extensión a 120 épocas (Figura~\ref{fig:trace_fase2_deimv2_1024_120ep}) con
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_learning_rate.pdf}
 \end{minipage}
 \vspace{0.3cm}
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_val_map.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_val_map.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_val_metrics.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_120ep_val_metrics.pdf}
 \end{minipage}
 \caption{Panel de monitorización para DEIMv2 (1024$\times$1024, 120 épocas). El mejor checkpoint (época 119) sugiere que el modelo aún no había convergido. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:deimv2_1024_120ep}.}
 \label{fig:trace_fase2_deimv2_1024_120ep}
@@ -1175,20 +1175,20 @@ El entrenamiento extendido a 300 épocas (Figura~\ref{fig:trace_fase2_deimv2_102
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_total_loss.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_total_loss.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_learning_rate.pdf}
 \end{minipage}
 \vspace{0.3cm}
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_val_map.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_val_map.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_val_metrics.png}
+\includegraphics[width=\textwidth]{fig/fase2_deimv2_1024_300ep_val_metrics.pdf}
 \end{minipage}
 \caption{Panel de monitorización para DEIMv2 (1024$\times$1024, 300 épocas). El mejor checkpoint (época 187) indica convergencia completa. La estabilización del mAP tras esta época confirma que 150--200 épocas capturan $>$98\% de la mejora potencial. Los resultados cuantitativos se detallan en la Tabla~\ref{tab:deimv2_1024_300ep}.}
 \label{fig:trace_fase2_deimv2_1024_300ep}
@@ -1207,11 +1207,11 @@ La Figura~\ref{fig:trace_fase3_resnet18_1024} muestra que ResNet-18 converge de 
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_learning_rate.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_loss_components.png}
+\includegraphics[width=\textwidth]{fig/fase3_resnet18_1024_loss_components.pdf}
 \end{minipage}
 \caption{Panel de monitorización para ResNet-18 a 1024$\times$1024: evolución del \textit{learning rate} (izquierda) y descomposición de la pérdida por componentes (derecha). La convergencia es similar a la configuración nativa, pero el mAP final apenas mejora (véase Tabla~\ref{tab:resnet18_1024}).}
 \label{fig:trace_fase3_resnet18_1024}
@@ -1224,11 +1224,11 @@ La Figura~\ref{fig:trace_fase3_efficientnet_1024} revela un comportamiento inesp
 \centering
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_learning_rate.png}
+\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_learning_rate.pdf}
 \end{minipage}\hfill
 \begin{minipage}{0.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_loss_components.png}
+\includegraphics[width=\textwidth]{fig/fase3_efficientnet_1024_loss_components.pdf}
 \end{minipage}
 \caption{Panel de monitorización para EfficientNet-B0 a 1024$\times$1024: evolución del \textit{learning rate} (izquierda) y descomposición de la pérdida por componentes (derecha). A pesar de una convergencia normal, el mAP final empeora respecto a la resolución nativa (véase Tabla~\ref{tab:efficientnet_1024}).}
 \label{fig:trace_fase3_efficientnet_1024}

@@ -16,6 +16,8 @@ Este capítulo presenta una revisión sistemática del estado del arte en detecc
 
 \section{Fundamentos de Vision Transformers y aprendizaje auto-supervisado}
 
+Esta sección establece los fundamentos teóricos y metodológicos que sustentan el trabajo. Se revisan en primer lugar las bases arquitectónicas del cambio de paradigma desde las redes convolucionales hacia los transformers en visión por computador, y a continuación las técnicas de aprendizaje auto-supervisado que permiten aprovechar estos modelos en escenarios industriales con datos etiquetados limitados.
+
 \subsection{De las redes convolucionales a los transformers en visión por computador}
 
 La arquitectura \acrfull{ViT}, introducida originalmente por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. Mientras que las \acrfull{CNN} procesan información mediante operaciones de convolución local, los \acrshort{ViT} dividen la imagen en parches y los procesan mediante mecanismos de self-attention que capturan relaciones entre todas las regiones de forma simultánea~\cite{sudarshan2025object}. Esta diferencia arquitectural confiere a los transformers ventajas significativas en términos de escalabilidad, flexibilidad en el manejo de imágenes de diferentes resoluciones, y capacidad de transfer learning.
@@ -38,6 +40,8 @@ La relevancia de estos métodos para aplicaciones industriales es crucial. Como 
 
 
 \section{Vision Transformers aplicados a detección de anomalías industriales}
+
+Una vez establecidos los fundamentos, esta sección se centra en las aplicaciones concretas de Vision Transformers al problema de detección de anomalías industriales. Se distinguen dos líneas principales de investigación en la literatura: arquitecturas basadas en ViT puro, que priorizan la simplicidad y eficiencia, y arquitecturas híbridas que combinan la localidad de las CNNs con la capacidad de atención global de los Transformers.
 
 \subsection{Arquitecturas basadas en ViT puro}
 
@@ -62,6 +66,8 @@ La validación experimental en tres datasets industriales distintos confirma la 
 
 \section{Transfer learning y aprendizaje con datos limitados}
 
+La escasez de datos etiquetados constituye uno de los principales obstáculos para la aplicación industrial de sistemas de detección de anomalías. Esta sección analiza cómo el transfer learning y el aprendizaje few-shot permiten abordar esta limitación, presentando trabajos que validan la efectividad de Vision Transformers preentrenados en entornos industriales reales, así como evaluaciones sistemáticas que orientan la selección de arquitecturas bajo restricciones prácticas.
+
 \subsection{Validación industrial con aprendizaje few-shot}
 
 Uno de los trabajos más relevantes para aplicaciones industriales prácticas es el de Huang et al.~\cite{huang2025semiconductor}, quienes reportan la implementación exitosa de Vision Transformers para clasificación automática de defectos (Automatic Defect Classification, ADC) en imágenes SEM (Scanning Electron Microscope) de semiconductores en la planta de fabricación de IBM en Albany. Este trabajo es particularmente significativo por tratarse de un caso de aplicación real en un entorno de producción, no de un experimento de laboratorio.
@@ -83,6 +89,8 @@ Los autores identifican que, con el ascenso de los transformers como backbones v
 
 \section{Técnicas avanzadas y enfoques emergentes}
 
+Más allá de los enfoques supervisados y semi-supervisados convencionales, la investigación reciente explora técnicas que amplían las capacidades de los sistemas de detección industrial. Esta sección recoge dos líneas emergentes: la detección zero-shot, que elimina la necesidad de datos etiquetados durante el entrenamiento, y el estudio de la robustez adversarial, dimensión crítica frecuentemente ignorada en aplicaciones donde las decisiones del sistema pueden tener consecuencias significativas.
+
 \subsection{Detección de anomalías zero-shot}
 
 Le-Gia y Ahn~\cite{legia2025consistent} introducen un problema novel en detección de anomalías industriales: el manejo de \textit{anomalías consistentes} (consistent anomalies), definidas como defectos similares que aparecen recurrentemente a través de múltiples imágenes. Este escenario, común en entornos de producción donde ciertos tipos de fallos ocurren sistemáticamente, resulta problemático para métodos de detección zero-shot existentes que comparan características de parches con vecinos más cercanos en imágenes de test sin etiquetar.
@@ -103,6 +111,8 @@ Aunque la robustez adversarial puede parecer un aspecto especializado, Nafez et 
 
 
 \section{Análisis crítico del estado del arte}
+
+Tras revisar las contribuciones individuales de la literatura, resulta necesario realizar un análisis transversal que identifique tendencias, tensiones y limitaciones comunes. Esta sección sintetiza las observaciones críticas extraídas del estado del arte, estructuradas en cuatro dimensiones: la convergencia hacia modelos preentrenados auto-supervisados, el trade-off entre simplicidad arquitectural y rendimiento, la brecha entre investigación y aplicación práctica, y el desafío persistente de los datos etiquetados limitados.
 
 \subsection{Convergencia hacia modelos preentrenados auto-supervisados}
 
@@ -131,6 +141,8 @@ El enfoque zero-shot de Le-Gia y Ahn~\cite{legia2025consistent} busca eliminar c
 
 \section{Identificación de oportunidades de investigación}
 
+El análisis crítico del estado del arte permite identificar brechas específicas que orientan la investigación futura. Esta sección enumera las oportunidades de investigación más relevantes derivadas de la revisión sistemática realizada, priorizando aquellas que conectan directamente con los objetivos del presente trabajo y que aún no han sido abordadas de forma exhaustiva en la literatura.
+
 \subsection{Validación en componentes electrónicos diversos}
 
 La revisión del estado del arte revela que, mientras existen validaciones en semiconductores~\cite{huang2025semiconductor} y superficies industriales genéricas~\cite{zhang2025exploring,wang2022defect}, existe una carencia de estudios sistemáticos en componentes electrónicos diversos tales como placas de circuito impreso (PCBs), conectores, carcasas, y componentes SMD. Cada uno de estos elementos presenta características visuales particulares y tipos de defectos específicos que requieren validación experimental independiente.
@@ -158,7 +170,7 @@ Esta línea de investigación conecta con el trabajo de Le-Gia y Ahn~\cite{legia
 
 \section{Síntesis y justificación del trabajo propuesto}
 
-La revisión sistemática del estado del arte revela un campo en rápida evolución donde Vision Transformers han demostrado superioridad sobre arquitecturas convolucionales tradicionales para detección de anomalías industriales. Los modelos preentrenados mediante aprendizaje auto-supervisado, particularmente DINOv2, han emergido como opción preferente por su capacidad de transferir conocimiento visual general a dominios específicos con datos limitados~\cite{huang2025semiconductor,legia2025consistent,khan2024survey}.
+Esta sección final del capítulo integra los hallazgos revisados y fundamenta la aproximación metodológica del trabajo propuesto. La revisión sistemática del estado del arte revela un campo en rápida evolución donde Vision Transformers han demostrado superioridad sobre arquitecturas convolucionales tradicionales para detección de anomalías industriales. Los modelos preentrenados mediante aprendizaje auto-supervisado, particularmente DINOv2, han emergido como opción preferente por su capacidad de transferir conocimiento visual general a dominios específicos con datos limitados~\cite{huang2025semiconductor,legia2025consistent,khan2024survey}.
 
 Sin embargo, persisten brechas significativas entre investigación académica y aplicación práctica. La validación en componentes electrónicos diversos es limitada, existiendo pocas demostraciones de sistemas funcionales que integren detección con interpretabilidad visual. El benchmarking sistemático de diferentes estrategias de transfer learning y arquitecturas ViT bajo restricciones prácticas de hardware y datos es insuficiente.
 
