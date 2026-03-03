@@ -28,3 +28,47 @@ Al principio de la memoria, aclarar que hay muchos tecniccismos porque no hay un
 
 
 Apartado experimentacion. Muy poco entendible
+
+
+Prompt adecuado continuacion tareas:
+
+"
+ Rol: Actúa como un asistente de investigación doctoral experto en Visión por Computador y redacción académica. Tu objetivo es completar la Fase 1: Personalización e Identidad del Trabajo Fin de Grado de Carlos Atalaya Gómez.
+
+Contexto del Proyecto:
+
+Título: Detección de Anomalías Industriales mediante Vision Transformers y Self-Supervised Learning.
+
+Institución: Escuela Superior de Ingeniería Informática (UCLM).
+
+Tecnología clave: Backbone DINOv3, arquitectura DEIMv2, métrica mAP 0.785.
+
+Recursos proporcionados:
+Listado de tareas a realizar/ hoja de ruta: @Trabajo-a-realizar.md 
+Contexto del proyecto: @CONTEXTUALIZACION-REPOSITORIO.txt 
+Repositorio completo: Estructura LaTeX basada en la clase sty/eiiatfg.cls. @sty/eiiatfg.cls 
+
+Documentos de Referencia: TFGs de Lapeña (2014) y Martínez (2019). Úsalos como estándar de excelencia para la estructura de índices, tono de los agradecimientos y profundidad del resumen. (@Documentacion-externa/Memorias-tfg-ejemplos/TFG_BernaroMartínezParras.pdf @Documentacion-externa/Memorias-tfg-ejemplos/TFG_JavierLapeñaParreño.pdf )
+
+Guía de Estilo: Debes seguir estrictamente las reglas de .cursorrules y tfg_writing.mdc (Voz impersonal, plural mayestático, citas solo de bib/main.bib). @.cursorrules @.cursor/rules/tfg_writing.mdc 
+
+Tareas a realizar en esta sesión:
+
+Auditoría de Identidad en Metadata: Revisa y cumplimenta datos-tfg.tex. Asegúrate de que el título, los datos del autor y el enlace al repositorio real sean correctos. Elimina cualquier rastro de la "plantilla de ejemplo".
+
+Reestructuración de TFG.tex @TFG.tex Analiza los índices de los TFGs de ejemplo y ajusta la jerarquía de capítulos de TFG.tex para que la narrativa fluya desde la motivación industrial hasta la validación científica de DINOv3, evitando estructuras genéricas.
+
+Redacción del Resumen (Abstract): Redacta de nuevo tex/resumen.tex @tex/resumen.tex (español e inglés). No uses un tono pasivo; usa un enfoque periodístico-científico:
+
+Problema: Limitaciones de la inspección manual y CNNs en Small Data industrial.
+
+Solución: Propuesta de Vision Transformers (DEIMv2) con pre-entrenamiento auto-supervisado (DINOv3).
+
+Resultados: Menciona el hito del mAP 0.785 y la robustez demostrada en la Fase 4 de experimentación.
+
+Entregable: Proporciona el código LaTeX actualizado para datos-tfg.tex (@datos-tfg.tex ), TFG.tex y tex/resumen.tex. Asegúrate de incluir las citas correctas usando \cite{} y de cerrar cada sección con una frase de transición hacia el siguiente capítulo.
+"
+
+
+
+
