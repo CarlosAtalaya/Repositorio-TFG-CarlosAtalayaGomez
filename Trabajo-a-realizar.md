@@ -1,7 +1,19 @@
-# 📘 PLAN MAESTRO DE EXCELENCIA: PULIDO INTEGRAL DE LA MEMORIA TÉCNICA
+# 📘 HOJA DE RUTA: PULIDO INTEGRAL DE LA MEMORIA TÉCNICA
 **Proyecto:** Detección de Anomalías Industriales mediante Vision Transformers y Self-Supervised Learning.
 **Institución:** Escuela Superior de Ingeniería Informática (UCLM).
 **Referencia Principal:** `CONTEXTUALIZACION-REPOSITORIO.txt`
+
+---
+
+## ESTADO ACTUAL (Última actualización)
+| Fase | Estado | Observaciones |
+|------|--------|---------------|
+| 1. Personalización e Identidad | ✅ Completada | Metadata, resumen, estructura, agradecimientos, DINOv3 |
+| 2. Cap. 3 Antecedentes | 🔄 Siguiente | Pendiente: ecuaciones, tablas |
+| 3. Cap. 4 Desarrollo | ⏳ Pendiente | |
+| 4. Cap. 5 Resultados | ⏳ Pendiente | |
+| 5. Cap. 6 Conclusiones | ⏳ Pendiente | |
+| 6. Auditoría Final | ⏳ Pendiente | |
 
 ---
 
@@ -15,20 +27,23 @@
 
 ---
 
-## 1. FASE DE PERSONALIZACIÓN E IDENTIDAD
+## 1. FASE DE PERSONALIZACIÓN E IDENTIDAD ✅ COMPLETADA
 **Objetivo:** Eliminar la sensación de "plantilla genérica" y adaptar la estructura a los TFGs de excelencia (Lapeña, 2014; Martínez, 2019).
 
-* **Acción 1:** Revisar `TFG.tex` y `datos-tfg.tex` para asegurar que los metadatos y la jerarquía de capítulos reflejan una investigación original y no un ejemplo de clase.
-* **Acción 2:** Redactar el `resumen.tex` (Abstract) con un enfoque periodístico-científico: Problema (Inspección industrial) -> Solución (ViT + SSL) -> Resultado (mAP 0.785 y robustez confirmada).
+- [x] **Acción 1:** Revisar `TFG.tex` y `datos-tfg.tex` para asegurar que los metadatos y la jerarquía de capítulos reflejan una investigación original.
+- [x] **Acción 2:** Redactar el `resumen.tex` (Abstract) con enfoque periodístico-científico.
+- [x] Auditoría DINOv2 vs DINOv3 aplicada en introducción, objetivos, antecedentes, resumen y desarrollo.
+- [x] Eliminación de restos de plantilla (avisoLocalizacionArchivo, Chuleta LaTeX, citas de ejemplo).
+- [x] Agradecimientos y dedicatoria personalizados.
 
 ---
 
-## 2. CAPÍTULO 3: ANTECEDENTES (INTENSIFICACIÓN TÉCNICA)
+## 2. CAPÍTULO 3: ANTECEDENTES (INTENSIFICACIÓN TÉCNICA) 🔄 SIGUIENTE
 **Objetivo:** Reflejar una cultura ingenieril profunda y corregir inconsistencias bibliográficas.
 
-1.  **Auditoría DINOv2 vs DINOv3:** Revisar cada mención técnica. Se debe citar DINOv2 como hito, pero aclarar que para la experimentación propia se ha empleado **DINOv3** (backbone `vittplus_distill.pt`) por sus capacidades superiores de representación.
-2.  **Rigor Matemático:** Insertar las ecuaciones de *Self-Attention* en `tex/antecedentes.tex` usando sintaxis LaTeX estándar ($...$ y \[...\]).
-3.  **Tablas Científicas:** Incluir comparativas entre CNN (bias inductivo local) y ViT (atención global y campo receptivo dinámico).
+- [x] **Auditoría DINOv2 vs DINOv3:** Ya aplicada. DINOv3 como backbone propio; DINOv2 conservado en citas de trabajo de otros autores.
+- [ ] **Rigor Matemático:** Insertar las ecuaciones de *Self-Attention* en `tex/antecedentes.tex` usando sintaxis LaTeX estándar ($...$ y \[...\]).
+- [ ] **Tablas Científicas:** Incluir comparativas entre CNN (bias inductivo local) y ViT (atención global y campo receptivo dinámico).
 
 ---
 
@@ -36,7 +51,7 @@
 **Objetivo:** Sincronizar el contenido, identificar lagunas y elevar la calidad del relato para un tribunal académico.
 
 ### 3.1. Sincronización y Auditoría de Contenidos
-El agente debe realizar una **comparativa crítica** entre:
+Realizar una **comparativa crítica** entre:
 * La versión actual en `tex/desarrollo.tex`.
 * El documento actualizado en `Documentacion-externa/FASE-1-analisis/herramienta_comparativa/FASE_EXPERIMENTACION.md`.
 

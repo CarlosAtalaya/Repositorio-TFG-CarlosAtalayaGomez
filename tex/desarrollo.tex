@@ -1,8 +1,6 @@
 \chapter{Desarrollo del TFG}
 \label{ch:desarrollo}
 
-\avisoLocalizacionArchivo 
-
 Este capítulo describe la metodología de trabajo empleada, la planificación en fases del proyecto y la ejecución detallada de los experimentos realizados para desarrollar y validar el sistema de detección de anomalías basado en Vision Transformers. Se documenta el proceso iterativo de optimización que condujo a la configuración final del modelo, así como los resultados obtenidos en cada fase experimental.
 
 
@@ -441,7 +439,7 @@ Los Vision Transformers (\acrshort{ViT}) han demostrado superioridad en tareas d
 
 La arquitectura \textbf{DEIMv2} (Dense Enhanced Image Matching) combina:
 \begin{itemize}
-    \item \textbf{DINOv3}: Backbone \acrshort{ViT} preentrenado mediante aprendizaje auto-supervisado en grandes datasets, que proporciona representaciones visuales robustas y semánticamente ricas.
+    \item \textbf{DINOv3}~\cite{simeoni2025dinov3}: Backbone \acrshort{ViT} preentrenado mediante aprendizaje auto-supervisado en grandes datasets, que proporciona representaciones visuales robustas y semánticamente ricas.
     \item \textbf{DEIM Decoder}: Framework optimizado para DETRs (Detection Transformers) que procesa las representaciones del backbone para generar detecciones.
     \item \textbf{Spatial Tuning Adapter (STA)}: Convierte la salida de escala única del backbone en features multi-escala necesarias para detección precisa.
 \end{itemize}

@@ -82,8 +82,6 @@
     </requires>
     <requires type="editable">
       <file>bib/main.bib</file>
-      <file>bib/how.bib</file>
-      <file>bib/ejemplos.bib</file>
     </requires>
   </external>
 </requests>

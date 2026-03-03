@@ -13,7 +13,7 @@
 % del TFG (consulta sty/eiiatfg.cls para más detalles).
 
 \input{datos-tfg.tex}
-\input{acronimos.tex}
+\input{tex/acronimos.tex}
 
 % La bibliografía la puedes descomponer en varios archivos .bib
 % Los archivos .bib se pueden escribir a mano con ayuda de un editor online
@@ -21,8 +21,8 @@
 % gestor de bibliografía. Solo se incluyen las referencias que son citadas
 % en el texto.
 \addbibresource{bib/main.bib}
-\addbibresource{bib/how.bib}
-\addbibresource{bib/ejemplos.bib}
+% \addbibresource{bib/how.bib}
+% \addbibresource{bib/ejemplos.bib}
 
 \begin{document}
 
@@ -37,40 +37,29 @@
 
 \portada
 
-% Edita los
-\input{agradecimientos.tex}	   
-\input{dedicatoria.tex}
-\input{resumen.tex}
+% Bloque preliminar: Agradecimientos y Dedicatoria
+\input{tex/agradecimientos.tex}
+\input{tex/dedicatoria.tex}
+
+% Resumen y Abstract (Enfoque periodístico-científico)
+\input{tex/resumen.tex}
 
 \indices
 
-% El cuerpo del documento está en la carpeta tex
-% Aquí simplemente se incluyen los archivos correspondientes a cada capítulo.
+% Estructura de capítulos
+% El orden garantiza el hilo conductor de la investigación
+\input{tex/introduccion.tex}   % Cap 1: El reto de la inspección industrial
+\input{tex/objetivos.tex}      % Cap 2: Definición del alcance y contribuciones
+\input{tex/antecedentes.tex}   % Cap 3: Estado del arte (ViT y SSL)
+\input{tex/desarrollo.tex}     % Cap 4: Metodología y Experimentación en 4 Fases
+\input{tex/resultados.tex}     % Cap 5: Discusión y Análisis de Interpretabilidad
+\input{tex/conclusiones.tex}   % Cap 6: Síntesis y Futuro Multimodal
 
-% No los llames capitulo1, capitulo2, etc. Los números los pondrá LaTeX según
-% el orden en que los pongas.  Eso facilitará después su posible reordenación
-% o división.
-
-% Esta estructura corresponde a un documento científico-técnico.
-% Si ves que tu proyecto concuerda con un trabajo profesional organiza el 
-% documento según UNE 157001
-
-\input{introduccion.tex}
-\input{objetivos.tex}
-\input{antecedentes.tex}
-\input{desarrollo.tex}
-\input{resultados.tex}
-\input{conclusiones.tex}
-
-% Los anexos pueden ir en la misma carpeta que el cuerpo del documento 
-% porque eso facilita la migración de partes de un capítulo a un anexo.
+% Anexos
 \appendix\cleardoublepage
-\hypertarget{ch:anexos}{%
-    \input{latex.tex}}
+\input{tex/latex.tex}
 
-% La bibliografía no suele ir numerada porque se pone después de los anexos.
-% No se debe poner antes de los anexos porque si se cita una referencia en
-% un anexo sería una backward reference, que deben evitarse a toda costa
+% Bibliografía (Estilo IEEE según normativa técnica)
 \cleardoublepage
 \hypertarget{ch:bibliografia}{%
     \printbibliography[heading=bibintoc]}

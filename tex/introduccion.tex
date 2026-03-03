@@ -13,7 +13,7 @@ En paralelo, el paradigma del aprendizaje supervisado tradicional enfrenta un ob
 
 La arquitectura \acrfull{ViT}, introducida por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. A diferencia de las \acrshort{CNN}, los transformers procesan las imágenes mediante mecanismos de atención que capturan relaciones entre todas las regiones de forma simultánea, sin las restricciones de localidad inherentes a las operaciones de convolución. Esta capacidad de modelar dependencias globales resulta particularmente valiosa para detección de anomalías, donde defectos sutiles pueden manifestarse en patrones que requieren comprensión del contexto completo de la imagen.
 
-El \acrfull{SSL} ha emergido como solución a la dependencia de datos etiquetados. Técnicas como DINOv2~\cite{oquab2024dinov2} permiten entrenar modelos que aprenden representaciones visuales robustas directamente de imágenes sin anotaciones, explotando las relaciones inherentes dentro de los datos como forma de supervisión. Los modelos preentrenados mediante \acrshort{SSL} pueden posteriormente adaptarse a tareas específicas mediante transfer learning, alcanzando rendimientos competitivos con volúmenes reducidos de datos etiquetados.
+El \acrfull{SSL} ha emergido como solución a la dependencia de datos etiquetados. Técnicas como DINOv3~\cite{simeoni2025dinov3} permiten entrenar modelos que aprenden representaciones visuales robustas directamente de imágenes sin anotaciones, explotando las relaciones inherentes dentro de los datos como forma de supervisión. Los modelos preentrenados mediante \acrshort{SSL} pueden posteriormente adaptarse a tareas específicas mediante transfer learning, alcanzando rendimientos competitivos con volúmenes reducidos de datos etiquetados.
 
 Investigaciones recientes han validado la efectividad de este enfoque en contextos industriales reales. Huang et al.~\cite{huang2025semiconductor} demostraron que, utilizando DINOv2 como backbone, es posible alcanzar accuracies superiores al 90\% en clasificación de defectos de semiconductores con menos de 15 imágenes por clase. Este hallazgo tiene implicaciones profundas para la aplicabilidad práctica de sistemas de inspección automática en entornos donde el etiquetado de datos es inherentemente limitado.
 
@@ -44,7 +44,7 @@ La organización de este documento responde a un documento científico-técnico.
     
     \item[\autoref{ch:conclusiones}] Sintetiza las principales conclusiones del trabajo, valora el grado de cumplimiento de los objetivos, y propone líneas de trabajo futuro para extensión de la investigación.
     
-    \item[\deschyperlink{ch:anexos}{Anexos}] Complementan la información del cuerpo del documento con detalles técnicos de implementación, configuraciones experimentales, y material adicional para reproducibilidad de resultados.
+    \item[\deschyperlink{ch:anexos}{Anexos}] Remiten al repositorio del proyecto, donde se encuentra disponible el material técnico complementario (código fuente, configuraciones experimentales, scripts y resultados detallados) para la reproducibilidad de los experimentos.
     
     \item[\deschyperlink{ch:bibliografia}{Bibliografía}] Recopila las referencias bibliográficas utilizadas en este documento.
 \end{description}
