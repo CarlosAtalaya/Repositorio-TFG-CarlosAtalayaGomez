@@ -3,15 +3,17 @@
 
 Este capítulo describe la metodología de trabajo empleada, la planificación en fases del proyecto y la ejecución detallada de los experimentos realizados para desarrollar y validar el sistema de detección de anomalías basado en Vision Transformers. Se documenta el proceso iterativo de optimización que condujo a la configuración final del modelo, así como los resultados obtenidos en cada fase experimental.
 
+A efectos de seguimiento, se adopta la siguiente \textbf{nomenclatura}: (i) \textit{Preparación del dataset} designa el trabajo previo de curación y normalización de datos, articulado en \textbf{cinco etapas} del pipeline (Etapas 1--5, con subetapas 4.1--4.4 donde corresponde); (ii) las \textbf{Fases experimentales 1--4} corresponden a la experimentación propiamente dicha, con \textbf{Experimentos} en las Fases 1 y 3, e \textbf{Iteraciones} en la Fase 2. Esta distinción entre preparación y experimentación permite al lector localizar con precisión cada apartado del desarrollo.
 
-\section{Fase 0: Preparación y Curación del Dataset}
-\label{sec:fase0}
+
+\section{Preparación y curación del dataset}
+\label{sec:preparacion_dataset}
 
 \subsection{Motivación y objetivos}
 
 La calidad del conjunto de datos constituye un factor determinante en el rendimiento de los sistemas de aprendizaje profundo. En tareas de detección de defectos industriales, este aspecto resulta especialmente crítico debido a la alta variabilidad del dominio (condiciones de iluminación, texturas, escalas y geometrías), así como a la necesidad de contar con anotaciones consistentes y una taxonomía de defectos coherente.
 
-Con este objetivo, se ha desarrollado un \textbf{pipeline de curación reproducible} para construir un dataset unificado, en formato COCO, equilibrado entre clases y con validaciones cuantitativas que aseguran su idoneidad para entrenamiento y evaluación de modelos detectores. De forma resumida, los objetivos de esta fase han sido:
+Con este objetivo, se ha desarrollado un \textbf{pipeline de curación reproducible} para construir un dataset unificado, en formato COCO, equilibrado entre clases y con validaciones cuantitativas que aseguran su idoneidad para entrenamiento y evaluación de modelos detectores. De forma resumida, los objetivos de esta parte del desarrollo han sido:
 
 \begin{itemize}
     \item \textbf{Unificación de fuentes heterogéneas}: combinar datasets públicos con formatos de anotación distintos (cajas delimitadoras y segmentación) en un formato común.
@@ -44,19 +46,19 @@ MVTec AD~\cite{bergmann2019mvtec} es un benchmark ampliamente utilizado en detec
 
 \subsection{Metodología de curación y preparación}
 
-La preparación del dataset se articuló en cinco etapas, desde la exploración de las fuentes hasta la validación final. La Tabla~\ref{tab:fase0_evolucion_dataset} resume la evolución cuantitativa del conjunto de datos a lo largo del pipeline.
+La preparación del dataset se articuló en \textbf{cinco etapas} del pipeline, desde la exploración de las fuentes hasta la validación final. Cada etapa tiene un propósito claro: las Etapas 1 y 3 son de análisis (no modifican el volumen de datos); las Etapas 2 y 4 realizan las transformaciones cuantitativas; la Etapa 5 verifica la integridad del resultado. La Tabla~\ref{tab:evolucion_dataset_curacion} resume la evolución cuantitativa del conjunto de datos a lo largo del pipeline, alineada con la nomenclatura de las etapas descritas a continuación.
 
 \subsubsection{Etapa 1: Exploración y análisis de datasets originales}
 
-Se realizó un análisis exploratorio para comprender la estructura de datos, los formatos de anotación y la distribución de defectos en cada fuente. Este análisis permitió identificar correspondencias semánticas entre etiquetas y definir criterios de selección de categorías/objetos relevantes para el dominio de componentes industriales.
+La \textbf{Etapa 1} consiste en un análisis exploratorio para comprender la estructura de datos, los formatos de anotación y la distribución de defectos en cada fuente. Este análisis permitió identificar correspondencias semánticas entre etiquetas y definir criterios de selección de categorías y objetos relevantes para el dominio de componentes industriales. No se realizan transformaciones sobre el volumen de datos; el resultado es un inventario de las fuentes.
 
 \subsubsection{Etapa 2: Curación inicial}
 
-Se implementó un curador que filtra categorías y defectos relevantes, homogeneiza el formato de imágenes (PNG) y genera una primera versión unificada en COCO. Tras esta etapa se obtuvo un dataset de 1{,}907 imágenes y 15 etiquetas (aún fragmentadas), con desbalance severo entre clases (ratio máx/mín $\sim$24.5:1).
+En la \textbf{Etapa 2} se implementó un curador que filtra categorías y defectos relevantes, homogeneiza el formato de imágenes (PNG) y genera una primera versión unificada en COCO. Tras esta etapa se obtuvo un dataset de 1{,}907 imágenes y 15 etiquetas (aún fragmentadas), con desbalance severo entre clases (ratio máx/mín $\sim$24.5:1).
 
 \subsubsection{Etapa 3: Análisis exhaustivo de calidad}
 
-Sobre el dataset curado inicial se ejecutó un análisis de calidad orientado a:
+La \textbf{Etapa 3} aplica un análisis de calidad sobre el dataset curado inicial, orientado a:
 \begin{itemize}
     \item detectar duplicados (49 pares detectados),
     \item verificar integridad (0 imágenes corruptas),
@@ -66,17 +68,17 @@ Sobre el dataset curado inicial se ejecutó un análisis de calidad orientado a:
 
 \subsubsection{Etapa 4: Recuración final}
 
-La preparación final se realizó mediante cuatro subetapas:
+La \textbf{Etapa 4} realiza la preparación final mediante cuatro subetapas (4.1 a 4.4) que transforman secuencialmente el dataset:
 \begin{itemize}
-    \item \textbf{Subetapa 4.1 (recuración)}: eliminación de componentes fuera de alcance (p.\ ej., \texttt{hazelnut}) y eliminación de duplicados, resultando en 1{,}393 imágenes.
-    \item \textbf{Subetapa 4.2 (unificación)}: mapeo de 15 etiquetas originales a 6 categorías unificadas.
-    \item \textbf{Subetapa 4.3 (balanceo)}: estrategia híbrida de under/over-sampling con augmentación conservadora, reduciendo el ratio máx/mín a 2.08:1.
-    \item \textbf{Subetapa 4.4 (splits)}: creación de particiones train/val/test (70/10/20) con estratificación dual (categoría y origen).
+    \item \textbf{Subetapa 4.1 --- Recuración}: eliminación de componentes fuera de alcance (p.\ ej., \texttt{hazelnut}) y eliminación de duplicados, resultando en 1{,}393 imágenes.
+    \item \textbf{Subetapa 4.2 --- Unificación}: mapeo de 15 etiquetas originales a 6 categorías unificadas.
+    \item \textbf{Subetapa 4.3 --- Balanceo}: estrategia híbrida de under/over-sampling con augmentación conservadora, reduciendo el ratio máx/mín a 2.08:1.
+    \item \textbf{Subetapa 4.4 --- Splits}: creación de particiones train/val/test (70/10/20) con estratificación dual (categoría y origen).
 \end{itemize}
 
 \subsubsection{Etapa 5: Validación final y análisis estadístico}
 
-Finalmente, se validó la consistencia del dataset final mediante:
+La \textbf{Etapa 5} cierra el pipeline validando la consistencia del dataset final mediante:
 \begin{itemize}
     \item \textbf{Estratificación} validada con test Chi-cuadrado (en todas las particiones: $p=0.999$).
     \item \textbf{Leakage} verificado: 0 imágenes compartidas entre splits.
@@ -85,17 +87,21 @@ Finalmente, se validó la consistencia del dataset final mediante:
 
 \begin{table}[htbp]
 \centering
-\caption{Evolución del dataset a través del pipeline de curación}
-\label{tab:fase0_evolucion_dataset}
-\begin{tabular}{lccc}
+\caption{Evolución del dataset a través del pipeline de curación (Etapas 1--5)}
+\label{tab:evolucion_dataset_curacion}
+\begin{tabular}{llcc}
 \toprule
 \textbf{Etapa} & \textbf{Operación} & \textbf{Imágenes} & \textbf{Categorías} \\
 \midrule
-Original & Datasets combinados & $\sim$9{,}142 & 64 \\
-Etapa 2 & Filtrado inicial & 1{,}907 & 15 \\
-Etapa 4.1 & Recuración (sin \texttt{hazelnut} y duplicados) & 1{,}393 & 15 \\
-Etapa 4.2 & Unificación de taxonomía & 1{,}393 & 6 \\
-Etapa 4.3--4.4 & Balanceo + splits & 1{,}022 & 6 \\
+Inicio & Fuentes originales combinadas (VISION-Datasets + MVTec AD) & $\sim$9{,}142 & 64 \\
+\midrule
+Etapa 1 & Exploración y análisis (sin transformación) & $\sim$9{,}142 & 64 \\
+Etapa 2 & Curación inicial: filtrado, formato COCO & 1{,}907 & 15 \\
+Etapa 3 & Análisis exhaustivo de calidad (sin transformación) & 1{,}907 & 15 \\
+Etapa 4.1 & Recuración: sin \texttt{hazelnut}, sin duplicados & 1{,}393 & 15 \\
+Etapa 4.2 & Unificación de taxonomía (6 categorías) & 1{,}393 & 6 \\
+Etapa 4.3--4.4 & Balanceo y creación de splits estratificados & 1{,}022 & 6 \\
+Etapa 5 & Validación final (estratificación, leakage, integridad) & 1{,}022 & 6 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -218,9 +224,9 @@ Para mitigar el desbalance entre categorías se aplicó una estrategia híbrida 
 \label{fig:fase0_augmentation_distribution}
 \end{figure}
 
-\subsection{Conclusiones de la Fase 0}
+\subsection{Conclusiones de la preparación del dataset}
 
-El pipeline de curación permitió transformar dos fuentes heterogéneas en un dataset único, trazable y listo para experimentación:
+El pipeline de curación (Etapas 1--5) permitió transformar dos fuentes heterogéneas en un dataset único, trazable y listo para experimentación:
 \begin{itemize}
     \item Se obtuvo un dataset final de 1{,}022 imágenes y 1{,}354 anotaciones, con 6 categorías unificadas.
     \item El balance entre clases se estabilizó hasta un ratio máx/mín de 2.08:1, adecuado para entrenamiento supervisado.
@@ -231,7 +237,7 @@ El pipeline de curación permitió transformar dos fuentes heterogéneas en un d
 \section{Metodología de trabajo}
 \label{sec:metodologia}
 
-El desarrollo del presente trabajo se ha estructurado siguiendo una metodología experimental rigurosa, fundamentada en el método científico y adaptada a las particularidades de la investigación en aprendizaje profundo. La aproximación metodológica se caracteriza por:
+Una vez preparado el dataset (Sección~\ref{sec:preparacion_dataset}), el núcleo del desarrollo consiste en la experimentación sistemática con diferentes arquitecturas. El presente trabajo se ha estructurado siguiendo una metodología experimental rigurosa, fundamentada en el método científico y adaptada a las particularidades de la investigación en aprendizaje profundo. La aproximación metodológica se caracteriza por:
 
 \begin{enumerate}
     \item \textbf{Enfoque iterativo e incremental}: El desarrollo se ha organizado en fases sucesivas, donde cada iteración construye sobre los resultados y lecciones aprendidas de la anterior. Esta aproximación permite identificar problemas tempranamente y ajustar la estrategia de forma adaptativa.
@@ -245,7 +251,7 @@ El desarrollo del presente trabajo se ha estructurado siguiendo una metodología
 
 \subsection{Dataset y configuración experimental}
 
-El dataset utilizado en todos los experimentos corresponde a \texttt{curated\_dataset\_splitted\_20251101\_provisional\_1st\_version}, un conjunto de datos industriales curado que incluye imágenes de componentes manufacturados con anotaciones en formato COCO. El proceso de preparación y curación del conjunto de datos se detalla en la Sección~\ref{sec:fase0}. Las características principales del dataset son:
+El dataset utilizado en todos los experimentos corresponde a \texttt{curated\_dataset\_splitted\_20251101\_provisional\_1st\_version}, un conjunto de datos industriales curado que incluye imágenes de componentes manufacturados con anotaciones en formato COCO. El proceso de preparación y curación del conjunto de datos se detalla en la Sección~\ref{sec:preparacion_dataset}. Las características principales del dataset son:
 
 \begin{itemize}
     \item \textbf{Resolución original}: Mediana de aproximadamente 1650×1350 píxeles, con variabilidad significativa entre imágenes.
@@ -275,23 +281,24 @@ Se han establecido criterios diferenciados según la arquitectura:
 \end{itemize}
 
 
-\section{Planificación en fases}
+\section{Planificación en fases experimentales}
 \label{sec:planificacion}
 
-El desarrollo del proyecto se ha estructurado en cuatro fases principales, cada una con objetivos específicos y metodología adaptada:
+El desarrollo experimental se ha estructurado en cuatro fases principales, cada una con objetivos específicos y metodología adaptada. Nótese que la \textbf{preparación del dataset} (Sección~\ref{sec:preparacion_dataset}) constituye un bloque previo e independiente; las fases que se enumeran a continuación corresponden exclusivamente a la experimentación con modelos:
 
 \begin{description}
-    \item[\textbf{Fase 0: Preparación y curación del dataset}] Construir un conjunto de datos unificado en formato COCO, con taxonomía coherente, balance de clases y particiones estratificadas, garantizando su calidad mediante validaciones cuantitativas.
+    \item[\textbf{Fase 1: Baseline con arquitecturas CNN}] Establecer líneas base con arquitecturas convolucionales tradicionales (ResNet-18 y EfficientNet-B0). El fracaso de estos modelos (mAP 0.077 y 0.162) actuará como motor de búsqueda que justifica explorar arquitecturas alternativas.
     
-    \item[\textbf{Fase 1: Baseline con arquitecturas CNN}] Establecer líneas base con arquitecturas convolucionales tradicionales (ResNet-18 y EfficientNet-B0) para tener un punto de referencia comparativo. Esta fase permite evaluar el rendimiento de métodos establecidos en el problema específico de detección de defectos industriales.
+    \item[\textbf{Fase 2: Exploración de Vision Transformers}] Evaluar el rendimiento de DEIMv2, explorando resoluciones (640px vs 1024px) y épocas (80, 120, 300) hasta identificar el punto óptimo de convergencia (época 187 de 300).
     
-    \item[\textbf{Fase 2: Exploración de Vision Transformers}] Evaluar el rendimiento de arquitecturas Vision Transformer, específicamente DEIMv2, explorando diferentes configuraciones de resolución y número de épocas para identificar la configuración óptima.
+    \item[\textbf{Fase 3: Validación experimental}] Experimento crucial: re-entrenar las CNNs a 1024×1024 bajo las mismas condiciones que DEIMv2 para demostrar que la mejora se debe a la arquitectura Vision Transformer y no a la resolución de entrada.
     
-    \item[\textbf{Fase 3: Validación experimental}] Validar científicamente que la superioridad observada de los Vision Transformers se debe a la arquitectura y no únicamente a factores como la resolución de entrada, mediante re-entrenamiento de las CNNs bajo las mismas condiciones que DEIMv2.
+    \item[\textbf{Fase 4: Validación de robustez}] Evaluar el mejor modelo con umbrales de confianza más estrictos (0.75 y 0.90) para descartar overfitting y verificar que la precisión perfecta observada no es un artefacto del umbral bajo.
 \end{description}
 
 Esta estructura permite una comparación justa y rigurosa entre arquitecturas, garantizando que las conclusiones extraídas sean válidas y reproducibles.
 
+Con la planificación establecida, se presenta a continuación la ejecución de cada fase experimental, comenzando por las líneas base con arquitecturas convolucionales.
 
 \section{Fase 1: Baseline con arquitecturas CNN}
 \label{sec:fase1}
@@ -419,7 +426,7 @@ Aunque EfficientNet mejora significativamente sobre ResNet-18, el rendimiento gl
 
 \subsection{Conclusiones de la Fase 1}
 
-Los resultados de la Fase 1 establecen líneas base claras y revelan limitaciones significativas de las arquitecturas CNN tradicionales:
+Los resultados de la Fase 1 establecen líneas base claras y actúan como \textbf{motor de búsqueda} que impulsa la exploración de arquitecturas alternativas:
 
 \begin{enumerate}
     \item \textbf{Rendimiento limitado}: ResNet-18 alcanza mAP de 0.077, detectando solo 3 categorías, mientras que EfficientNet-B0 obtiene 0.162, detectando 5 categorías pero con precision muy baja.
@@ -427,7 +434,7 @@ Los resultados de la Fase 1 establecen líneas base claras y revelan limitacione
     \item \textbf{Hipótesis sobre limitaciones}: Las CNNs tienen bias inductivo fuerte hacia patrones locales, lo que puede limitar su capacidad para capturar relaciones espaciales complejas necesarias para distinguir algunos tipos de defectos. La alta variabilidad del dataset (iluminación, superficies, escalas) puede ser difícil de manejar para arquitecturas con campo receptivo limitado.
 \end{enumerate}
 
-Estos resultados justifican explorar arquitecturas más modernas como Vision Transformers, que tienen capacidad de atención global desde el inicio y pueden capturar dependencias de largo alcance de forma más efectiva. La evidencia gráfica completa del proceso de entrenamiento de esta fase (curvas de pérdida, \textit{learning rate} y descomposición por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase1}.
+El fracaso de las CNN nativas (mAP 0.077 y 0.162) constituye la evidencia que justifica explorar Vision Transformers, arquitecturas con capacidad de atención global desde el inicio. Tras estos resultados, la Fase 2 se centra en evaluar la arquitectura DEIMv2 bajo diferentes configuraciones. La evidencia gráfica completa del proceso de entrenamiento de la Fase 1 (curvas de pérdida, \textit{learning rate} y descomposición por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase1}.
 
 
 \section{Fase 2: Exploración de Vision Transformers}
@@ -437,7 +444,7 @@ Estos resultados justifican explorar arquitecturas más modernas como Vision Tra
 
 Los Vision Transformers (\acrshort{ViT}) han demostrado superioridad en tareas de visión complejas gracias a su capacidad de atención global, que permite capturar relaciones espaciales de largo alcance desde las primeras capas, y a su menor bias inductivo, que no asume localidad espacial y permite aprender patrones más complejos.
 
-La arquitectura \textbf{DEIMv2} (Dense Enhanced Image Matching) combina:
+Para esta fase se seleccionó la arquitectura \textbf{DEIMv2} (Dense Enhanced Image Matching), un detector en tiempo real que integra representaciones de DINOv3 con un decoder optimizado para detección~\cite{huang2025deimv2}. Huang et al. demostraron que DEIMv2 establece nuevos récords de rendimiento en COCO manteniendo eficiencia computacional; en particular, la variante DEIMv2-S fue el primer modelo con menos de 10M parámetros en superar 50 AP. Su diseño resulta especialmente adecuado para dominios industriales con variabilidad visual elevada. La arquitectura combina:
 \begin{itemize}
     \item \textbf{DINOv3}~\cite{simeoni2025dinov3}: Backbone \acrshort{ViT} preentrenado mediante aprendizaje auto-supervisado en grandes datasets, que proporciona representaciones visuales robustas y semánticamente ricas.
     \item \textbf{DEIM Decoder}: Framework optimizado para DETRs (Detection Transformers) que procesa las representaciones del backbone para generar detecciones.
@@ -448,7 +455,7 @@ La hipótesis es que esta arquitectura puede capturar mejor las relaciones espac
 
 \subsection{Proceso iterativo de optimización}
 
-El desarrollo de DEIMv2 siguió un proceso iterativo donde cada experimento construyó sobre los resultados del anterior, identificando limitaciones y optimizando configuraciones progresivamente.
+El desarrollo de DEIMv2 siguió un proceso iterativo donde cada \textbf{iteración} (2.1 a 2.4) construyó sobre los resultados del anterior, identificando limitaciones y optimizando configuraciones progresivamente. Esta sucesión de iteraciones permite rastrear con precisión cómo cada decisión de configuración (resolución, épocas) impactó en el rendimiento final.
 
 \subsubsection{Iteración 2.1: DEIMv2 @ 640×640 (87 épocas)}
 
@@ -464,7 +471,7 @@ El desarrollo de DEIMv2 siguió un proceso iterativo donde cada experimento cons
 
 \textbf{Resultados:} mAP@0.5 = 0.499
 
-Esta primera iteración con resolución 640×640 demostró que DEIMv2 supera significativamente a las CNNs (0.499 vs 0.162 de EfficientNet), pero presentó una limitación crítica: la resolución 640×640 pierde aproximadamente el 82\% de la información visual del dataset original (~1650×1350px), lo que puede limitar la detección de defectos pequeños o detalles finos.
+Esta primera iteración con resolución 640×640 demostró que DEIMv2 supera significativamente a las CNNs (0.499 vs 0.162 de EfficientNet), pero reveló una \textbf{limitación crítica}: el redimensionamiento a 640×640 no es un capricho de implementación---es una necesidad técnica impuesta por restricciones de memoria---pero implica perder aproximadamente el \textbf{82\% de la información visual} del dataset original (~1650×1350~px). Esta pérdida invalida la detección fiable de defectos milimétricos y detalles finos, justificando el incremento de resolución en iteraciones posteriores.
 
 \subsubsection{Iteración 2.2: DEIMv2 @ 1024×1024 (80 épocas)}
 
@@ -558,7 +565,7 @@ ROTURA\_FRACTURA & 0.539 & 1.000 & 0.700 \\
     \item El mejor epoch fue el 119 (penúltimo), indicando que aún no había convergido completamente.
 \end{itemize}
 
-\subsubsection{Iteración 2.4: DEIMv2 @ 1024×1024 (300 épocas) ⭐ Mejor Modelo}
+\subsubsection{Iteración 2.4: DEIMv2 @ 1024×1024 (300 épocas) --- Mejor modelo}
 
 Para identificar el punto de convergencia real y explorar si había margen de mejora adicional, se realizó un entrenamiento extendido de 300 épocas.
 
@@ -594,10 +601,10 @@ ROTURA\_FRACTURA & 0.576 & 1.000 & 0.725 \\
 \end{tabular}
 \end{table}
 
-\textbf{Análisis de convergencia:}
+\textbf{Análisis de convergencia --- hallazgo del punto óptimo:}
 \begin{itemize}
     \item Mejora adicional vs 120 épocas: +0.019 mAP absoluto (+2.5\% relativo).
-    \item Mejor epoch en 187 (62\% del entrenamiento), indicando convergencia clara.
+    \item \textbf{Punto óptimo identificado}: el mejor checkpoint se alcanza en la época 187 de 300 (62\% del entrenamiento), no en la última. A partir de entonces las métricas se estabilizan; entrenamientos más largos aportan rendimiento marginal.
     \item Mejoras en clases desafiantes:
     \begin{itemize}
         \item RAYONES\_ARAÑAZOS: +0.089 AP adicional (+12.4\%)
@@ -653,9 +660,9 @@ La Tabla~\ref{tab:evolucion_fase2} resume la evolución del rendimiento a travé
 
 \textbf{Observaciones clave:}
 \begin{enumerate}
-    \item \textbf{Impacto de resolución}: El salto de 640px a 1024px aporta +25\% de mejora.
-    \item \textbf{Impacto de épocas}: Entrenamientos largos son críticos para ViTs.
-    \item \textbf{Punto óptimo}: Epoch 187 en entrenamiento de 300, sugiriendo que 150-200 épocas es el sweet spot.
+    \item \textbf{Impacto de resolución}: El salto de 640px a 1024px aporta +25\% de mejora. A 1024×1024 se preserva aproximadamente el 47\% de la información visual original (frente al 18\% a 640px), un balance crítico entre detección de defectos finos y consumo de memoria.
+    \item \textbf{Impacto de épocas}: Entrenamientos largos son críticos para ViTs; las CNNs convergen en ~50 épocas, los ViT requieren 150--200.
+    \item \textbf{Punto óptimo}: El hallazgo del «punto óptimo» en época 187 de 300 fundamenta la recomendación práctica de 150--180 épocas para futuros entrenamientos.
 \end{enumerate}
 
 \subsection{Conclusiones de la Fase 2}
@@ -678,17 +685,17 @@ La evidencia gráfica completa de las cuatro iteraciones de DEIMv2 (curvas de p�
 
 \subsection{Motivación y objetivos}
 
-Tras los excelentes resultados de DEIMv2, surge la pregunta: \textbf{¿La mejora se debe a la arquitectura Vision Transformer o simplemente a usar resolución 1024×1024?}
+Tras los excelentes resultados de DEIMv2, surge la pregunta crítica que exige un \textbf{experimento crucial}: \textbf{¿La mejora se debe a la arquitectura Vision Transformer o simplemente a usar resolución 1024×1024?}
 
-Para responder esto científicamente, se re-entrenaron ResNet-18 y EfficientNet-B0 con las \textbf{mismas condiciones} que DEIMv2:
+Para responderlo científicamente, se diseñó un protocolo de validación: re-entrenar ResNet-18 y EfficientNet-B0 con las \textbf{mismas condiciones} que DEIMv2 (resolución, dataset, conjunto de test). Si las CNNs mejoraran significativamente con 1024px, la resolución sería el factor dominante; si no, la arquitectura ViT quedaría demostrada como superior.
+
+Para ejecutar este protocolo, se re-entrenaron ambas arquitecturas con:
 \begin{itemize}
     \item Resolución 1024×1024
     \item Mismo dataset
     \item Mismo conjunto de test
     \item Mismas condiciones experimentales
 \end{itemize}
-
-Si las CNNs mejoran significativamente con 1024px y se acercan al rendimiento de DEIMv2, entonces la resolución sería el factor principal. Si no mejoran o mejoran poco, entonces la arquitectura ViT es fundamentalmente superior.
 
 \subsection{Experimento 3.1: ResNet-18 @ 1024×1024}
 
@@ -872,17 +879,52 @@ Esta fase de validación experimental permite responder de forma definitiva a la
     \end{itemize}
 \end{enumerate}
 
-La evidencia gráfica adicional de los entrenamientos de esta fase (evolución del \textit{learning rate} y descomposición de la pérdida por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase3}.
+La evidencia gráfica adicional de los entrenamientos de la Fase 3 (evolución del \textit{learning rate} y descomposición de la pérdida por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase3}.
+
+Con la superioridad arquitectural de DEIMv2 demostrada, la Fase 4 aborda una cuestión complementaria: verificar que los resultados no reflejan sobreajuste ni artefactos del umbral de decisión.
+
+
+\section{Fase 4: Validación de robustez con umbrales de confianza}
+\label{sec:fase4}
+
+\subsection{Motivación y metodología}
+
+Tras obtener precisión perfecta (1.0) en todas las clases con el modelo DEIMv2, surge una pregunta crítica: \textbf{¿dicha precisión refleja un modelo genuinamente bien entrenado o podría ser un artefacto de un umbral de confianza demasiado permisivo (0.15)?}
+
+Para responderlo, se implementó una validación post-procesamiento estándar: se evaluó el mismo modelo con umbrales de score progresivamente más estrictos (0.75 y 0.90), filtrando las detecciones originales. Esta metodología es matemáticamente equivalente a evaluar con esos umbrales desde el inicio y se encuentra en protocolos COCO y Pascal VOC.
+
+\subsection{Resultados}
+
+La Tabla~\ref{tab:fase4_robustez} resume los resultados. Con umbral 0.75, el mAP desciende solo un 1.9\% (0.785$\rightarrow$0.770) y la precisión se mantiene en 1.0 en todas las clases. Con umbral 0.90, el mAP cae un 10.2\% (0.785$\rightarrow$0.705) pero sigue muy por encima de las CNNs, y la precisión permanece en 1.0. La caída en recall es esperada al filtrar detecciones de confianza media; la ausencia de falsos positivos (precisión 1.0 en todos los umbrales) descarta overfitting.
+
+\begin{table}[htbp]
+\centering
+\caption{Validación de robustez del mejor modelo DEIMv2 con umbrales de confianza estrictos}
+\label{tab:fase4_robustez}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Umbral} & \textbf{mAP@0.5} & \textbf{Cambio vs 0.15} & \textbf{Precision (todas)} \\
+\midrule
+0.15 (original) & 0.785 & --- & 1.000 \\
+0.75 & 0.770 & $-$1.9\% & 1.000 \\
+0.90 & 0.705 & $-$10.2\% & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Conclusiones de la Fase 4}
+
+La validación con umbrales altos confirma que: (1) la precisión perfecta no es artefacto del umbral bajo; (2) el modelo mantiene mAP$>$0.70 incluso con umbral 0.90; (3) no hay evidencia de overfitting. El análisis detallado se presenta en el Capítulo~\ref{ch:resultados}.
 
 
 \section{Análisis comparativo final}
 \label{sec:analisis_comparativo}
 
-Tras completar las tres fases experimentales, esta sección consolida los resultados obtenidos y ofrece una visión integrada del rendimiento de cada arquitectura. El objetivo es facilitar al lector una comparación directa que permita extraer conclusiones claras sobre la idoneidad de cada enfoque para el problema de detección de defectos industriales.
+Tras completar las cuatro fases experimentales, esta sección consolida los resultados obtenidos y ofrece una visión integrada del rendimiento de cada arquitectura. El objetivo es facilitar al lector una comparación directa que permita extraer conclusiones claras sobre la idoneidad de cada enfoque para el problema de detección de defectos industriales.
 
 \subsection{Tabla resumen de todos los experimentos}
 
-La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de los ocho experimentos realizados a lo largo de las tres fases. Para cada configuración se indica la arquitectura, resolución de entrada, número de épocas de entrenamiento, mAP@0.5 obtenido en el conjunto de test, precision media y época del mejor checkpoint. Las observaciones destacan aspectos relevantes de cada experimento que contextualizan los resultados numéricos.
+La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de los ocho experimentos realizados a lo largo de las Fases 1--3. Para cada configuración se indica la arquitectura, resolución de entrada, número de épocas de entrenamiento, mAP@0.5 obtenido en el conjunto de test, precision media y época del mejor checkpoint. Las observaciones destacan aspectos relevantes de cada experimento que contextualizan los resultados numéricos.
 
 \begin{table}[htbp]
 \centering

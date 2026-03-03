@@ -2461,7 +2461,8 @@
     <bcf:citekey order="86" intorder="1">bergmann2019mvtec</bcf:citekey>
     <bcf:citekey order="87" intorder="1">he2016resnet</bcf:citekey>
     <bcf:citekey order="88" intorder="1">tan2019efficientnet</bcf:citekey>
-    <bcf:citekey order="89" intorder="1">simeoni2025dinov3</bcf:citekey>
+    <bcf:citekey order="89" intorder="1">huang2025deimv2</bcf:citekey>
+    <bcf:citekey order="90" intorder="1">simeoni2025dinov3</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

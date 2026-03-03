@@ -9,9 +9,9 @@
 | Fase | Estado | Observaciones |
 |------|--------|---------------|
 | 1. Personalización e Identidad | ✅ Completada | Metadata, resumen, estructura, agradecimientos, DINOv3 |
-| 2. Cap. 3 Antecedentes | 🔄 Siguiente | Pendiente: ecuaciones, tablas |
-| 3. Cap. 4 Desarrollo | ⏳ Pendiente | |
-| 4. Cap. 5 Resultados | ⏳ Pendiente | |
+| 2. Cap. 3 Antecedentes | ✅ Completada | Ecuaciones Self-Attention, tabla CNN vs ViT, transiciones |
+| 3. Cap. 4 Desarrollo | ✅ Completada | Fase 4 robustez, narrativa 82%, punto óptimo, experimento crucial |
+| 4. Cap. 5 Resultados | 🔄 Siguiente | Pendiente: dashboard, Fase 4 detallada |
 | 5. Cap. 6 Conclusiones | ⏳ Pendiente | |
 | 6. Auditoría Final | ⏳ Pendiente | |
 
@@ -38,32 +38,26 @@
 
 ---
 
-## 2. CAPÍTULO 3: ANTECEDENTES (INTENSIFICACIÓN TÉCNICA) 🔄 SIGUIENTE
+## 2. CAPÍTULO 3: ANTECEDENTES (INTENSIFICACIÓN TÉCNICA) ✅ COMPLETADA
 **Objetivo:** Reflejar una cultura ingenieril profunda y corregir inconsistencias bibliográficas.
 
 - [x] **Auditoría DINOv2 vs DINOv3:** Ya aplicada. DINOv3 como backbone propio; DINOv2 conservado en citas de trabajo de otros autores.
-- [ ] **Rigor Matemático:** Insertar las ecuaciones de *Self-Attention* en `tex/antecedentes.tex` usando sintaxis LaTeX estándar ($...$ y \[...\]).
-- [ ] **Tablas Científicas:** Incluir comparativas entre CNN (bias inductivo local) y ViT (atención global y campo receptivo dinámico).
+- [x] **Rigor Matemático:** Ecuaciones de Self-Attention insertadas en `tex/antecedentes.tex`.
+- [x] **Tablas Científicas:** Tabla comparativa CNN vs ViT con booktabs.
 
 ---
 
-## 3. CAPÍTULO 4: DESARROLLO (EL CORAZÓN DE LA INVESTIGACIÓN)
+## 3. CAPÍTULO 4: DESARROLLO (EL CORAZÓN DE LA INVESTIGACIÓN) ✅ COMPLETADA
 **Objetivo:** Sincronizar el contenido, identificar lagunas y elevar la calidad del relato para un tribunal académico.
 
 ### 3.1. Sincronización y Auditoría de Contenidos
-Realizar una **comparativa crítica** entre:
-* La versión actual en `tex/desarrollo.tex`.
-* El documento actualizado en `Documentacion-externa/FASE-1-analisis/herramienta_comparativa/FASE_EXPERIMENTACION.md`.
-
-**Instrucción:** No se trata de una copia literal. El agente debe identificar qué detalles técnicos presentes en el `.md` faltan en el `.tex` (específicamente métricas de la Fase 3 y 4) y viceversa, asegurando que no se pierda ningún matiz del reto técnico.
+- [x] Comparativa crítica realizada entre `tex/desarrollo.tex` y `FASE_EXPERIMENTACION.md`.
+- [x] Fase 4 (Validación de robustez) integrada con metodología y tabla de umbrales 0.75/0.90.
+- [x] Métricas de Fases 3 y 4 sincronizadas.
 
 ### 3.2. Calidad de Redacción y Storytelling
-Este capítulo supone el mayor reto de ingeniería de la memoria. La redacción debe ser "excelsa" para que profesores universitarios de otras ramas de la ingeniería no se pierdan:
-* **Justificación de la Resolución:** Explicar detalladamente que el uso de 1024px no es un capricho, sino una necesidad técnica. Al redimensionar a 640px se perdía el **82% de la información visual**, invalidando la detección de defectos milimétricos.
-* **Narrativa de Fases:**
-    * **Fase 1:** El fracaso de las CNN nativas (mAP 0.077 y 0.162) como motor de búsqueda de nuevas arquitecturas.
-    * **Fase 2:** La exploración de DEIMv2 y el hallazgo del "punto óptimo" (época 187 de 300).
-    * **Fase 3 (Validación Científica):** El experimento crucial donde se re-entrenan CNNs a 1024px para demostrar que la mejora es por la **arquitectura Vision Transformer** y no por la resolución.
+- [x] **Justificación de la Resolución:** 82% de pérdida de información a 640px, invalidando defectos milimétricos; 47% preservado a 1024px.
+- [x] **Narrativa de Fases:** Fase 1 como motor de búsqueda; Fase 2 con punto óptimo (época 187); Fase 3 como experimento crucial.
 
 ---
 

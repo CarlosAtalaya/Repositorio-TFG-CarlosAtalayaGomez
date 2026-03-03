@@ -18,9 +18,31 @@ Esta sección establece los fundamentos teóricos y metodológicos que sustentan
 
 \subsection{De las redes convolucionales a los transformers en visión por computador}
 
-La arquitectura \acrfull{ViT}, introducida originalmente por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. Mientras que las \acrfull{CNN} procesan información mediante operaciones de convolución local, los \acrshort{ViT} dividen la imagen en parches y los procesan mediante mecanismos de self-attention que capturan relaciones entre todas las regiones de forma simultánea~\cite{sudarshan2025object}. Esta diferencia arquitectural confiere a los transformers ventajas significativas en términos de escalabilidad, flexibilidad en el manejo de imágenes de diferentes resoluciones, y capacidad de transfer learning.
+La arquitectura \acrfull{ViT}, introducida originalmente por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. Mientras que las \acrfull{CNN} procesan información mediante operaciones de convolución local, los \acrshort{ViT} dividen la imagen en parches y los procesan mediante mecanismos de self-attention que capturan relaciones entre todas las regiones de forma simultánea~\cite{sudarshan2025object}. El mecanismo de atención escalada producto escalar (\textit{scaled dot-product attention}) constituye el núcleo computacional: dados los vectores de consulta $Q$, clave $K$ y valor $V$ (proyecciones lineales del entrada), la salida se obtiene como
+\[
+\text{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+\label{eq:attention}
+\]
+donde $d_k$ es la dimensión de las claves. El factor $\sqrt{d_k}$ evita que los valores de $QK^\top$ crezcan en magnitud cuando $d_k$ es grande, estabilizando los gradientes durante el entrenamiento. Esta diferencia arquitectural confiere a los transformers ventajas significativas en términos de escalabilidad, flexibilidad en el manejo de imágenes de diferentes resoluciones, y capacidad de transfer learning.
 
-Sudarshan et al.~\cite{sudarshan2025object} destacan que los ViTs superan a las CNNs en precisión cuando se dispone de grandes volúmenes de datos de entrenamiento, alcanzando accuracy del 93\% en tareas de clasificación general de objetos. Más importante aún, demuestran que los transformers preentrenados en grandes corpus de imágenes pueden transferir conocimiento de forma más efectiva a tareas específicas, una característica crucial para aplicaciones industriales donde los datos etiquetados son escasos.
+Sudarshan et al.~\cite{sudarshan2025object} destacan que los ViTs superan a las CNNs en precisión cuando se dispone de grandes volúmenes de datos de entrenamiento, alcanzando accuracy del 93\% en tareas de clasificación general de objetos. Más importante aún, demuestran que los transformers preentrenados en grandes corpus de imágenes pueden transferir conocimiento de forma más efectiva a tareas específicas, una característica crucial para aplicaciones industriales donde los datos etiquetados son escasos. La tabla~\ref{tab:cnn-vit-comparativa} resume las diferencias arquitecturales clave entre ambos paradigmas.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparativa arquitectural entre CNN y Vision Transformer.}
+\label{tab:cnn-vit-comparativa}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspecto} & \textbf{CNN} & \textbf{ViT} \\
+\midrule
+Bias inductivo & Local (asume vecindad espacial) & Sin asunción de localidad \\
+Campo receptivo & Limitado por apilamiento de convoluciones & Global desde la primera capa \\
+Mecanismo de atención & Implícito (operaciones locales) & Explícito (self-attention entre parches) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Con estos fundamentos arquitectónicos establecidos, se revisan a continuación las técnicas de aprendizaje auto-supervisado que permiten aprovechar los ViT en escenarios con datos limitados.
 
 \subsection{Aprendizaje auto-supervisado para Vision Transformers}
 
@@ -34,8 +56,7 @@ El aprendizaje auto-supervisado se fundamenta en la explotación de las relacion
 
 \textbf{Self-distillation:} Aproximaciones como DINO~\cite{caron2021dino}, DINOv2~\cite{oquab2024dinov2} y DINOv3~\cite{simeoni2025dinov3}, donde el modelo aprende de sus propias predicciones sin etiquetas, generando representaciones visuales robustas.
 
-La relevancia de estos métodos para aplicaciones industriales es crucial. Como señalan Khan et al.~\cite{khan2024survey}, el SSL permite reducir significativamente la dependencia de anotaciones manuales, ofreciendo un enfoque más escalable y eficiente en términos de recursos. Esta característica es especialmente valiosa en escenarios de manufactura donde el etiquetado de defectos requiere expertise técnico especializado y resulta costoso en tiempo y recursos.
-
+La relevancia de estos métodos para aplicaciones industriales es crucial. Como señalan Khan et al.~\cite{khan2024survey}, el SSL permite reducir significativamente la dependencia de anotaciones manuales, ofreciendo un enfoque más escalable y eficiente en términos de recursos. Esta característica es especialmente valiosa en escenarios de manufactura donde el etiquetado de defectos requiere expertise técnico especializado y resulta costoso en tiempo y recursos. Con estos fundamentos establecidos, la siguiente sección se centra en las aplicaciones concretas de Vision Transformers a la detección de anomalías industriales.
 
 \section{Vision Transformers aplicados a detección de anomalías industriales}
 
@@ -59,8 +80,7 @@ La arquitectura DefT incorpora un bloque convolucional inicial (stem) que preser
 
 Wang et al.~\cite{wang2022defect} enfatizan que esta aproximación híbrida es particularmente efectiva en casos complejos característicos de entornos industriales reales: fondos desordenados (cluttered backgrounds) y pseudo-defectos difíciles de distinguir. El decoder, deliberadamente simple, recupera gradualmente los detalles espaciales mediante skip connections desde el encoder, priorizando la eficiencia sobre la complejidad arquitectural.
 
-La validación experimental en tres datasets industriales distintos confirma la efectividad de combinar localidad (CNN) y globalidad (Transformer). Esta línea de trabajo sugiere que, dependiendo de las características específicas del problema de detección, las arquitecturas híbridas pueden ofrecer ventajas sobre aproximaciones puras.
-
+La validación experimental en tres datasets industriales distintos confirma la efectividad de combinar localidad (CNN) y globalidad (Transformer). Esta línea de trabajo sugiere que, dependiendo de las características específicas del problema de detección, las arquitecturas híbridas pueden ofrecer ventajas sobre aproximaciones puras. Independientemente de la elección arquitectural, la escasez de datos etiquetados constituye un desafío transversal; la siguiente sección analiza cómo el transfer learning y el aprendizaje few-shot permiten abordar esta limitación.
 
 \section{Transfer learning y aprendizaje con datos limitados}
 
@@ -82,8 +102,7 @@ La investigación se centra en el trade-off fundamental entre calidad de detecci
 
 Las contribuciones del trabajo son particularmente valiosas para practitioners: proporcionan guidelines detalladas para seleccionar arquitecturas considerando tanto el caso de uso específico como las restricciones de hardware disponible. Enfatizan la importancia de considerar requisitos de tiempo real, necesidades de accuracy, y limitaciones de memoria y cómputo. Este enfoque pragmático reconoce que el modelo "mejor" en términos académicos puede no ser el más apropiado para un deployment industrial específico.
 
-Los autores identifican que, con el ascenso de los transformers como backbones visuales de elección, existe una gran variedad de combinaciones posibles, y que los profesionales del área frecuentemente deben invertir tiempo considerable investigando la opción adecuada para su caso particular. Su trabajo busca reducir esta carga mediante evaluación sistemática y recomendaciones basadas en evidencia experimental.
-
+Los autores identifican que, con el ascenso de los transformers como backbones visuales de elección, existe una gran variedad de combinaciones posibles, y que los profesionales del área frecuentemente deben invertir tiempo considerable investigando la opción adecuada para su caso particular. Su trabajo busca reducir esta carga mediante evaluación sistemática y recomendaciones basadas en evidencia experimental. Más allá de estos enfoques de transfer learning, la investigación reciente explora técnicas que amplían aún más las capacidades de los sistemas de detección, objeto de la siguiente sección.
 
 \section{Técnicas avanzadas y enfoques emergentes}
 
@@ -105,8 +124,7 @@ PatchGuard, la solución propuesta, incorpora pseudo-anomalías generadas artifi
 
 La arquitectura incorpora estas muestras sintéticas en un framework basado en ViT, con entrenamiento adversarial guiado por una función de pérdida novel diseñada para mejorar la robustez del modelo, soportada por el análisis teórico presentado. Los resultados experimentales en datasets industriales y médicos establecidos demuestran mejoras significativas: PatchGuard supera métodos anteriores en 53.2\% para detección de anomalías y 68.5\% para localización en configuraciones adversariales, mientras mantiene accuracy competitiva en configuraciones no adversariales.
 
-Aunque la robustez adversarial puede parecer un aspecto especializado, Nafez et al.~\cite{nafez2025patchguard} argumentan convincentemente su relevancia práctica. En entornos de producción, donde sistemas de inspección visual pueden estar expuestos a variaciones no previstas en iluminación, posicionamiento, o características de productos, la capacidad de mantener rendimiento robusto bajo condiciones adversas es esencial para deployment confiable.
-
+Aunque la robustez adversarial puede parecer un aspecto especializado, Nafez et al.~\cite{nafez2025patchguard} argumentan convincentemente su relevancia práctica. En entornos de producción, donde sistemas de inspección visual pueden estar expuestos a variaciones no previstas en iluminación, posicionamiento, o características de productos, la capacidad de mantener rendimiento robusto bajo condiciones adversas es esencial para deployment confiable. Tras esta revisión de contribuciones individuales, la siguiente sección sintetiza las tendencias, tensiones y limitaciones identificadas en el estado del arte.
 
 \section{Análisis crítico del estado del arte}
 
@@ -134,8 +152,7 @@ Alber et al.~\cite{alber2024evaluating} reconocen explícitamente esta problemá
 
 La dependencia de datos etiquetados continúa siendo el desafío más significativo para aplicación industrial de sistemas de detección de anomalías. Aunque técnicas de transfer learning y aprendizaje auto-supervisado mitigan parcialmente esta limitación, la mayoría de métodos aún requieren algún nivel de supervisión para adaptación a dominios específicos. Los resultados de Huang et al.~\cite{huang2025semiconductor}, demostrando accuracy superior al 90\% con menos de 15 imágenes por clase mediante DINOv2, representan un avance significativo hacia few-shot learning práctico.
 
-El enfoque zero-shot de Le-Gia y Ahn~\cite{legia2025consistent} busca eliminar completamente la necesidad de datos etiquetados, pero introduce sus propias limitaciones, particularmente en el manejo de anomalías consistentes. La generación de pseudo-anomalías, explorada por Nafez et al.~\cite{nafez2025patchguard}, ofrece una vía alternativa para aumentar datos de entrenamiento, aunque requiere diseño cuidadoso para garantizar relevancia respecto a defectos reales.
-
+El enfoque zero-shot de Le-Gia y Ahn~\cite{legia2025consistent} busca eliminar completamente la necesidad de datos etiquetados, pero introduce sus propias limitaciones, particularmente en el manejo de anomalías consistentes. La generación de pseudo-anomalías, explorada por Nafez et al.~\cite{nafez2025patchguard}, ofrece una vía alternativa para aumentar datos de entrenamiento, aunque requiere diseño cuidadoso para garantizar relevancia respecto a defectos reales. Este análisis crítico revela brechas específicas que orientan la investigación futura; la siguiente sección las enuncia como oportunidades de investigación concretas.
 
 \section{Identificación de oportunidades de investigación}
 
@@ -163,8 +180,7 @@ Un sistema práctico debería no solo detectar anomalías sino también proporci
 
 Si bien Huang et al.~\cite{huang2025semiconductor} demuestran que menos de 15 imágenes por clase pueden ser suficientes con DINOv2, la pregunta de cuán bajo puede reducirse este número sin degradación significativa de rendimiento permanece abierta. En contextos educativos o de prototipado rápido, donde la captura de datos puede estar aún más limitada (por ejemplo, 5-10 imágenes por tipo de componente), es relevante investigar técnicas de data augmentation específicas para imágenes industriales, combinadas con transfer learning agresivo.
 
-Esta línea de investigación conecta con el trabajo de Le-Gia y Ahn~\cite{legia2025consistent} sobre detección zero-shot, pero con un enfoque en escenarios one-shot o few-shot extremos donde se dispone de muy pocas muestras etiquetadas pero se busca rendimiento superior al zero-shot puro.
-
+Esta línea de investigación conecta con el trabajo de Le-Gia y Ahn~\cite{legia2025consistent} sobre detección zero-shot, pero con un enfoque en escenarios one-shot o few-shot extremos donde se dispone de muy pocas muestras etiquetadas pero se busca rendimiento superior al zero-shot puro. Las oportunidades identificadas se integran en la sección final del capítulo, donde se fundamenta la aproximación metodológica del trabajo propuesto.
 
 \section{Síntesis y justificación del trabajo propuesto}
 
