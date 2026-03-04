@@ -48,6 +48,27 @@ MVTec AD~\cite{bergmann2019mvtec} es un benchmark ampliamente utilizado en detec
 
 La preparación del dataset se articuló en \textbf{cinco etapas} del pipeline, desde la exploración de las fuentes hasta la validación final. Cada etapa tiene un propósito claro: las Etapas 1 y 3 son de análisis (no modifican el volumen de datos); las Etapas 2 y 4 realizan las transformaciones cuantitativas; la Etapa 5 verifica la integridad del resultado. La Tabla~\ref{tab:evolucion_dataset_curacion} resume la evolución cuantitativa del conjunto de datos a lo largo del pipeline, alineada con la nomenclatura de las etapas descritas a continuación.
 
+\begin{table}[H]
+\centering
+\begin{tabular}{llcc}
+\toprule
+\textbf{Etapa} & \textbf{Operación} & \textbf{Imágenes} & \textbf{Categorías} \\
+\midrule
+Inicio & Fuentes originales combinadas (VISION-Datasets + MVTec AD) & $\sim$9{,}142 & 64 \\
+\midrule
+Etapa 1 & Exploración y análisis (sin transformación) & $\sim$9{,}142 & 64 \\
+Etapa 2 & Curación inicial: filtrado, formato COCO & 1{,}907 & 15 \\
+Etapa 3 & Análisis exhaustivo de calidad (sin transformación) & 1{,}907 & 15 \\
+Etapa 4.1 & Recuración: sin \texttt{hazelnut}, sin duplicados & 1{,}393 & 15 \\
+Etapa 4.2 & Unificación de taxonomía (6 categorías) & 1{,}393 & 6 \\
+Etapa 4.3--4.4 & Balanceo y creación de splits estratificados & 1{,}022 & 6 \\
+Etapa 5 & Validación final (estratificación, leakage, integridad) & 1{,}022 & 6 \\
+\bottomrule
+\end{tabular}
+\caption{Evolución del dataset a través del pipeline de curación (Etapas 1--5)}
+\label{tab:evolucion_dataset_curacion}
+\end{table}
+
 \subsubsection{Etapa 1: Exploración y análisis de datasets originales}
 
 La \textbf{Etapa 1} consiste en un análisis exploratorio para comprender la estructura de datos, los formatos de anotación y la distribución de defectos en cada fuente. Este análisis permitió identificar correspondencias semánticas entre etiquetas y definir criterios de selección de categorías y objetos relevantes para el dominio de componentes industriales. No se realizan transformaciones sobre el volumen de datos; el resultado es un inventario de las fuentes.
@@ -85,35 +106,12 @@ La \textbf{Etapa 5} cierra el pipeline validando la consistencia del dataset fin
     \item \textbf{Integridad} completa: 100\% de archivos presentes en las particiones.
 \end{itemize}
 
-\begin{table}[htbp]
-\centering
-\caption{Evolución del dataset a través del pipeline de curación (Etapas 1--5)}
-\label{tab:evolucion_dataset_curacion}
-\begin{tabular}{llcc}
-\toprule
-\textbf{Etapa} & \textbf{Operación} & \textbf{Imágenes} & \textbf{Categorías} \\
-\midrule
-Inicio & Fuentes originales combinadas (VISION-Datasets + MVTec AD) & $\sim$9{,}142 & 64 \\
-\midrule
-Etapa 1 & Exploración y análisis (sin transformación) & $\sim$9{,}142 & 64 \\
-Etapa 2 & Curación inicial: filtrado, formato COCO & 1{,}907 & 15 \\
-Etapa 3 & Análisis exhaustivo de calidad (sin transformación) & 1{,}907 & 15 \\
-Etapa 4.1 & Recuración: sin \texttt{hazelnut}, sin duplicados & 1{,}393 & 15 \\
-Etapa 4.2 & Unificación de taxonomía (6 categorías) & 1{,}393 & 6 \\
-Etapa 4.3--4.4 & Balanceo y creación de splits estratificados & 1{,}022 & 6 \\
-Etapa 5 & Validación final (estratificación, leakage, integridad) & 1{,}022 & 6 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \subsection{Taxonomía unificada de defectos}
 
 Para garantizar coherencia semántica y facilitar la evaluación comparativa, se definió una taxonomía unificada de 6 categorías. La Tabla~\ref{tab:fase0_taxonomia} resume la definición y ejemplos de etiquetas originales mapeadas.
 
 \begin{table}[htbp]
 \centering
-\caption{Taxonomía unificada de defectos y ejemplos de etiquetas originales mapeadas}
-\label{tab:fase0_taxonomia}
 \begin{tabular}{cllp{6.6cm}}
 \toprule
 \textbf{ID} & \textbf{Categoría} & \textbf{Criticidad} & \textbf{Ejemplos de etiquetas originales} \\
@@ -126,6 +124,8 @@ Para garantizar coherencia semántica y facilitar la evaluación comparativa, se
 5 & CONTAMINACIÓN & Alta & \texttt{contamination}, \texttt{metal\_contamination}, \texttt{Dirty} \\
 \bottomrule
 \end{tabular}
+\caption{Taxonomía unificada de defectos y ejemplos de etiquetas originales mapeadas}
+\label{tab:fase0_taxonomia}
 \end{table}
 
 \subsection{Análisis del dataset final}
@@ -136,8 +136,6 @@ La versión final del dataset curado contiene 1{,}022 imágenes y 1{,}354 anotac
 
 \begin{table}[htbp]
 \centering
-\caption{Resumen del dataset final curado}
-\label{tab:fase0_resumen_dataset_final}
 \begin{tabular}{lc}
 \toprule
 \textbf{Característica} & \textbf{Valor} \\
@@ -149,12 +147,12 @@ Ratio máx/mín (anotaciones por clase) & 2.08:1 \\
 Resolución media (train/val/test) & 1647$\times$1347 / 1735$\times$1457 / 1704$\times$1415 px \\
 \bottomrule
 \end{tabular}
+\caption{Resumen del dataset final curado}
+\label{tab:fase0_resumen_dataset_final}
 \end{table}
 
 \begin{table}[htbp]
 \centering
-\caption{Distribución del dataset por split y proporción de augmentación}
-\label{tab:fase0_splits}
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Split} & \textbf{Imágenes} & \textbf{Anotaciones} & \textbf{\%} & \textbf{\% Augmentadas} \\
@@ -164,6 +162,8 @@ Val & 102 & 145 & 10\% & 38.24\% \\
 Test & 205 & 265 & 20\% & 35.12\% \\
 \bottomrule
 \end{tabular}
+\caption{Distribución del dataset por split y proporción de augmentación}
+\label{tab:fase0_splits}
 \end{table}
 
 \subsubsection{Distribución por categorías y origen}
@@ -184,6 +184,7 @@ La Figura~\ref{fig:fase0_category_distribution} muestra la distribución de anot
 \label{fig:fase0_source_dataset_distribution}
 \end{figure}
 
+\FloatBarrier
 \subsubsection{Características de resolución y escalas}
 
 El dataset presenta alta variabilidad en tamaño de imagen (Figura~\ref{fig:fase0_image_size_distributions}), lo que motivó la selección de resoluciones de entrenamiento que preservan información relevante sin exceder las limitaciones computacionales. La Figura~\ref{fig:fase0_width_vs_height_scatter} ilustra la dispersión ancho--alto, evidenciando la heterogeneidad inter-split.
@@ -202,6 +203,7 @@ El dataset presenta alta variabilidad en tamaño de imagen (Figura~\ref{fig:fase
 \label{fig:fase0_width_vs_height_scatter}
 \end{figure}
 
+\FloatBarrier
 \subsubsection{Características de las anotaciones (bounding boxes)}
 
 El análisis de las cajas delimitadoras (Figura~\ref{fig:fase0_bbox_distribution}) muestra la existencia de una fracción relevante de bboxes pequeñas. En el split de entrenamiento, el 23.41\% de las cajas presenta anchura menor de 32 píxeles y el 22.25\% presenta altura menor de 32 píxeles (en validación y test estos porcentajes se sitúan entre el 16\% y el 20\%). Esta observación resulta relevante para modelos basados en \textit{Region Proposal Networks} (RPN) y configuraciones de anchors por defecto, y se tuvo en cuenta en la fase de experimentación.
@@ -213,6 +215,7 @@ El análisis de las cajas delimitadoras (Figura~\ref{fig:fase0_bbox_distribution
 \label{fig:fase0_bbox_distribution}
 \end{figure}
 
+\FloatBarrier
 \subsubsection{Balanceo mediante augmentación}
 
 Para mitigar el desbalance entre categorías se aplicó una estrategia híbrida de under/over-sampling complementada con augmentación conservadora. La Figura~\ref{fig:fase0_augmentation_distribution} muestra la proporción de imágenes originales y augmentadas en cada split, manteniéndose en torno al 36\% a nivel global.
@@ -224,6 +227,7 @@ Para mitigar el desbalance entre categorías se aplicó una estrategia híbrida 
 \label{fig:fase0_augmentation_distribution}
 \end{figure}
 
+\FloatBarrier
 \subsection{Conclusiones de la preparación del dataset}
 
 El pipeline de curación (Etapas 1--5) permitió transformar dos fuentes heterogéneas en un dataset único, trazable y listo para experimentación:
@@ -338,8 +342,6 @@ Los resultados en el conjunto de test (205 imágenes) se presentan en la Tabla~\
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de ResNet-18 + Faster R-CNN en resolución nativa}
-\label{tab:resnet18_nativa}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
@@ -354,6 +356,8 @@ NORMAL & 0.000 & --- & 0.000 \\
 \textbf{mAP@0.5} & \textbf{0.077} & --- & --- \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de ResNet-18 + Faster R-CNN en resolución nativa}
+\label{tab:resnet18_nativa}
 \end{table}
 
 \subsubsection{Análisis de resultados}
@@ -393,8 +397,6 @@ Los resultados se presentan en la Tabla~\ref{tab:efficientnet_nativa}.
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de EfficientNet-B0 + Faster R-CNN en resolución nativa}
-\label{tab:efficientnet_nativa}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
@@ -409,8 +411,11 @@ NORMAL & 0.000 & --- & 0.000 \\
 \textbf{mAP@0.5} & \textbf{0.162} & --- & --- \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de EfficientNet-B0 + Faster R-CNN en resolución nativa}
+\label{tab:efficientnet_nativa}
 \end{table}
 
+\FloatBarrier
 \subsubsection{Análisis de resultados}
 
 EfficientNet-B0 muestra un rendimiento superior a ResNet-18:
@@ -489,8 +494,6 @@ Esta primera iteración con resolución 640×640 demostró que DEIMv2 supera sig
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de DEIMv2 @ 1024×1024 (80 épocas)}
-\label{tab:deimv2_1024_80ep}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
@@ -505,6 +508,8 @@ ROTURA\_FRACTURA & 0.384 & 1.000 & 0.650 \\
 \textbf{mAP@0.5} & \textbf{0.624} & \textbf{1.000} & --- \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de DEIMv2 @ 1024×1024 (80 épocas)}
+\label{tab:deimv2_1024_80ep}
 \end{table}
 
 \textbf{Análisis:}
@@ -534,8 +539,6 @@ El hecho de que el mejor epoch en 80 épocas fuera el último sugiere que el mod
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de DEIMv2 @ 1024×1024 (120 épocas)}
-\label{tab:deimv2_1024_120ep}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
@@ -550,6 +553,8 @@ ROTURA\_FRACTURA & 0.539 & 1.000 & 0.700 \\
 \textbf{mAP@0.5} & \textbf{0.766} & \textbf{1.000} & --- \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de DEIMv2 @ 1024×1024 (120 épocas)}
+\label{tab:deimv2_1024_120ep}
 \end{table}
 
 \textbf{Análisis:}
@@ -583,8 +588,6 @@ Para identificar el punto de convergencia real y explorar si había margen de me
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de DEIMv2 @ 1024×1024 (300 épocas, mejor epoch 187)}
-\label{tab:deimv2_1024_300ep}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
@@ -599,6 +602,8 @@ ROTURA\_FRACTURA & 0.576 & 1.000 & 0.725 \\
 \textbf{mAP@0.5} & \textbf{0.785} & \textbf{1.000} & --- \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de DEIMv2 @ 1024×1024 (300 épocas, mejor epoch 187)}
+\label{tab:deimv2_1024_300ep}
 \end{table}
 
 \textbf{Análisis de convergencia --- hallazgo del punto óptimo:}
@@ -630,6 +635,7 @@ Las Figuras~\ref{fig:fase2_deimv2_val_map_300ep} y~\ref{fig:fase2_deimv2_val_met
 \label{fig:fase2_deimv2_val_metrics_300ep}
 \end{figure}
 
+\FloatBarrier
 \textbf{Análisis de eficiencia de entrenamiento:}
 \begin{itemize}
     \item 80→120 épocas: +14.2 puntos mAP / +40 épocas = \textbf{0.355 puntos/época}
@@ -638,14 +644,13 @@ Las Figuras~\ref{fig:fase2_deimv2_val_map_300ep} y~\ref{fig:fase2_deimv2_val_met
     \item \textbf{Recomendación práctica}: Para futuros entrenamientos, 150-180 épocas capturan >98\% de la mejora potencial.
 \end{itemize}
 
+\FloatBarrier
 \subsection{Evolución del rendimiento en Fase 2}
 
 La Tabla~\ref{tab:evolucion_fase2} resume la evolución del rendimiento a través de las diferentes iteraciones.
 
 \begin{table}[htbp]
 \centering
-\caption{Evolución del rendimiento de DEIMv2 en Fase 2}
-\label{tab:evolucion_fase2}
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Configuración} & \textbf{mAP} & \textbf{Mejora vs anterior} & \textbf{Épocas} & \textbf{Mejor Epoch} \\
@@ -656,6 +661,8 @@ La Tabla~\ref{tab:evolucion_fase2} resume la evolución del rendimiento a travé
 1024px, 300ep & 0.785 & +2.5\% & 300 & 187 \\
 \bottomrule
 \end{tabular}
+\caption{Evolución del rendimiento de DEIMv2 en Fase 2}
+\label{tab:evolucion_fase2}
 \end{table}
 
 \textbf{Observaciones clave:}
@@ -679,7 +686,7 @@ Los resultados de esta fase demuestran de forma contundente la superioridad de l
 
 La evidencia gráfica completa de las cuatro iteraciones de DEIMv2 (curvas de pérdida, \textit{learning rate} y métricas de validación) se presenta en la Sección~\ref{subsec:evidencia_fase2}, donde se analiza en detalle el proceso de convergencia de cada configuración.
 
-
+\FloatBarrier
 \section{Fase 3: Validación experimental}
 \label{sec:fase3}
 
@@ -717,8 +724,6 @@ Los resultados se presentan en la Tabla~\ref{tab:resnet18_1024}, comparados con 
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de ResNet-18 @ 1024×1024 vs resolución nativa}
-\label{tab:resnet18_1024}
 \begin{tabular}{lcc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5 (1024px)} & \textbf{Cambio vs Nativa} \\
@@ -733,6 +738,8 @@ NORMAL & 0.000 & 0.0 \\
 \textbf{mAP@0.5} & \textbf{0.080} & \textbf{+3.9\%} \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de ResNet-18 @ 1024×1024 vs resolución nativa}
+\label{tab:resnet18_1024}
 \end{table}
 
 \subsubsection{Análisis}
@@ -766,8 +773,6 @@ Los resultados se presentan en la Tabla~\ref{tab:efficientnet_1024}.
 
 \begin{table}[htbp]
 \centering
-\caption{Resultados de EfficientNet-B0 @ 1024×1024 vs resolución nativa}
-\label{tab:efficientnet_1024}
 \begin{tabular}{lcc}
 \toprule
 \textbf{Clase} & \textbf{AP@0.5 (1024px)} & \textbf{Cambio vs Nativa} \\
@@ -782,6 +787,8 @@ NORMAL & 0.000 & 0.0 \\
 \textbf{mAP@0.5} & \textbf{0.122} & \textbf{-24.7\%} \\
 \bottomrule
 \end{tabular}
+\caption{Resultados de EfficientNet-B0 @ 1024×1024 vs resolución nativa}
+\label{tab:efficientnet_1024}
 \end{table}
 
 \subsubsection{Análisis}
@@ -802,14 +809,13 @@ NORMAL & 0.000 & 0.0 \\
 
 \textbf{Conclusión:} EfficientNet-B0 empeora con resolución 1024×1024, confirmando que está optimizada para resoluciones menores.
 
+\FloatBarrier
 \subsection{Comparación Fase 3 vs Fase 1}
 
 La Tabla~\ref{tab:comparacion_fase3} resume la comparación entre las mejores configuraciones de cada arquitectura.
 
 \begin{table}[htbp]
 \centering
-\caption{Comparación de mejores modelos por arquitectura}
-\label{tab:comparacion_fase3}
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Modelo} & \textbf{Resolución} & \textbf{mAP@0.5} & \textbf{Cambio} & \textbf{Mejor Config} \\
@@ -823,6 +829,8 @@ EfficientNet-B0 & 1024×1024 & 0.122 & -24.7\% & --- \\
 DEIMv2 & 1024×1024 & 0.785 & --- & 1024×1024 \\
 \bottomrule
 \end{tabular}
+\caption{Comparación de mejores modelos por arquitectura}
+\label{tab:comparacion_fase3}
 \end{table}
 
 La Figura~\ref{fig:fase3_total_loss_1024} muestra las curvas de pérdida para ambas arquitecturas CNN entrenadas a 1024$\times$1024. Es notable que ambos modelos convergen de forma aparentemente correcta (la pérdida de entrenamiento decrece y la de validación se estabiliza), pero esto no se traduce en mejoras significativas de mAP. Este fenómeno subraya una limitación fundamental de las CNNs: \textbf{la reducción de la pérdida no garantiza mejor rendimiento en detección} cuando la arquitectura no puede capturar las relaciones espaciales necesarias.
@@ -883,7 +891,7 @@ La evidencia gráfica adicional de los entrenamientos de la Fase 3 (evolución d
 
 Con la superioridad arquitectural de DEIMv2 demostrada, la Fase 4 aborda una cuestión complementaria: verificar que los resultados no reflejan sobreajuste ni artefactos del umbral de decisión.
 
-
+\FloatBarrier
 \section{Fase 4: Validación de robustez con umbrales de confianza}
 \label{sec:fase4}
 
@@ -899,8 +907,6 @@ La Tabla~\ref{tab:fase4_robustez} resume los resultados. Con umbral 0.75, el mAP
 
 \begin{table}[htbp]
 \centering
-\caption{Validación de robustez del mejor modelo DEIMv2 con umbrales de confianza estrictos}
-\label{tab:fase4_robustez}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Umbral} & \textbf{mAP@0.5} & \textbf{Cambio vs 0.15} & \textbf{Precision (todas)} \\
@@ -910,13 +916,15 @@ La Tabla~\ref{tab:fase4_robustez} resume los resultados. Con umbral 0.75, el mAP
 0.90 & 0.705 & $-$10.2\% & 1.000 \\
 \bottomrule
 \end{tabular}
+\caption{Validación de robustez del mejor modelo DEIMv2 con umbrales de confianza estrictos}
+\label{tab:fase4_robustez}
 \end{table}
 
 \subsection{Conclusiones de la Fase 4}
 
 La validación con umbrales altos confirma que: (1) la precisión perfecta no es artefacto del umbral bajo; (2) el modelo mantiene mAP$>$0.70 incluso con umbral 0.90; (3) no hay evidencia de overfitting. El análisis detallado se presenta en el Capítulo~\ref{ch:resultados}.
 
-
+\FloatBarrier
 \section{Análisis comparativo final}
 \label{sec:analisis_comparativo}
 
@@ -928,8 +936,6 @@ La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de los och
 
 \begin{table}[htbp]
 \centering
-\caption{Resumen completo de todos los experimentos realizados}
-\label{tab:resumen_experimentos}
 \small
 \begin{tabular}{lcccccc}
 \toprule
@@ -947,6 +953,8 @@ DEIMv2 & 1024×1024 & 120 & 0.766 & 1.000 & 119 & Mejora por épocas \\
 DEIMv2 & 1024×1024 & 300 & \textbf{0.785} & \textbf{1.000} & \textbf{187} & \textbf{Mejor modelo} \\
 \bottomrule
 \end{tabular}
+\caption{Resumen completo de todos los experimentos realizados}
+\label{tab:resumen_experimentos}
 \end{table}
 
 \subsection{Comparación de mejores modelos por arquitectura}
@@ -955,8 +963,6 @@ La Tabla~\ref{tab:mejores_modelos} compara los mejores modelos de cada arquitect
 
 \begin{table}[htbp]
 \centering
-\caption{Comparación de mejores modelos por arquitectura}
-\label{tab:mejores_modelos}
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Arquitectura} & \textbf{Configuración} & \textbf{mAP@0.5} & \textbf{AP NORMAL} & \textbf{Precision} & \textbf{Parámetros} \\
@@ -966,6 +972,8 @@ EfficientNet-B0 & Nativa & 0.162 & 0.000 & Variable & ~5M \\
 \textbf{DEIMv2} & \textbf{1024×1024, 300ep} & \textbf{0.785} & \textbf{0.980} & \textbf{1.000} & \textbf{~17M} \\
 \bottomrule
 \end{tabular}
+\caption{Comparación de mejores modelos por arquitectura}
+\label{tab:mejores_modelos}
 \end{table}
 
 \textbf{Diferencias de rendimiento:}
@@ -1030,14 +1038,13 @@ EfficientNet-B0 & Nativa & 0.162 & 0.000 & Variable & ~5M \\
 
 \textbf{Conclusión:} DEIMv2 supera a las CNNs por ~3× en esta categoría.
 
+\FloatBarrier
 \subsection{Diferencias arquitectónicas fundamentales}
 
 La Tabla~\ref{tab:diferencias_arquitectonicas} resume las diferencias clave entre CNNs y ViTs observadas en este trabajo.
 
 \begin{table}[htbp]
 \centering
-\caption{Diferencias arquitectónicas fundamentales observadas}
-\label{tab:diferencias_arquitectonicas}
 \begin{tabular}{lcc}
 \toprule
 \textbf{Aspecto} & \textbf{CNNs} & \textbf{ViTs (DEIMv2)} \\
@@ -1051,6 +1058,8 @@ Detección relaciones espaciales & Gradual, jerárquica & Directa, global \\
 mAP máximo alcanzado & 0.162 & \textbf{0.785} \\
 \bottomrule
 \end{tabular}
+\caption{Diferencias arquitectónicas fundamentales observadas}
+\label{tab:diferencias_arquitectonicas}
 \end{table}
 
 \textbf{Implicaciones:}
@@ -1062,6 +1071,7 @@ mAP máximo alcanzado & 0.162 & \textbf{0.785} \\
 
 Los resultados presentados en esta sección sintetizan las conclusiones principales de la experimentación. A continuación, la Sección~\ref{sec:evidencia_grafica} ofrece un compendio de la evidencia gráfica del proceso de entrenamiento de cada experimento, que permite al lector auditar los patrones de convergencia y verificar la consistencia de los resultados.
 
+\FloatBarrier
 \clearpage
 \section{Evidencia gráfica del proceso de entrenamiento}
 \label{sec:evidencia_grafica}

@@ -2463,6 +2463,9 @@
     <bcf:citekey order="88" intorder="1">tan2019efficientnet</bcf:citekey>
     <bcf:citekey order="89" intorder="1">huang2025deimv2</bcf:citekey>
     <bcf:citekey order="90" intorder="1">simeoni2025dinov3</bcf:citekey>
+    <bcf:citekey order="91" intorder="1">wang2022defect</bcf:citekey>
+    <bcf:citekey order="91" intorder="2">sudarshan2025object</bcf:citekey>
+    <bcf:citekey order="92" intorder="1">streamlit2024</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

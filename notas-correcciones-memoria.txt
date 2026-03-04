@@ -84,7 +84,7 @@ A partir de tu síntesis del contexto, interpreta cómo estructurar resultados.t
 - Robustez (Fase 4): La tabla está en desarrollo. Resultados debe interpretar, no repetir.
 - Hilo narrativo: Cap. 5 como capa de cierre: síntesis, herramienta, evidencia visual complementaria. Voz pasiva refleja o plural mayestático.
 
-Entregable: tex/resultados.tex actualizado, coherente con desarrollo.tex. Compilar con ./compile.sh.
+Entregable: tex/resultados.tex actualizado, coherente con desarrollo.tex (Si fuese necesario por tu interpretabilidad hacer modificaciones dentro de tex/desarrollo.tex, puedes hacerlo). Compilar con ./compile.sh.
 "
 
 
