@@ -30,37 +30,61 @@ Al principio de la memoria, aclarar que hay muchos tecniccismos porque no hay un
 Apartado experimentacion. Muy poco entendible
 
 
-=== PROMPT PARA EL PRÓXIMO AGENTE (Fase 2: Capítulo 3 Antecedentes) ===
+=== PROMPT PARA EL PRÓXIMO AGENTE (Fase 4: Capítulo 5 Resultados y Herramienta de Análisis) ===
 
 "
-Rol: Actúa como un asistente de investigación doctoral experto en Visión por Computador y redacción académica LaTeX. Tu objetivo es completar la Fase 2 del Trabajo Fin de Grado de Carlos Atalaya Gómez: intensificar técnicamente el Capítulo 3 (Antecedentes).
+Rol: Actúas como experto en Visión por Computador y redacción académica. Tu objetivo es completar el Capítulo 5 (Resultados y discusión) del TFG de Carlos Atalaya Gómez, integrando la herramienta de análisis y el material visual del dashboard Streamlit. Tendrás autonomía interpretativa para estructurar y jerarquizar los apartados de Desarrollo (Cap. 4) y Resultados (Cap. 5) de forma que la narrativa no se pierda y el índice de coherencia entre ambas secciones sea muy alto.
 
-Contexto del Proyecto:
-- Título: Detección de Anomalías Industriales mediante Vision Transformers y Self-Supervised Learning.
-- Institución: Escuela Superior de Ingeniería Informática (UCLM).
-- Tecnología clave: Backbone DINOv3, arquitectura DEIMv2, métrica mAP 0.785.
-- La Fase 1 (Personalización e Identidad) ya está completada. La auditoría DINOv2 vs DINOv3 está aplicada en toda la memoria.
+*** SÍNTESIS DE CONTEXTO (TAREA PREVIA A LA REDACCIÓN) ***
 
-Recursos obligatorios:
-- Hoja de ruta y estado actual: @Trabajo-a-realizar.md
-- Contexto del repositorio: @CONTEXTUALIZACION-REPOSITORIO.txt
-- Reglas de estilo: @.cursorrules y @.cursor/rules/tfg_writing.mdc
-- Archivo a modificar: @tex/antecedentes.tex
-- Citas: usar solo claves de @bib/main.bib (no inventar citas).
+Antes de redactar, debes:
 
-Tareas a realizar en esta sesión (Fase 2 — Cap. 3 Antecedentes):
+1. SINTETIZAR LA MEMORIA DEL PROYECTO: Leer íntegramente tex/desarrollo.tex para entender qué resultados ya están documentados (tablas de mAP, AP por clase, robustez, resumen de experimentos, figuras de curvas de entrenamiento). Identificar el inventario de tablas y figuras presentes y su función en el hilo narrativo.
 
-1. RIGOR MATEMÁTICO: Insertar las ecuaciones de Self-Attention en tex/antecedentes.tex. Usar sintaxis LaTeX estándar: $...$ para fórmulas en línea y \[...\] para ecuaciones en bloque. Incluir la formulación estándar de atención (softmax de QK^T sobre sqrt(d_k) aplicado a V, o equivalente). Colocar las ecuaciones en la sección de fundamentos de Vision Transformers, cerca de donde se introduce la arquitectura ViT. Añadir \label{} y \ref{} si se referencian en el texto.
+2. SINTETIZAR MEMORIAS TFG DE REFERENCIA: Consultar Documentacion-externa/Memorias-tfg-ejemplos/ (TFG_JavierLapeñaParreño.pdf, TFG_BernaroMartínezParras.pdf). Extraer patrones estructurales de cómo esos TFGs de excelencia separan Desarrollo vs Resultados, cómo evitan redundancia y cómo mantienen el hilo conductor. Aprovecha tu criterio de experto en redacción académica.
 
-2. TABLAS CIENTÍFICAS: Crear una tabla comparativa entre CNN y ViT que refleje:
-   - Bias inductivo: local (CNN) vs. sin asunción de localidad (ViT)
-   - Campo receptivo: limitado por convoluciones vs. global desde la primera capa
-   - Atención: implícita vs. explícita (mecanismos de self-attention)
-   Usar booktabs (\toprule, \midrule, \bottomrule). Incluir \caption y \label (p. ej. tab:cnn-vit-comparativa).
+3. CONTEXTUALIZAR EL MATERIAL VISUAL: Revisar el contenido de fig/ (incluidas fig/resultados_dashboard/ y fig/resultados_predicciones/). Las carpetas de resultados pueden estar vacías o contener gráficas y pantallazos ya generados. Interpreta qué material visual complementa el Cap. 4 sin repetirlo.
 
-3. COHERENCIA: Revisar que cada sección del capítulo cierre con una frase de transición hacia la siguiente. Verificar que no queden referencias a «plan maestro» ni a documentación interna en el texto de la memoria.
+4. INTERPRETAR LA INCONGRUENCIA: El Cap. 4 ya incorpora resultados cuantitativos detallados. Existe un solapamiento natural entre «experimentación documentada» (Cap. 4) y «resultados discutidos» (Cap. 5). Tu tarea es determinar, con criterio experto, cómo diferenciar y jerarquizar ambos capítulos para que:
+   - La narrativa no se fracture.
+   - El lector no perciba redundancia.
+   - Cap. 5 aporte valor aditivo (herramienta, interpretabilidad, evidencia visual complementaria).
+   - La calidad académica sea excelsa.
 
-Entregable: Código LaTeX actualizado para tex/antecedentes.tex. Compilar con ./compile.sh para verificar que no hay errores.
+*** RECURSOS Y CONTENIDO ***
+
+Contexto de la Herramienta Comparativa:
+- Ubicación: Documentacion-externa/FASE-1-analisis/herramienta_comparativa/
+- Tecnología: Dashboard Streamlit (dashboard.py), NO Flask. Se ejecuta con: streamlit run dashboard.py desde la carpeta herramienta_comparativa.
+- El dashboard tiene 6 vistas. Las más relevantes para el Cap. 5 son:
+  * EXPLORADOR (vista 3): Análisis por experimento. Incluye: (1) Gráficos Plotly de AP/Precision/Recall por clase (descargables); (2) Para DEIMv2, gráficos de mAP vs Score Threshold (0.15, 0.75, 0.90) y tabla comparativa de robustez; (3) Pestaña «Métricas de Entrenamiento» con imágenes estáticas (Total Loss, Classification Loss, Learning Rate, Loss Components, Validation mAP) cargadas desde data/{exp_path}/training_metrics/*.png.
+  * COMPARATIVA (vista 4): Gráfico de mAP global, tabs de AP/Precision/Recall por clase, tabla completa. Opción para incluir análisis de thresholds. Todo con Plotly (descargable desde el ícono de cámara).
+  * VISUALIZACIONES (vista 6): Comparación visual Ground Truth vs predicciones por arquitectura (ResNet-18, EfficientNet-B0, DEIMv2). Muestra imágenes del conjunto de test con bounding boxes dibujadas. Selector de arquitectura y threshold dinámico. Navegación entre imágenes. Ideal para pantallazos comparativos.
+
+Ubicación de imágenes para el Capítulo 5:
+- Gráficas desde Explorador/Comparativa (Plotly, PNG): fig/resultados_dashboard/
+- Pantallazos de predicciones (vista Visualizaciones): fig/resultados_predicciones/ (3-5 imágenes representativas que ilustren superioridad del ViT y casos de confusión ROTURA vs RAYONES)
+
+Recursos disponibles:
+- @Trabajo-a-realizar.md (sección 4)
+- @Documentacion-externa/FASE-1-analisis/herramienta_comparativa/dashboard.py y README.md
+- @tex/desarrollo.tex (Cap. 4 ya redactado; base para referencias cruzadas y síntesis)
+- @tex/resultados.tex (archivo a completar)
+- @Documentacion-externa/Memorias-tfg-ejemplos/ (TFG Lapeña, TFG Martínez; patrones estructurales)
+- fig/ (evidencia gráfica de entrenamiento; resultados_dashboard; resultados_predicciones)
+- @.cursorrules; citas solo de @bib/main.bib
+
+*** ORIENTACIONES (NO PRESCRIPCIONES) ***
+
+A partir de tu síntesis del contexto, interpreta cómo estructurar resultados.tex. Como guía:
+
+- Conexión con Cap. 4: Abrir con enlace explícito al Capítulo de Desarrollo para mantener el hilo conductor.
+- Herramienta de análisis: Describir el dashboard Streamlit, su motivación (interpretabilidad; confusión ROTURA vs RAYONES), vistas (Explorador, Comparativa, Visualizaciones).
+- Gráficas y pantallazos: Incluir solo material que aporte valor aditivo respecto a desarrollo.tex. Las carpetas fig/resultados_dashboard/ y fig/resultados_predicciones/ contendrán (o contendrán tras generarlas) el material visual. Usar referencias cruzadas cuando una tabla/figura ya exista en Cap. 4.
+- Robustez (Fase 4): La tabla está en desarrollo. Resultados debe interpretar, no repetir.
+- Hilo narrativo: Cap. 5 como capa de cierre: síntesis, herramienta, evidencia visual complementaria. Voz pasiva refleja o plural mayestático.
+
+Entregable: tex/resultados.tex actualizado, coherente con desarrollo.tex. Compilar con ./compile.sh.
 "
 
 
