@@ -1,7 +1,12 @@
 \chapter{Resultados y discusión}
 \label{ch:resultados}
 
-Este apartado consolida los resultados experimentales obtenidos tras la validación científica (Fase~3) y el análisis de robustez (Fase~4) descritos en la sección de Desarrollo. En línea con la motivación del trabajo, evaluar la efectividad de Vision Transformers frente a arquitecturas convolucionales tradicionales para la detección de defectos en componentes industriales, aquí se ofrece una discusión global que integra: (1) síntesis de los hallazgos cuantitativos en relación al estado del arte; (2) descripción exhaustiva de la herramienta de análisis e interpretabilidad desarrollada, que ha sido fundamental para validar y distinguir el comportamiento de cada arquitectura; y (3) evidencia visual completa generada desde el \textit{dashboard}, incluyendo todas las gráficas comparativas y pantallazos de predicciones que ilustran la superioridad del \acrshort{ViT} y los patrones de confusión entre clases.
+Este apartado consolida los resultados experimentales obtenidos tras la validación científica (Fase~3) y el análisis de robustez (Fase~4) descritos en la sección de Desarrollo. En línea con la motivación del trabajo, evaluar la efectividad de Vision Transformers frente a arquitecturas convolucionales tradicionales para la detección de defectos en componentes industriales, aquí se ofrece una discusión global que integra:
+\begin{enumerate}
+    \item Síntesis de los hallazgos cuantitativos en relación al estado del arte.
+    \item Descripción exhaustiva de la herramienta de análisis e interpretabilidad desarrollada, que ha sido fundamental para validar y distinguir el comportamiento de cada arquitectura.
+    \item Evidencia visual completa generada desde el \textit{dashboard}, incluyendo todas las gráficas comparativas y pantallazos de predicciones que ilustran la superioridad del \acrshort{ViT} y los patrones de confusión entre clases.
+\end{enumerate}
 
 
 \section{Síntesis de los resultados experimentales}
@@ -26,10 +31,10 @@ DEIMv2 detecta correctamente las seis categorías del dataset curado (NORMAL, DE
 \label{sec:herramienta_analisis}
 
 Las métricas cuantitativas (mAP, AP por clase, precision, recall) documentadas en la sección de Desarrollo resultaban insuficientes para comprender el comportamiento cualitativo de cada arquitectura. En particular, la confusión semántica entre \mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS}, ambas asociadas a discontinuidades en la superficie del material, no era explicable únicamente mediante números. Se hacía necesario un recurso que permitiera:
-\begin{enumerate}[label=(\arabic*)]
-    \item contrastar visualmente las predicciones de cada modelo frente al \textit{ground truth};
-    \item analizar métricas por experimento, por clase y en función del umbral de confianza;
-    \item auditar la evolución del rendimiento ante diferentes score thresholds.
+\begin{enumerate}
+    \item Contrastar visualmente las predicciones de cada modelo frente al \textit{ground truth}.
+    \item Analizar métricas por experimento, por clase y en función del umbral de confianza.
+    \item Auditar la evolución del rendimiento ante diferentes score thresholds.
 \end{enumerate}
 Con estos objetivos, se desarrolló una herramienta de análisis interactiva que ha resultado de gran utilidad para la validación posterior y la distinción clara del funcionamiento de cada modelo con cada arquitectura.
 
@@ -104,11 +109,11 @@ La última vista muestra una tabla resumen de los mejores modelos por arquitectu
 \subsection{Valor de la herramienta para la validación}
 
 La herramienta ha demostrado su utilidad en múltiples dimensiones:
-\begin{enumerate}[label=(\arabic*)]
-    \item Reproducibilidad: permite verificar los resultados sin acceder al código de entrenamiento.
-    \item Interpretabilidad: la vista de Visualizaciones ha permitido validar cualitativamente la superioridad del \acrshort{ViT} más allá de las métricas numéricas.
-    \item Auditoría de robustez: el análisis de umbrales integrado en el Explorador y la Comparativa ha facilitado la validación de la Fase~4.
-    \item Documentación viva: el \textit{dashboard} sirve como documentación interactiva del histórico completo de experimentación.
+\begin{enumerate}
+    \item \textbf{Reproducibilidad}: permite verificar los resultados sin acceder al código de entrenamiento.
+    \item \textbf{Interpretabilidad}: la vista de Visualizaciones ha permitido validar cualitativamente la superioridad del \acrshort{ViT} más allá de las métricas numéricas.
+    \item \textbf{Auditoría de robustez}: el análisis de umbrales integrado en el Explorador y la Comparativa ha facilitado la validación de la Fase~4.
+    \item \textbf{Documentación viva}: el \textit{dashboard} sirve como documentación interactiva del histórico completo de experimentación.
 \end{enumerate}
 Las gráficas exportadas desde la interfaz Plotly se han incorporado al presente documento para ilustrar los hallazgos.
 

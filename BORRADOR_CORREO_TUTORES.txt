@@ -1,0 +1,43 @@
+================================================================================
+BORRADOR DE CORREO PARA TUTORES — ACTUALIZACIÓN MEMORIA TFG
+================================================================================
+Asunto sugerido: Actualización memoria TFG - redacción encaminada
+
+Hola,
+
+os escribo para daros un breve update del estado de la memoria del TFG. Ya tengo
+la redacción bastante encaminada y he aprovechado para hacer una revisión a fondo
+enfocada en formato, coherencia y legibilidad. Resumo de forma explícita lo que he
+hecho:
+
+Formato y maquetación:
+- Corregidas enumeraciones inline tipo (1)(2)(3) que seguían al texto como una
+  frase continua; ahora están en listas numeradas bien formateadas con mayúsculas
+  al inicio de cada punto.
+- Eliminados todos los guiones largos en texto corriente que invadían el margen
+  derecho; sustituidos por paréntesis o comas.
+- Corregido el título largo de la sección 3.2 para que no desborde el margen.
+- Pies de figura de los diagramas de arquitectura reducidos a texto mínimo; la
+  explicación técnica pasa al cuerpo de la memoria.
+- Eliminado el uso de negrita en texto normal (solo en títulos, encabezados o
+  etiquetas de lista).
+- Reorganizada la introducción a ResNet-18 y EfficientNet-B0: ahora está en
+  Antecedentes, y en Desarrollo solo se referencia.
+
+Validación técnica:
+- Verificadas todas las fórmulas matemáticas con sus referencias bibliográficas.
+- Verificadas las citas; añadida la entrada de Faster R-CNN que faltaba en el .bib.
+
+Estructura narrativa:
+- Mejorada la estructura de listas y transiciones para que el hilo narrativo sea
+  más fácil de seguir de principio a fin.
+- Alineación revisada entre objetivos, desarrollo y conclusiones.
+
+El PDF compila correctamente. Por si os pasáis por la memoria y veis algo que no
+cuadre, quedo abierto a cualquier corrección o sugerencia que consideréis oportuna.
+Cualquier errata que se me haya podido escapar la reviso encantado.
+
+Un saludo,
+Carlos
+
+================================================================================

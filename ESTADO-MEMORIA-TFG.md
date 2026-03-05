@@ -43,6 +43,35 @@
 - [x] Objetivo 5 reformulado: "Análisis de interpretabilidad por atención" → "Validación de robustez y análisis comparativo final".
 - [x] Alcance actualizado: refleja el dataset curado real (1.022 imágenes, 6 categorías).
 
+### 1.4 Pulido de formato y estructura narrativa (marzo 2026)
+
+Objetivo: llevar la memoria a calidad de documento científico-técnico de investigación en visión por computador, facilitando el hilo narrativo.
+
+**Enumeraciones y listas:**
+- [x] Convertidas todas las enumeraciones inline tipo "(1)...(2)...(3)" a entornos `enumerate` con ítems que empiezan en mayúscula (antecedentes.tex, desarrollo.tex, resultados.tex, conclusiones.tex).
+- [x] Eliminado el formato `[label=(\arabic*)]` en resultados.tex; ahora se usa enumerate estándar (1., 2., 3.).
+
+**Em-dashes y guiones:**
+- [x] Eliminados todos los em-dashes (`—`, `---`) en texto corriente; sustituidos por paréntesis, comas o dos puntos (evita overflow de margen derecho).
+
+**Títulos y maquetación:**
+- [x] Título largo sección 3.2: `\section[Fundamentos de ViT y aprendizaje auto-supervisado]{...}` para evitar desborde de margen.
+- [x] Subetapas 4.1–4.4: sustituido `---` por `.` en etiquetas de lista.
+
+**Negritas:**
+- [x] Eliminadas negritas en texto corriente (solo se usan en títulos, encabezados y etiquetas estructurales). Ejemplos corregidos: "experimento crucial", "mismas condiciones", "DEIMv2", "Etapa X", "la reducción de la pérdida no garantiza...", etc.
+
+**Estructura de contenido:**
+- [x] Introducción a ResNet-18 y EfficientNet-B0 trasladada de desarrollo.tex a antecedentes.tex (nueva subsección 3.2.2). Desarrollo.tex ahora referencia `\ref{subsec:cnn-arquitecturas-referencia}`.
+
+**Pies de figura:**
+- [x] ViT, DINOv3, DEIMv2, ResNet-18, EfficientNet-B0: captions reducidos a una línea (nombre + cita). La explicación técnica está en el cuerpo de la memoria.
+
+**Validación técnica:**
+- [x] Fórmulas matemáticas (Attention, MHSA, IoU, Precision, Recall, AP) verificadas y correctamente citadas.
+- [x] Añadida entrada `ren2015fasterrcnn` (Faster R-CNN) en bib/main.bib.
+- [x] Verificada coherencia de todas las citas con las entradas del .bib.
+
 ---
 
 ## 2. Tareas pendientes (añade las tuyas)
@@ -50,7 +79,7 @@
 - [ ] Revisar el capítulo de introducción para que mencione correctamente los objetivos actualizados.
 - [ ] Revisar si la sección de Contribución Esperada (final de objetivos.tex) sigue siendo coherente con el trabajo real.
 - [ ] Añadir el F1-score retroactivamente si se desea (ver sección 3 de este documento).
-- [ ] Obtener e incorporar diagramas de arquitecturas (ver sección 4).
+- [x] ~~Obtener e incorporar diagramas de arquitecturas~~ — Completado: ViT, DINOv3, DEIMv2, ResNet-18, EfficientNet-B0 en fig/diagramas-arquitectura/.
 - [ ] Revisar y unificar el estilo de las figuras (mismo tamaño de fuente, leyendas consistentes).
 - [ ] Revisión final de ortografía y tipografía (especialmente el uso de comillas españolas «» vs "").
 - [ ] Revisar que el resumen (abstract en español e inglés) refleje los resultados finales.

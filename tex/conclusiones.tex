@@ -95,7 +95,7 @@ Una vía de mejora con alto potencial de impacto es la ampliación y refinamient
 
 \subsection{Exploración de modelos de Visión-Lenguaje (VLMs)}
 
-La línea de investigación futura con mayor potencial transformador es la exploración de modelos de visión-lenguaje (\acrfull{VLM}) como arquitectura base para la detección de anomalías industriales. A diferencia del enfoque multimodal adoptado en la Fase 2 —que fusiona un detector visual ya entrenado con un encoder textual—, los VLMs modernos integran de forma nativa y masiva las modalidades visual y lingüística desde el preentrenamiento, desarrollando una comprensión multimodal fundamentalmente diferente y más potente.
+La línea de investigación futura con mayor potencial transformador es la exploración de modelos de visión-lenguaje (\acrfull{VLM}) como arquitectura base para la detección de anomalías industriales. A diferencia del enfoque multimodal adoptado en la Fase 2 (que fusiona un detector visual ya entrenado con un encoder textual), los VLMs modernos integran de forma nativa y masiva las modalidades visual y lingüística desde el preentrenamiento, desarrollando una comprensión multimodal fundamentalmente diferente y más potente.
 
 \paragraph{Qwen3-VL como línea principal.}
 
@@ -106,9 +106,15 @@ La línea de investigación futura con mayor potencial transformador es la explo
 \label{fig:logo-qwen3vl}
 \end{figure}
 
-Entre los VLMs de código abierto de referencia se encuentra Qwen3-VL~\cite{bai2025qwen3vl}, que introduce tres avances arquitecturales fundamentales: (1) embeddings de posición rotacional intercalados (\textit{interleaved MRoPE}) para modelado espaciotemporal robusto en imágenes y vídeo; (2) integración \textit{DeepStack} para aprovechar características ViT multi-nivel y mejorar la alineación visión-lenguaje; y (3) alineación temporal textual para vídeo. El modelo soporta contextos intercalados de hasta 256K tokens y está disponible en variantes densas (2B/8B/32B parámetros) y mezcla de expertos (235B-A22B parámetros), lo que permite adaptarlo a diferentes restricciones computacionales.
+Entre los VLMs de código abierto de referencia se encuentra Qwen3-VL~\cite{bai2025qwen3vl}, que introduce tres avances arquitecturales fundamentales:
+\begin{enumerate}
+    \item Embeddings de posición rotacional intercalados (\textit{interleaved MRoPE}) para modelado espaciotemporal robusto en imágenes y vídeo.
+    \item Integración \textit{DeepStack} para aprovechar características ViT multi-nivel y mejorar la alineación visión-lenguaje.
+    \item Alineación temporal textual para vídeo, que amplía la aplicabilidad a secuencias temporales de inspección.
+\end{enumerate}
+El modelo soporta contextos intercalados de hasta 256K tokens y está disponible en variantes densas (2B/8B/32B parámetros) y mezcla de expertos (235B-A22B parámetros), lo que permite adaptarlo a diferentes restricciones computacionales.
 
-La característica más relevante para el dominio industrial es la capacidad de Qwen3-VL de razonar sobre imágenes a nivel semántico profundo: ante una imagen de componente electrónico con un defecto, el modelo puede no solo detectar y localizar la anomalía mediante \textit{grounding} visual, sino también generar una descripción textual de la naturaleza del defecto, su posible causa y su criticidad —funcionalidades de alto valor para operadores industriales que necesitan tomar decisiones a partir de las alertas del sistema.
+La característica más relevante para el dominio industrial es la capacidad de Qwen3-VL de razonar sobre imágenes a nivel semántico profundo: ante una imagen de componente electrónico con un defecto, el modelo puede no solo detectar y localizar la anomalía mediante \textit{grounding} visual, sino también generar una descripción textual de la naturaleza del defecto, su posible causa y su criticidad, funcionalidades de alto valor para operadores industriales que necesitan tomar decisiones a partir de las alertas del sistema.
 
 \paragraph{Ventajas sobre el paradigma actual.}
 

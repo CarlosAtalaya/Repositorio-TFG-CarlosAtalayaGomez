@@ -5,6 +5,7 @@ Repositorio: Trabajo Fin de Grado (TFG) + artículo para revista IEEE TII
 Tema: Vision Transformers para detección de anomalías/defectos industriales
 Uso: Plantilla de ayuda y ejemplo proporcionada por la universidad (UCLM-EIIA)
 Fecha de referencia: 2025
+Última actualización convenciones de formato: marzo 2026
 
 Este documento sirve como base de apoyo para cualquier agente o IA que deba
 ayudar con correcciones, redacción académica avanzada, léxico científico-técnico
@@ -198,6 +199,8 @@ Documento de apoyo para redacción del paper desde la memoria:
 4.2 Figuras
 -----------
   - Ubicación principal: fig/
+  - fig/diagramas-arquitectura/: diagramas de ViT, DEIMv2, ResNet-18, EfficientNet-B0;
+    logotipos DINOv3 y Qwen3-VL. Captions breves (nombre + cita).
   - La memoria referencia figuras con rutas relativas desde el directorio del
     documento (p. ej. fig/fase0_category_distribution.png). En desarrollo.tex
     se usan muchas figuras de experimentos (fase0_*, fase1_*, fase2_*, fase3_*).
@@ -304,6 +307,30 @@ y de paper).
 - Solo claves existentes en bib/main.bib. Si falta una referencia, indicar
   que debe añadirse la entrada BibTeX antes de usar \cite{clave}.
 - Comprobar que autor, título y año estén completos en las entradas usadas.
+
+6.6 Convenciones de formato aplicadas (revisión marzo 2026)
+-----------------------------------------------------------
+Estas convenciones se han aplicado en la última revisión de formato para alcanzar
+calidad de documento científico-técnico y facilitar el hilo narrativo:
+
+- Enumeraciones: no usar listas inline tipo "(1)...(2)...(3)" dentro de párrafos.
+  Usar entornos \begin{enumerate} con \item; cada ítem debe empezar en mayúscula.
+- Em-dashes y guiones largos: no usar "---" ni "—" en texto corriente; provocan
+  overflow de margen. Sustituir por paréntesis, comas o dos puntos.
+- Negritas: solo en títulos, encabezados (\paragraph{}, \subsubsection{}) y
+  etiquetas estructurales de lista (p. ej. \textbf{Reproducibilidad}:). No usar
+  \textbf{} para enfatizar palabras sueltas en medio de un párrafo.
+- Títulos largos: si una sección tiene título que desborda el margen, usar
+  \section[Título corto para encabezado]{Título completo en el documento}.
+- Pies de figura: para diagramas de arquitectura (ViT, DEIMv2, ResNet, EfficientNet),
+  mantener captions breves (nombre + cita). La explicación técnica va en el cuerpo.
+- Nombres de clases con guión bajo (ROTURA_FRACTURA, RAYONES_ARAÑAZOS): proteger
+  con \mbox{ROTURA\_FRACTURA} para evitar partición incorrecta al final de línea.
+- Sección/referencias: usar "sección" con minúscula cuando va en medio de frase
+  (ej.: "como se describe en la sección 4.2").
+- Arquitecturas CNN (ResNet-18, EfficientNet-B0): la descripción conceptual está
+  en antecedentes.tex (subsec:cnn-arquitecturas-referencia); desarrollo.tex
+  referencia esa sección y mantiene las figuras y experimentos.
 
 ================================================================================
 7) RESUMEN RÁPIDO PARA IA
