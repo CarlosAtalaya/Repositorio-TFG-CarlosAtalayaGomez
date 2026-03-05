@@ -30,63 +30,62 @@ Al principio de la memoria, aclarar que hay muchos tecniccismos porque no hay un
 Apartado experimentacion. Muy poco entendible
 
 
-=== PROMPT PARA EL PRÓXIMO AGENTE (Fase 4: Capítulo 5 Resultados y Herramienta de Análisis) ===
+================================================================================
+PROMPT PARA EL PRÓXIMO AGENTE (Remate final de la memoria TFG)
+================================================================================
 
-"
-Rol: Actúas como experto en Visión por Computador y redacción académica. Tu objetivo es completar el Capítulo 5 (Resultados y discusión) del TFG de Carlos Atalaya Gómez, integrando la herramienta de análisis y el material visual del dashboard Streamlit. Tendrás autonomía interpretativa para estructurar y jerarquizar los apartados de Desarrollo (Cap. 4) y Resultados (Cap. 5) de forma que la narrativa no se pierda y el índice de coherencia entre ambas secciones sea muy alto.
+ROL: Eres un agente experto en redacción académica, LaTeX y Visión por Computador. Tu objetivo es rematar y pulir la memoria técnica del TFG de Carlos Atalaya Gómez (Detección de Anomalías Industriales con Vision Transformers), aplicando todas las tareas pendientes definidas en la hoja de ruta del proyecto.
 
-*** SÍNTESIS DE CONTEXTO (TAREA PREVIA A LA REDACCIÓN) ***
+*** CONTEXTUALIZACIÓN OBLIGATORIA (LEER ANTES DE ACTUAR) ***
 
-Antes de redactar, debes:
+1. CONTEXTUALIZACION-REPOSITORIO.txt
+   - Documento MAESTRO del proyecto. Define la estructura del repositorio (memoria TFG vs paper IEEE), ubicación de archivos (tex/, fig/, bib/, Documentacion-externa/), normas de redacción (voz pasiva/plural mayestático, citas solo desde bib/main.bib), y convenciones LaTeX (clase eiiatfg.cls).
+   - OBLIGATORIO leerlo íntegramente antes de proponer cambios.
 
-1. SINTETIZAR LA MEMORIA DEL PROYECTO: Leer íntegramente tex/desarrollo.tex para entender qué resultados ya están documentados (tablas de mAP, AP por clase, robustez, resumen de experimentos, figuras de curvas de entrenamiento). Identificar el inventario de tablas y figuras presentes y su función en el hilo narrativo.
+2. Trabajo-a-realizar.md
+   - Hoja de ruta actualizada con todo lo completado y lo pendiente.
+   - Secciones: Formato y maquetación (numeración, márgenes, cabeceras, acrónimos), Cap. 3 (correcciones), Cap. 4 (justificaciones), Cap. 6 (Conclusiones + Trabajos a futuro).
+   - Usar como checklist principal de tareas.
 
-2. SINTETIZAR MEMORIAS TFG DE REFERENCIA: Consultar Documentacion-externa/Memorias-tfg-ejemplos/ (TFG_JavierLapeñaParreño.pdf, TFG_BernaroMartínezParras.pdf). Extraer patrones estructurales de cómo esos TFGs de excelencia separan Desarrollo vs Resultados, cómo evitan redundancia y cómo mantienen el hilo conductor. Aprovecha tu criterio de experto en redacción académica.
+3. Documentos técnicos de referencia (para Trabajos a futuro y justificaciones):
+   - Documentacion-externa/FASE-2-analisis/why-fase2.txt
+   - Documentacion-externa/FASE-2-analisis/FASE2_Estrategias_Implementacion.md
+   - Documentacion-externa/FASE-2-analisis/fase2-entrenamiento-progresivo/fase2-implementacion-entrenamientoprogresivo-conlcuisones.md
+   - Documentacion-externa/FASE-2-analisis/fase2-entrenamiento-progresivo/cosas-repo-codigo/analysis_fase2_entrenamiento_progresivo/
 
-3. CONTEXTUALIZAR EL MATERIAL VISUAL: Revisar el contenido de fig/ (incluidas fig/resultados_dashboard/ y fig/resultados_predicciones/). Las carpetas de resultados pueden estar vacías o contener gráficas y pantallazos ya generados. Interpreta qué material visual complementa el Cap. 4 sin repetirlo.
+*** TAREAS PRIORITARIAS (ORDEN SUGERIDO) ***
 
-4. INTERPRETAR LA INCONGRUENCIA: El Cap. 4 ya incorpora resultados cuantitativos detallados. Existe un solapamiento natural entre «experimentación documentada» (Cap. 4) y «resultados discutidos» (Cap. 5). Tu tarea es determinar, con criterio experto, cómo diferenciar y jerarquizar ambos capítulos para que:
-   - La narrativa no se fracture.
-   - El lector no perciba redundancia.
-   - Cap. 5 aporte valor aditivo (herramienta, interpretabilidad, evidencia visual complementaria).
-   - La calidad académica sea excelsa.
+A) FORMATO Y MAQUETACIÓN
+   - Incluir listado de siglas/acrónimos completo.
+   - Numeración de páginas: todas en parte superior derecha (revisar eiiatfg.cls, fancyhdr/headings).
+   - Márgenes: corregir asimetría páginas impares vs pares.
+   - Cabeceras: corregir que en páginas impares aparezca el título del capítulo (ej. "CAPÍTULO 2. OBJETIVOS"), no el de la subsección.
 
-*** RECURSOS Y CONTENIDO ***
+B) CAPÍTULO 3 (Antecedentes)
+   - Título 3.2 y Tabla 3.1: corregir desbordamiento de márgenes.
+   - Todas las tablas: verificar pie con descripción y referencia.
+   - DEIMv2: asegurar que está descrito en 3.8; no describir en Desarrollo.
+   - ViT, DINOv3, DEIMv2: más detalle técnico-científico; al menos un diagrama de DEIMv2 (reciclar del paper).
 
-Contexto de la Herramienta Comparativa:
-- Ubicación: Documentacion-externa/FASE-1-analisis/herramienta_comparativa/
-- Tecnología: Dashboard Streamlit (dashboard.py), NO Flask. Se ejecuta con: streamlit run dashboard.py desde la carpeta herramienta_comparativa.
-- El dashboard tiene 6 vistas. Las más relevantes para el Cap. 5 son:
-  * EXPLORADOR (vista 3): Análisis por experimento. Incluye: (1) Gráficos Plotly de AP/Precision/Recall por clase (descargables); (2) Para DEIMv2, gráficos de mAP vs Score Threshold (0.15, 0.75, 0.90) y tabla comparativa de robustez; (3) Pestaña «Métricas de Entrenamiento» con imágenes estáticas (Total Loss, Classification Loss, Learning Rate, Loss Components, Validation mAP) cargadas desde data/{exp_path}/training_metrics/*.png.
-  * COMPARATIVA (vista 4): Gráfico de mAP global, tabs de AP/Precision/Recall por clase, tabla completa. Opción para incluir análisis de thresholds. Todo con Plotly (descargable desde el ícono de cámara).
-  * VISUALIZACIONES (vista 6): Comparación visual Ground Truth vs predicciones por arquitectura (ResNet-18, EfficientNet-B0, DEIMv2). Muestra imágenes del conjunto de test con bounding boxes dibujadas. Selector de arquitectura y threshold dinámico. Navegación entre imágenes. Ideal para pantallazos comparativos.
+C) CAPÍTULO 4 (Desarrollo)
+   - Métricas de evaluación: introducción técnica con fórmulas (mAP@0.5, AP, Precision, Recall por clase).
+   - Justificar parámetros (Batch Size, LR, etc.) y por qué son óptimos por arquitectura.
+   - Justificar evaluación en test y uso de AP por clase.
+   - Justificar score threshold 0.15 (CNNs con bajas detecciones; umbral bajo para comparativa justa).
+   - Justificar EN DETALLE precision 1.0 en DEIMv2 (no es ficticio; alta capacidad de detección, siempre al menos una correcta por encima de 0.15).
 
-Ubicación de imágenes para el Capítulo 5:
-- Gráficas desde Explorador/Comparativa (Plotly, PNG): fig/resultados_dashboard/
-- Pantallazos de predicciones (vista Visualizaciones): fig/resultados_predicciones/ (3-5 imágenes representativas que ilustren superioridad del ViT y casos de confusión ROTURA vs RAYONES)
+D) CAPÍTULO 6 (Conclusiones y Trabajos a futuro)
+   - Separar: (1) Sección Conclusiones, (2) Capítulo/Sección Trabajos a futuro.
+   - Conclusiones: valorar unificación de datasets, resultados, potencia de DEIMv2, comportamiento en entornos adversos.
+   - Trabajos a futuro: contextualizar why-fase2, FASE2_Estrategias, fase2-implementacion; mencionar analysis_fase2_entrenamiento_progresivo; ÉNFASIS en explorar VLMs (QWEN3-VL como línea principal; buscar referencias bibliográficas).
 
-Recursos disponibles:
-- @Trabajo-a-realizar.md (sección 4)
-- @Documentacion-externa/FASE-1-analisis/herramienta_comparativa/dashboard.py y README.md
-- @tex/desarrollo.tex (Cap. 4 ya redactado; base para referencias cruzadas y síntesis)
-- @tex/resultados.tex (archivo a completar)
-- @Documentacion-externa/Memorias-tfg-ejemplos/ (TFG Lapeña, TFG Martínez; patrones estructurales)
-- fig/ (evidencia gráfica de entrenamiento; resultados_dashboard; resultados_predicciones)
-- @.cursorrules; citas solo de @bib/main.bib
+*** RECURSOS Y RESTRICCIONES ***
 
-*** ORIENTACIONES (NO PRESCRIPCIONES) ***
+- Memoria TFG: TFG.tex, tex/*.tex, sty/eiiatfg.cls, bib/main.bib, fig/
+- Citas: SOLO claves existentes en bib/main.bib.
+- Compilación: ./compile.sh desde la raíz.
+- Reglas: .cursorrules
 
-A partir de tu síntesis del contexto, interpreta cómo estructurar resultados.tex. Como guía:
+*** ENTREGABLE ***
 
-- Conexión con Cap. 4: Abrir con enlace explícito al Capítulo de Desarrollo para mantener el hilo conductor.
-- Herramienta de análisis: Describir el dashboard Streamlit, su motivación (interpretabilidad; confusión ROTURA vs RAYONES), vistas (Explorador, Comparativa, Visualizaciones).
-- Gráficas y pantallazos: Incluir solo material que aporte valor aditivo respecto a desarrollo.tex. Las carpetas fig/resultados_dashboard/ y fig/resultados_predicciones/ contendrán (o contendrán tras generarlas) el material visual. Usar referencias cruzadas cuando una tabla/figura ya exista en Cap. 4.
-- Robustez (Fase 4): La tabla está en desarrollo. Resultados debe interpretar, no repetir.
-- Hilo narrativo: Cap. 5 como capa de cierre: síntesis, herramienta, evidencia visual complementaria. Voz pasiva refleja o plural mayestático.
-
-Entregable: tex/resultados.tex actualizado, coherente con desarrollo.tex (Si fuese necesario por tu interpretabilidad hacer modificaciones dentro de tex/desarrollo.tex, puedes hacerlo). Compilar con ./compile.sh.
-"
-
-
-
-
+Memoria TFG corregida y pulida según todas las tareas de Trabajo-a-realizar.md. Comprobar que la compilación ./compile.sh finaliza sin errores críticos.
