@@ -61,15 +61,18 @@
 \usepackage{xstring}
 \usepackage{pdfpages}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{cleveref}
 \usepackage{ifthen}
 \usepackage{currfile}
+\usepackage{fancyhdr}
 
 \usepackage[
   paperwidth=210mm,
   paperheight=297mm,
   left=35mm,right=30mm,
   top=25mm, bottom=25mm,
+  headheight=14pt,
   marginparwidth=1cm, marginparsep=1cm]{geometry}
 
 \captionsetup{
@@ -85,7 +88,21 @@
 \makeatother
 \graphicspath{{fig/}}
 
-\pagestyle{headings}
+% Configuración de cabeceras con fancyhdr
+\pagestyle{fancy}
+\fancyhf{}
+% Capítulo en la izquierda, número de página siempre en la derecha
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ \MakeUppercase{#1}}{}}
+\renewcommand{\sectionmark}[1]{}  % no mostrar secciones en cabecera
+\fancyhead[L]{\small\itshape\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+% Páginas de apertura de capítulo (estilo plain): solo número de página a la derecha
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[R]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
 
 \renewcommand{\bibname}{Referencias}
 \renewcommand{\appendixname}{Anexo}

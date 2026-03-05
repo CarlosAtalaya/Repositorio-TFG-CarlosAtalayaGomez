@@ -18,31 +18,53 @@ Esta sección establece los fundamentos teóricos y metodológicos que sustentan
 
 \subsection{De las redes convolucionales a los transformers en visión por computador}
 
-La arquitectura \acrfull{ViT}, introducida originalmente por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. Mientras que las \acrfull{CNN} procesan información mediante operaciones de convolución local, los \acrshort{ViT} dividen la imagen en parches y los procesan mediante mecanismos de self-attention que capturan relaciones entre todas las regiones de forma simultánea~\cite{sudarshan2025object}. El mecanismo de atención escalada producto escalar (\textit{scaled dot-product attention}) constituye el núcleo computacional: dados los vectores de consulta $Q$, clave $K$ y valor $V$ (proyecciones lineales del entrada), la salida se obtiene como
+La arquitectura \acrfull{ViT}, introducida originalmente por Dosovitskiy et al.~\cite{dosovitskiy2021vit}, representa un cambio paradigmático en el procesamiento de imágenes. La idea central consiste en tratar una imagen de entrada como una secuencia de parches visuales de tamaño fijo —típicamente $16\times16$ píxeles— que se proyectan linealmente a un espacio de dimensión $D$ y se procesan mediante bloques de \textit{Transformer Encoder} estándar. Formalmente, dada una imagen $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$, se divide en $N = HW/P^2$ parches de tamaño $P\times P$, cada uno aplanado y proyectado a un embedding $\mathbf{z}_i \in \mathbb{R}^D$. Se añade un \textit{token de clase} especial $\mathbf{x}_\text{cls}$ y embeddings de posición $\mathbf{E}_\text{pos}$, obteniendo la secuencia de entrada:
 \[
-\text{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
-\label{eq:attention}
+\mathbf{Z}_0 = [\mathbf{x}_\text{cls};\, \mathbf{z}_1;\, \mathbf{z}_2;\, \ldots;\, \mathbf{z}_N] + \mathbf{E}_\text{pos}
 \]
-donde $d_k$ es la dimensión de las claves. El factor $\sqrt{d_k}$ evita que los valores de $QK^\top$ crezcan en magnitud cuando $d_k$ es grande, estabilizando los gradientes durante el entrenamiento. Esta diferencia arquitectural confiere a los transformers ventajas significativas en términos de escalabilidad, flexibilidad en el manejo de imágenes de diferentes resoluciones, y capacidad de transfer learning.
 
-Sudarshan et al.~\cite{sudarshan2025object} destacan que los ViTs superan a las CNNs en precisión cuando se dispone de grandes volúmenes de datos de entrenamiento, alcanzando accuracy del 93\% en tareas de clasificación general de objetos. Más importante aún, demuestran que los transformers preentrenados en grandes corpus de imágenes pueden transferir conocimiento de forma más efectiva a tareas específicas, una característica crucial para aplicaciones industriales donde los datos etiquetados son escasos. La tabla~\ref{tab:cnn-vit-comparativa} resume las diferencias arquitecturales clave entre ambos paradigmas.
+El núcleo computacional de cada bloque Transformer es el mecanismo de \textit{scaled dot-product attention}. Dados los vectores de consulta $Q$, clave $K$ y valor $V$ —proyecciones lineales del embedding de entrada—, la atención se calcula como:
+\begin{equation}
+\text{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+\label{eq:attention}
+\end{equation}
+donde $d_k$ es la dimensión de las claves. El factor de escala $1/\sqrt{d_k}$ evita que los productos escalares crezcan en magnitud con la dimensionalidad, estabilizando los gradientes durante el entrenamiento. En la práctica se emplea \textit{Multi-Head Self-Attention} (\textsc{MHSA}) con $h$ cabezas de atención en paralelo, permitiendo que el modelo capture relaciones entre parches a distintos niveles de abstracción semántica simultáneamente:
+\begin{equation}
+\begin{split}
+\text{MHSA}(Q,K,V) &= \mathrm{Concat}(\text{head}_1, \ldots, \text{head}_h)\,W^O \\
+\text{head}_i &= \text{Attention}(QW_i^Q,\, KW_i^K,\, VW_i^V)
+\end{split}
+\label{eq:mhsa}
+\end{equation}
+
+A diferencia de las \acrshort{CNN}, que procesan información local mediante filtros convolucionales y deben apilar muchas capas para ampliar el campo receptivo, los \acrshort{ViT} obtienen un campo receptivo global desde la primera capa de atención. Esta característica confiere ventajas fundamentales: (1) capacidad de modelar dependencias a largo alcance entre regiones distantes de la imagen, (2) escalabilidad favorable —el rendimiento mejora consistentemente con el tamaño del modelo y del corpus de preentrenamiento—, y (3) mayor transferibilidad a nuevos dominios. La tabla~\ref{tab:cnn-vit-comparativa} resume las diferencias arquitecturales clave entre ambos paradigmas.
 
 \begin{table}[htbp]
 \centering
-\caption{Comparativa arquitectural entre CNN y Vision Transformer.}
-\label{tab:cnn-vit-comparativa}
-\begin{tabular}{lll}
+\begin{tabularx}{\textwidth}{@{}p{3.5cm}XX@{}}
 \toprule
 \textbf{Aspecto} & \textbf{CNN} & \textbf{ViT} \\
 \midrule
-Bias inductivo & Local (asume vecindad espacial) & Sin asunción de localidad \\
-Campo receptivo & Limitado por apilamiento de convoluciones & Global desde la primera capa \\
-Mecanismo de atención & Implícito (operaciones locales) & Explícito (self-attention entre parches) \\
+Bias inductivo & Local (asume vecindad espacial y equivarianza traslacional) & Sin asunción de localidad; aprende relaciones globales \\
+Campo receptivo & Limitado; se amplía apilando convoluciones & Global desde la primera capa de atención \\
+Mecanismo principal & Convolución con filtros aprendidos & Multi-Head Self-Attention entre parches \\
+Complejidad computacional & $\mathcal{O}(N \cdot k^2 \cdot C)$ por capa & $\mathcal{O}(N^2 \cdot D)$ por capa \\
+Escalabilidad & Buena; saturación con más datos & Excelente; mejora continua con más datos \\
+Interpretabilidad & GradCAM~\cite{selvaraju2017gradcam} y similares & Mapas de atención directamente legibles \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
+\caption{Comparativa arquitectural entre CNN y Vision Transformer.}
+\label{tab:cnn-vit-comparativa}
 \end{table}
 
-Con estos fundamentos arquitectónicos establecidos, se revisan a continuación las técnicas de aprendizaje auto-supervisado que permiten aprovechar los ViT en escenarios con datos limitados.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{diagramas-arquitectura/diagrama-arquitetcura-ViT.png}
+\caption{Arquitectura Vision Transformer (ViT). La imagen de entrada se divide en parches de tamaño fijo ($16\times16$~px) que se proyectan linealmente a un espacio de dimensión $D$. Se añade un token de clase especial \texttt{[CLS]} y embeddings de posición para preservar la información espacial. La secuencia resultante se procesa mediante bloques Transformer Encoder con mecanismo de Multi-Head Self-Attention, obteniendo un campo receptivo global desde la primera capa. La representación del token \texttt{[CLS]} en la última capa se usa para clasificación; las representaciones de parches permiten tareas de detección y segmentación.}
+\label{fig:diagrama-vit}
+\end{figure}
+
+Sudarshan et al.~\cite{sudarshan2025object} demuestran que los ViTs superan a las CNNs en precisión cuando se dispone de grandes volúmenes de datos de entrenamiento, alcanzando un \textit{accuracy} del 93\,\% en tareas de clasificación general de objetos. Además, los transformers preentrenados en grandes corpus pueden transferir conocimiento de forma más efectiva a tareas específicas, una característica de valor crítico para aplicaciones industriales donde los datos etiquetados son escasos. Con estos fundamentos establecidos, se revisan a continuación las técnicas de aprendizaje auto-supervisado que permiten aprovechar los ViT en escenarios con datos limitados.
 
 \subsection{Aprendizaje auto-supervisado para Vision Transformers}
 
@@ -54,9 +76,30 @@ El aprendizaje auto-supervisado se fundamenta en la explotación de las relacion
 
 \textbf{Masked Image Modeling:} Inspirado en BERT~\cite{devlin2019bert} del procesamiento de lenguaje natural, donde regiones de la imagen se enmascaran y el modelo aprende a predecirlas. Los Masked Autoencoders (\acrshort{MAE})~\cite{he2022mae} han demostrado ser particularmente efectivos para \acrshort{ViT}.
 
-\textbf{Self-distillation:} Aproximaciones como DINO~\cite{caron2021dino}, DINOv2~\cite{oquab2024dinov2} y DINOv3~\cite{simeoni2025dinov3}, donde el modelo aprende de sus propias predicciones sin etiquetas, generando representaciones visuales robustas.
+\textbf{Self-distillation:} Aproximaciones como DINO~\cite{caron2021dino}, \acrshort{DINOv2}~\cite{oquab2024dinov2} y \acrshort{DINOv3}~\cite{simeoni2025dinov3}, donde el modelo aprende de sus propias predicciones sin etiquetas, generando representaciones visuales robustas.
 
-La relevancia de estos métodos para aplicaciones industriales es crucial. Como señalan Khan et al.~\cite{khan2024survey}, el SSL permite reducir significativamente la dependencia de anotaciones manuales, ofreciendo un enfoque más escalable y eficiente en términos de recursos. Esta característica es especialmente valiosa en escenarios de manufactura donde el etiquetado de defectos requiere expertise técnico especializado y resulta costoso en tiempo y recursos. Con estos fundamentos establecidos, la siguiente sección se centra en las aplicaciones concretas de Vision Transformers a la detección de anomalías industriales.
+\begin{figure}[H]
+\centering
+\includegraphics[height=1.8cm]{diagramas-arquitectura/logo-dinov3.png}
+\caption{Logotipo de DINOv3, modelo de aprendizaje auto-supervisado que constituye el backbone del sistema de detección desarrollado en este trabajo.}
+\label{fig:logo-dinov3}
+\end{figure}
+
+Entre estas familias, \acrshort{DINOv3}~\cite{simeoni2025dinov3} representa el estado del arte en aprendizaje auto-supervisado para visión por computador. A diferencia de sus predecesores, DINOv3 escala el modelo a 7B parámetros mediante una arquitectura ViT personalizada con embeddings de posición rotacional (\textit{RoPE}) y un tamaño de parche de 16 píxeles. El objetivo de entrenamiento combina tres señales complementarias:
+\begin{equation}
+\mathcal{L}_\text{Pre} = \mathcal{L}_\text{DINO} + \mathcal{L}_\text{iBOT} + 0.1 \cdot \mathcal{L}_\text{DKoleo}
+\label{eq:dinov3_loss}
+\end{equation}
+donde $\mathcal{L}_\text{DINO}$ es una pérdida discriminativa a nivel de imagen (self-distillation entre ramas \textit{student/teacher}), $\mathcal{L}_\text{iBOT}$ es una pérdida de reconstrucción latente a nivel de parche enmascara\-do, y $\mathcal{L}_\text{DKoleo}$ es un regularizador que fomenta la distribución uniforme de representaciones en el espacio embebido, evitando el colapso de representación.
+
+Una contribución técnica singular de DINOv3 es el mecanismo de \textit{Gram Anchoring}, diseñado para mitigar la degradación de los mapas de características densas que se observa en entrenamientos prolongados. Esta degradación se manifiesta como un incremento de la similitud coseno entre el token de clase (\texttt{[CLS]}) y los tokens de parche, reduciendo la discriminación espacial local. El regularizador de Gram ancla los patrones de similitud entre parches del modelo en entrenamiento respecto a un modelo maestro en etapas tempranas:
+\begin{equation}
+\mathcal{L}_\text{Gram} = \left\| \mathbf{X}_S \cdot \mathbf{X}_S^\top - \mathbf{X}_G \cdot \mathbf{X}_G^\top \right\|_F^2
+\label{eq:gram}
+\end{equation}
+donde $\mathbf{X}_S \in \mathbb{R}^{P \times d}$ y $\mathbf{X}_G \in \mathbb{R}^{P \times d}$ son las matrices de características \textit{L2-normalizadas} del \textit{student} y del maestro Gram respectivamente, $P$ es el número de parches, y $\|\cdot\|_F$ denota la norma de Frobenius. Al operar sobre la matriz de Gram —que codifica relaciones de similitud entre parches— en lugar de sobre las características individuales, el método preserva la libertad del modelo para modificar las representaciones siempre que mantenga su estructura de correlación espacial. El resultado es un modelo con mapas densos de alta calidad que mantienen su nitidez semántica incluso a resoluciones de $4096\times4096$ píxeles.
+
+La relevancia de estos métodos para aplicaciones industriales es crucial. Como señalan Khan et al.~\cite{khan2024survey}, el SSL permite reducir significativamente la dependencia de anotaciones manuales, ofreciendo un enfoque más escalable y eficiente en términos de recursos. Esta característica es especialmente valiosa en escenarios de manufactura donde el etiquetado de defectos requiere \textit{expertise} técnico especializado y resulta costoso en tiempo y recursos. Con estos fundamentos establecidos, la siguiente sección se centra en las aplicaciones concretas de Vision Transformers a la detección de anomalías industriales.
 
 \section{Vision Transformers aplicados a detección de anomalías industriales}
 
@@ -181,6 +224,47 @@ Un sistema práctico debería no solo detectar anomalías sino también proporci
 Si bien Huang et al.~\cite{huang2025semiconductor} demuestran que menos de 15 imágenes por clase pueden ser suficientes con DINOv2, la pregunta de cuán bajo puede reducirse este número sin degradación significativa de rendimiento permanece abierta. En contextos educativos o de prototipado rápido, donde la captura de datos puede estar aún más limitada (por ejemplo, 5-10 imágenes por tipo de componente), es relevante investigar técnicas de data augmentation específicas para imágenes industriales, combinadas con transfer learning agresivo.
 
 Esta línea de investigación conecta con el trabajo de Le-Gia y Ahn~\cite{legia2025consistent} sobre detección zero-shot, pero con un enfoque en escenarios one-shot o few-shot extremos donde se dispone de muy pocas muestras etiquetadas pero se busca rendimiento superior al zero-shot puro. Las oportunidades identificadas se integran en la sección final del capítulo, donde se fundamenta la aproximación metodológica del trabajo propuesto.
+
+\section{DEIMv2: arquitectura de detección en tiempo real con DINOv3}
+\label{sec:deimv2}
+
+La arquitectura \acrfull{DEIMv2}~\cite{huang2025deimv2} representa la solución tecnológica adoptada en el presente trabajo como detector de defectos industriales. DEIMv2 es un detector de objetos de extremo a extremo (\textit{end-to-end}) que combina el backbone auto-supervisado \acrshort{DINOv3} con un decodificador basado en \acrshort{DETR}, obteniendo un equilibrio excepcional entre precisión y eficiencia computacional en tiempo real.
+
+\subsection{Arquitectura general}
+
+DEIMv2 sigue el paradigma RT-DETR, compuesto por tres módulos principales: (1) un backbone ViT con DINOv3, (2) un \acrfull{STA} para adaptación de características multi-escala, y (3) un decodificador basado en atención cruzada para refinamiento iterativo de predicciones. La cadena de procesamiento es la siguiente: la imagen de entrada se divide en parches de $16\times16$ píxeles que el backbone ViT procesa mediante \textit{Multi-Head Self-Attention}; las salidas de tres capas intermedias (5ª, 8ª y 11ª del ViT) se extraen para construir una representación multi-escala. La Figura~\ref{fig:diagrama-deimv2} ilustra esta arquitectura de forma esquemática.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{diagramas-arquitectura/diagrama-deimv2.png}
+\caption{Arquitectura DEIMv2. El pipeline integra: (1) backbone ViT preentrenado con DINOv3, que extrae características globales con campo receptivo completo; (2) \acrshort{STA}, que combina mediante fusión Bi-Fusion un ramal semántico (interpolación de características ViT) y un ramal de detalle fino (CNN ultraligera) para producir representaciones multi-escala a $1/8$, $1/16$ y $1/32$ del tamaño de entrada; y (3) decodificador DETR basado en atención cruzada que refina iterativamente un conjunto de consultas de objetos para generar las detecciones finales sin post-procesado NMS.}
+\label{fig:diagrama-deimv2}
+\end{figure}
+
+\subsection{Spatial Tuning Adapter (STA)}
+
+El \acrshort{STA} es el componente clave que resuelve una limitación fundamental de los ViT en detección de objetos: su salida es de escala única ($1/16$ del tamaño de entrada), mientras que los detectores modernos requieren características multi-escala para manejar objetos de tamaños muy diferentes. El STA opera en dos ramas paralelas:
+
+\begin{enumerate}
+    \item \textbf{Rama de semántica (DINOv3)}: las características de los bloques intermedios del ViT se remuestrean mediante interpolación bilineal sin parámetros a las escalas $\{1/8,\, 1/16,\, 1/32\}$ del tamaño de entrada.
+    \item \textbf{Rama de detalle fino (CNN ultraligera)}: una red convolucional de muy bajo coste extrae características de alta frecuencia y detalle local que el ViT no captura con resolución suficiente.
+\end{enumerate}
+
+Ambas ramas se fusionan mediante un operador \textit{Bi-Fusion} con convoluciones $1\times1$, produciendo características multi-escala enriquecidas semánticamente y con preservación de detalle fino. Esta arquitectura está ilustrada conceptualmente en la Figura~2 del artículo original~\cite{huang2025deimv2}.
+
+\subsection{Decodificador eficiente}
+
+El decodificador de DEIMv2 refina iterativamente un conjunto de consultas de objetos (\textit{object queries}) mediante atención cruzada sobre las características del STA. Incorpora mejoras de eficiencia respecto al DETR original: activaciones \textit{SwiGLU} en lugar de ReLU, normalización \textit{RMSNorm}, y compartición de embeddings de posición entre capas del decodificador (dado que las posiciones de las consultas cambian mínimamente durante el refinamiento iterativo).
+
+\subsection{Estrategia Dense Object-to-Object (Dense O2O)}
+
+Una contribución técnica relevante de DEIMv2 es la estrategia \textit{Dense O2O} para supervisión durante el entrenamiento: mediante aumentos de imagen a nivel de objeto (\textit{Copy-Blend}), se incrementa artificialmente el número de instancias por imagen durante el entrenamiento, proveyendo señal de supervisión más densa y acelerando la convergencia sin sobreajuste.
+
+\subsection{Variantes y rendimiento}
+
+DEIMv2 abarca ocho variantes escalables, desde modelos ultra-ligeros (DEIMv2-Atto, 0.49M parámetros) hasta modelos de alto rendimiento (DEIMv2-X, 50.3M parámetros). En particular, DEIMv2-X alcanza 57.8 AP en COCO superando a arquitecturas previas con más del doble de parámetros. La variante utilizada en el presente trabajo es DEIMv2 con backbone DINOv3 distilado (\textit{ViT-Tiny+/ViT-Small distillados}), configuración que maximiza el rendimiento dentro de las restricciones computacionales disponibles.
+
+La elección de DEIMv2 como arquitectura principal para el presente TFG se fundamenta en tres razones concretas: (1) la integración nativa de las representaciones auto-supervisadas de DINOv3, que han demostrado superior transferibilidad a dominios industriales~\cite{huang2025semiconductor}; (2) la capacidad de detección multi-escala sin fine-tuning completo del backbone; y (3) el paradigma DETR que elimina la necesidad de \acrshort{RPN} y procedimientos de supresión de no-máximos (\textit{NMS}), simplificando el pipeline y reduciendo errores de post-procesado.
 
 \section{Síntesis y justificación del trabajo propuesto}
 

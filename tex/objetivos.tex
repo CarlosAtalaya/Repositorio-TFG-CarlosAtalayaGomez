@@ -37,56 +37,56 @@ Realizar un benchmarking sistemático del sistema desarrollado frente a métodos
 \begin{itemize}
     \item Implementar arquitecturas baseline representativas del estado del arte en detección de anomalías, incluyendo modelos basados en ResNet~\cite{he2016resnet} y EfficientNet~\cite{tan2019efficientnet}, garantizando que las comparaciones se realicen bajo condiciones experimentales equivalentes en términos de datos de entrenamiento, procedimientos de validación y métricas de evaluación.
     
-    \item Evaluar el rendimiento de todos los modelos mediante un conjunto comprehensivo de métricas que capture diferentes aspectos de la capacidad de detección: precisión de clasificación (accuracy), balance entre sensibilidad y especificidad (F1-score), capacidad de discriminación (AUC-ROC), y calidad de localización de anomalías cuando sea aplicable.
-    
-    \item Analizar no solo el rendimiento en términos de precisión, sino también aspectos pragmáticos relevantes para aplicaciones reales: tiempo de inferencia, consumo de memoria, requisitos computacionales de entrenamiento, y facilidad de adaptación a nuevos tipos de componentes o defectos.
+    \item Evaluar el rendimiento de todos los modelos mediante el protocolo estándar COCO, que incluye: Mean Average Precision (mAP@0.5) como métrica global, Average Precision (AP) por clase para caracterizar el rendimiento en cada tipo de defecto, Precision y Recall como métricas complementarias que describen la ausencia de falsos positivos y la capacidad de recuperación respectivamente, y el umbral de confianza como parámetro de operación del sistema.
+
+    \item Analizar el rendimiento por categoría de defecto para identificar fortalezas y debilidades específicas de cada arquitectura, y documentar el impacto de decisiones de configuración clave (resolución de entrada, número de épocas) en el rendimiento final.
 \end{itemize}
 
 Este análisis comparativo proporcionará evidencia empírica sobre las condiciones bajo las cuales Vision Transformers ofrecen ventajas prácticas sobre aproximaciones tradicionales, contribuyendo a orientar decisiones de selección de arquitectura en proyectos industriales futuros.
 
-\subsection{Validación en datasets benchmark estándar}
+\subsection{Construcción y validación de un dataset industrial curado}
 
-Validar el sistema desarrollado en datasets de referencia ampliamente utilizados en la literatura de detección de anomalías industriales, particularmente MVTec AD, con el objetivo de situar los resultados obtenidos en el contexto del estado del arte y facilitar la comparación con trabajos previos. Este objetivo incluye:
-
-\begin{itemize}
-    \item Entrenar y evaluar el modelo propuesto en MVTec AD~\cite{bergmann2019mvtec}, dataset que constituye el benchmark de facto en detección de anomalías industriales y que permite comparación directa con los numerosos métodos publicados en la literatura~\cite{zhang2025exploring,alber2024evaluating}.
-    
-    \item Analizar el rendimiento del sistema en diferentes categorías de objetos y tipos de defectos presentes en el dataset, identificando fortalezas y debilidades del enfoque transformer en función de las características visuales específicas de cada caso.
-    
-    \item Documentar detalladamente las configuraciones experimentales, procedimientos de entrenamiento y validación, y resultados obtenidos, garantizando reproducibilidad y permitiendo que trabajos futuros puedan extender o contrastar los hallazgos.
-\end{itemize}
-
-La validación en datasets estándar es esencial para establecer la validez científica de los resultados y para posibilitar que la comunidad investigadora pueda contrastar y extender el trabajo realizado.
-
-\subsection{Demostración práctica con componentes electrónicos reales}
-
-Desarrollar un sistema de demostración que valide la aplicabilidad práctica del enfoque propuesto mediante detección de anomalías en componentes electrónicos reales capturados en condiciones no controladas de laboratorio. Este objetivo contempla:
+Construir un dataset industrial curado y representativo mediante la integración de fuentes públicas de referencia, con el objetivo de disponer de datos suficientes para la comparativa arquitectural en condiciones experimentales controladas. Este objetivo incluye:
 
 \begin{itemize}
-    \item Crear un dataset específico de componentes electrónicos diversos (\acrlong{PCB}, conectores, componentes \acrlong{SMD}, carcasas) mediante captura fotográfica, incluyendo tanto ejemplares sin defectos como con anomalías características de uso, manipulación o manufactura.
+    \item Integrar datos de MVTec AD~\cite{bergmann2019mvtec} (benchmark de facto en detección de anomalías industriales) y VISION-Datasets~\cite{bai2023visiondatasets} en un formato unificado COCO, desarrollando un pipeline de curación reproducible que resuelva la heterogeneidad de formatos, escalas y taxonomías.
+
+    \item Normalizar la taxonomía de defectos a 6 categorías semánticas coherentes, validar el balance entre clases mediante análisis estadístico, y verificar la ausencia de leakage entre particiones train/val/test.
     
-    \item Aplicar transfer learning desde el modelo validado en datasets estándar hacia este dataset de componentes reales, evaluando la capacidad del sistema para adaptarse a nuevos dominios con volúmenes limitados de datos, aspecto crítico para aplicabilidad práctica en entornos industriales donde el etiquetado de datos es costoso.
-    
-    \item Desarrollar una interfaz de demostración interactiva que permita visualizar el proceso de detección en tiempo real, incluyendo no solo la clasificación de anomalías sino también la visualización de los mecanismos de atención del modelo, proporcionando interpretabilidad sobre qué regiones de la imagen son relevantes para la decisión del sistema.
-    
-    \item Evaluar la robustez del sistema frente a variaciones en condiciones de captura (iluminación, ángulos de cámara, fondos) que son inevitables en aplicaciones prácticas pero frecuentemente no consideradas en evaluaciones sobre datasets benchmark altamente controlados.
+    \item Documentar detalladamente el proceso de curación, garantizando reproducibilidad y permitiendo que trabajos futuros puedan extender o reproducir el dataset.
 \end{itemize}
 
-Este objetivo es particularmente relevante porque aborda la brecha entre experimentación en datasets académicos y aplicación en escenarios reales, proporcionando evidencia sobre la viabilidad práctica del enfoque propuesto más allá del rendimiento en benchmarks estándar.
+La construcción del dataset es una contribución metodológica en sí misma, ya que establece las condiciones experimentales sobre las que se realizan todas las comparativas arquitecturales.
 
-\subsection{Análisis de interpretabilidad mediante visualización de atención}
+\subsection{Desarrollo de herramienta de análisis e interpretabilidad}
 
-Explotar los mecanismos de atención inherentes a la arquitectura Vision Transformer para proporcionar interpretabilidad del proceso de detección, aspecto crucial para aceptación y confianza en sistemas de inspección automática en entornos industriales. Este objetivo específico incluye:
+Desarrollar una herramienta de análisis interactiva que permita visualizar, auditar y comparar el rendimiento de todas las arquitecturas evaluadas, facilitando tanto la validación científica de los resultados como la interpretabilidad del proceso de detección. Este objetivo contempla:
 
 \begin{itemize}
-    \item Implementar técnicas de visualización de mapas de atención que permitan identificar qué regiones de la imagen contribuyen a la decisión del modelo, facilitando la comprensión del proceso de inferencia tanto para propósitos de debugging y mejora del sistema como para explicación a usuarios finales.
+    \item Implementar un \textit{dashboard} web interactivo basado en Streamlit que centralice todos los experimentos realizados y permita consultar métricas por experimento, por clase de defecto y en función del umbral de confianza.
+
+    \item Proporcionar visualización comparativa de predicciones (ground truth vs.\ predicciones de cada arquitectura) sobre el conjunto de test, permitiendo validar cualitativamente la superioridad del Vision Transformer más allá de las métricas numéricas.
     
-    \item Analizar cualitativamente la correspondencia entre las regiones atendidas por el modelo y la localización de defectos reales, evaluando si los mecanismos de atención capturan efectivamente características visuales relevantes para discriminación de anomalías.
+    \item Integrar análisis de robustez que permita explorar el comportamiento del mejor modelo bajo umbrales de confianza estrictos (0.15, 0.75 y 0.90), validando que la precision perfecta observada no es artefacto del umbral bajo.
     
-    \item Comparar los patrones de atención del modelo transformer con técnicas de visualización aplicables a redes convolucionales (como GradCAM~\cite{selvaraju2017gradcam}), caracterizando las diferencias en cómo ambos tipos de arquitecturas procesan información visual para detección de anomalías.
+    \item Garantizar la autocontenibilidad de la herramienta para que pueda utilizarse de forma independiente del entorno de entrenamiento, facilitando la reproducibilidad y auditoría de resultados.
 \end{itemize}
 
-La interpretabilidad no es meramente deseable sino frecuentemente necesaria para deployment de sistemas de machine learning en contextos críticos donde decisiones erróneas tienen consecuencias significativas. Este objetivo aborda esta necesidad práctica.
+Este objetivo responde a la necesidad práctica de interpretabilidad en sistemas de inspección industrial, donde la visualización de predicciones y el análisis de umbrales son fundamentales para generar confianza en el sistema y para tomar decisiones operativas informadas.
+
+\subsection{Validación de robustez y análisis comparativo final}
+
+Validar la robustez del mejor modelo bajo condiciones de evaluación más exigentes y consolidar la comparativa entre todas las arquitecturas mediante un análisis integrado que permita extraer conclusiones claras y trazables. Este objetivo incluye:
+
+\begin{itemize}
+    \item Evaluar el mejor modelo DEIMv2 con umbrales de confianza más estrictos (0.75 y 0.90) para descartar que la precision perfecta observada sea un artefacto del umbral bajo y verificar la ausencia de sobreajuste.
+
+    \item Consolidar los resultados de todas las fases experimentales en tablas comparativas que permitan al lector verificar directamente la superioridad arquitectural del Vision Transformer sobre las CNNs bajo condiciones equivalentes (misma resolución de entrada, mismo conjunto de test).
+    
+    \item Analizar el rendimiento por categoría de defecto para identificar clases críticas donde la diferencia de rendimiento entre arquitecturas es especialmente relevante para aplicaciones industriales reales.
+\end{itemize}
+
+Esta validación proporciona evidencia sólida sobre las condiciones en las que los Vision Transformers ofrecen ventajas prácticas sobre las CNNs, contribuyendo a orientar decisiones de selección de arquitectura en proyectos industriales futuros.
 
 
 \section{Alcance y limitaciones}
@@ -99,7 +99,7 @@ El trabajo se centra en detección y clasificación de anomalías en imágenes i
 
 El enfoque metodológico es transfer learning desde modelos preentrenados, no entrenamiento de arquitecturas transformer desde cero. Esta decisión se fundamenta en la evidencia empírica de la literatura~\cite{huang2025semiconductor,khan2024survey} que demuestra la superioridad del transfer learning en escenarios con datos limitados, y en restricciones prácticas de recursos computacionales y temporales.
 
-Los datasets considerados comprenden MVTec AD como benchmark estándar y un conjunto propio de componentes electrónicos capturados específicamente para este trabajo. No se pretende validación exhaustiva en todos los datasets industriales disponibles, sino demostración de aplicabilidad del enfoque en casos representativos.
+El dataset considerado es un conjunto industrial curado que integra MVTec AD~\cite{bergmann2019mvtec} y VISION-Datasets~\cite{bai2023visiondatasets} en un formato unificado COCO (1{,}022 imágenes, 6 categorías). No se pretende validación exhaustiva en todos los datasets industriales disponibles, sino demostración de aplicabilidad del enfoque en un caso representativo con condiciones realistas de variabilidad de datos.
 
 \subsection{Limitaciones reconocidas}
 

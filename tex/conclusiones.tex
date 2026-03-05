@@ -1,3 +1,142 @@
-\chapter{Conclusiones}
+\chapter{Conclusiones y Trabajos a Futuro}
 \label{ch:conclusiones}
-Las conclusiones cierran el documento, destacando los aspectos más relevantes de la ejecución del Trabajo Fin de Grado. Se analiza el grado de cumplimiento de los objetivos planteados, las limitaciones identificadas y las líneas de trabajo futuro que se abren a partir de esta investigación. El orden establecido mantiene la coherencia con los objetivos definidos en el Capítulo~\ref{ch:objetivos}, sin limitarse a parafrasear su contenido.
+
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+El presente Trabajo Fin de Grado ha abordado el problema de la detección automática de anomalías en componentes industriales mediante Vision Transformers, comparando sistemáticamente esta familia de arquitecturas con los enfoques convencionales basados en redes convolucionales. A continuación se recogen las principales conclusiones derivadas de la investigación realizada, estructuradas en torno a los objetivos planteados en el Capítulo~\ref{ch:objetivos}.
+
+\subsection{Construcción de un dataset industrial unificado}
+
+Una de las contribuciones metodológicas más relevantes del trabajo ha sido el desarrollo de un pipeline de curación reproducible que integra dos fuentes públicas heterogéneas (VISION-Datasets~\cite{bai2023visiondatasets} y MVTec AD~\cite{bergmann2019mvtec}) en un dataset unificado en formato COCO. El conjunto resultante, con 1{,}022 imágenes, 1{,}354 anotaciones y 6 categorías semánticas coherentes, presenta un balance inter-clase de 2.08:1, validado estadísticamente mediante test Chi-cuadrado ($p = 0.999$) y verificado sin leakage entre particiones.
+
+Este proceso demostró que la heterogeneidad de origen (diferentes formatos, escalas, tipos de componentes y filosofías de anotación) puede convertirse en una fortaleza: el dataset unificado cubre una variabilidad visual mayor que cualquiera de las fuentes individuales, y el hecho de que aporte contribuciones similares de ambas fuentes (517 imágenes de MVTec AD y 505 de VISION-Datasets) garantiza representatividad equilibrada. Esta variedad es precisamente la que exige arquitecturas con capacidad de generalización robusta, y explica en parte por qué los modelos CNN convencionales, con su sesgo inductivo local, no consiguen resultados satisfactorios.
+
+\subsection{Superioridad demostrada de Vision Transformers sobre CNNs}
+
+La comparativa experimental entre arquitecturas es el núcleo cuantitativo de este trabajo. Los resultados obtenidos son inequívocos:
+
+\begin{itemize}
+    \item \textbf{ResNet-18 + Faster R-CNN}: mAP@0.5 = 0.077, detectando solo 3 de 6 categorías.
+    \item \textbf{EfficientNet-B0 + Faster R-CNN}: mAP@0.5 = 0.162, con precision muy baja en categorías críticas.
+    \item \textbf{DEIMv2 (DINOv3 backbone) @ 1024×1024, 300 épocas}: mAP@0.5 = 0.785, con precision de 1.0 en todas las clases.
+\end{itemize}
+
+La mejora de DEIMv2 sobre la mejor CNN (EfficientNet-B0) es de +62.3 puntos porcentuales absolutos en mAP, un resultado que supera ampliamente cualquier expectativa inicial. Este resultado es especialmente significativo porque la superioridad se mantiene incluso cuando se reevalúan las CNNs a 1024×1024 píxeles (Fase 3), descartando que la diferencia se deba a la resolución de entrada y confirmando que la ventaja es de naturaleza arquitectural.
+
+El mecanismo subyacente a esta superioridad es la combinación de dos factores: el campo receptivo global del mecanismo de \textit{Multi-Head Self-Attention}, que permite a DEIMv2 capturar relaciones espaciales entre regiones distantes de la imagen desde la primera capa; y las representaciones preentrenadas de \acrshort{DINOv3}, que aportan características semánticamente ricas sin necesidad de grandes volúmenes de datos etiquetados industriales.
+
+\subsection{Potencia de DEIMv2 con backbone DINOv3}
+
+La arquitectura DEIMv2~\cite{huang2025deimv2} ha demostrado ser particularmente adecuada para el dominio de inspección industrial. La precisión perfecta (Precision = 1.0 en todas las clases) indica que el modelo no genera falsos positivos por encima del umbral de confianza utilizado, lo que en un sistema de inspección real se traduce en que cada alarma de defecto corresponde efectivamente a una anomalía real, eliminando las revisiones innecesarias que suponen un coste operativo significativo.
+
+El backbone \acrshort{DINOv3}~\cite{simeoni2025dinov3}, preentrenado mediante aprendizaje auto-supervisado con la función de pérdida combinada DINO + iBOT + Gram Anchoring, proporciona representaciones visuales que capturan tanto información global semántica como correlaciones espaciales locales de alta calidad. La transferibilidad de estas representaciones a dominios industriales, ya validada en semiconductores por Huang et al.~\cite{huang2025semiconductor}, se confirma nuevamente en el presente trabajo con componentes electrónicos de mayor diversidad.
+
+\subsection{Comportamiento en condiciones adversas}
+
+La Fase 4 del trabajo evaluó la robustez de DEIMv2 bajo umbrales de confianza más estrictos (0.75 y 0.90), obteniendo resultados que descartan sobreajuste y confirman la solidez del modelo. El rendimiento se mantiene por encima de valores competitivos incluso con estos filtros de alta confianza, lo que indica que el modelo no depende de detecciones marginales para obtener sus métricas.
+
+Más allá de los umbrales de confianza, el dataset presentó condiciones adversas naturales: alta variabilidad de iluminación, superficies heterogéneas, defectos de tamaño muy variable (desde milimétricos hasta ocupar una fracción significativa de la imagen) y geometrías complejas. En todos estos escenarios, DEIMv2 mantuvo un comportamiento consistente, con recalls superiores al 72\% en todas las categorías en el mejor checkpoint.
+
+\subsection{Síntesis}
+
+En conjunto, los resultados validan la hipótesis central del trabajo: los Vision Transformers con preentrenamiento auto-supervisado representan un salto cualitativo sobre las redes convolucionales en la tarea de detección de anomalías industriales con datos limitados. La combinación de DINOv3 como backbone y DEIMv2 como arquitectura de detección constituye una solución técnicamente madura, eficiente y de rendimiento estado del arte para el dominio estudiado. El sistema desarrollado demuestra que es posible desplegar detección industrial robusta con conjuntos de datos de alrededor de 1{,}000 imágenes, siempre que se utilicen modelos con preentrenamiento auto-supervisado de gran escala.
+
+
+\section{Trabajos a Futuro}
+\label{sec:trabajos_futuro}
+
+A pesar de los resultados satisfactorios obtenidos, el análisis crítico del trabajo realizado y del estado del arte revela varias líneas de investigación que quedan abiertas y que podrían extender o mejorar significativamente las contribuciones de este TFG.
+
+\subsection{Exploración de estrategias de mejora sobre DEIMv2}
+
+Tras consolidar el modelo DEIMv2 como la arquitectura de referencia (mAP 0.785), se realizó una exploración experimental adicional orientada a superar este rendimiento mediante la incorporación de información semántica textual. La motivación fue la dificultad del modelo para discriminar automáticamente las clases \mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS}: ambas comparten patrones de bajo nivel muy similares (discontinuidades lineales y bajo contraste), por lo que se hipotetizó que una descripción lingüística externa podría aportar la señal discriminativa que el modelo puramente visual no captura.
+
+Se evaluaron tres estrategias: entrenamiento multimodal conjunto (\textit{joint training}), fusión temprana de características (\textit{early fusion}), y refinamiento progresivo residual. Esta última fue seleccionada por su conservación del preentrenamiento visual y se implementó como un módulo de fusión latente que corrige los logits de clasificación de DEIMv2 con embeddings textuales CLIP:
+\[
+\mathbf{L}_\text{final} = \mathbf{L}_\text{visual} + \alpha \cdot f(V, T)
+\]
+donde $\alpha$ es un parámetro de \textit{gating} inicializado en cero para preservar el baseline visual.
+
+Las Figuras~\ref{fig:fase2_loss}, \ref{fig:fase2_metrics} y \ref{fig:fase2_composite} documentan la dinámica del entrenamiento. La función de pérdida focal (Figura~\ref{fig:fase2_loss}) converge de forma regular a lo largo de las épocas ---desde valores superiores a 40 hasta estabilizarse en torno a 10---, lo que confirma que el módulo de fusión integra efectivamente la señal textual durante la optimización. Sin embargo, la comparativa de métricas (Figura~\ref{fig:fase2_metrics}) revela un patrón inequívoco: el mAP global desciende de forma monótona desde 0.674 en la primera época hasta 0.616 al concluir el entrenamiento, sin aproximarse en ningún momento al baseline de Fase~1 (0.785, línea de puntos). El recall de las clases críticas se estabiliza en torno a 0.64 pero tampoco supera al modelo unimodal. El score híbrido de decisión (Figura~\ref{fig:fase2_composite}) confirma la tendencia: el mejor valor compuesto alcanzado ($\approx 0{,}665$) es inferior al equivalente del modelo de referencia.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{fase2/fase2_training_loss.png}
+    \caption{Evolución de la función de pérdida focal durante el entrenamiento multimodal de Fase~2. La convergencia progresiva confirma que el módulo de fusión aprende a integrar la señal textual, aunque ello no se traduce en mejora del mAP.}
+    \label{fig:fase2_loss}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{fase2/fase2_metrics_comparison.png}
+    \caption{Comparativa de métricas principales durante el entrenamiento multimodal de Fase~2. El mAP global (línea sólida) desciende de forma monótona respecto al baseline de Fase~1 (línea de puntos, 0.785), mientras el recall de clases críticas (línea discontinua) se mantiene estable sin superar al modelo unimodal.}
+    \label{fig:fase2_metrics}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{fase2/fase2_composite_score.png}
+    \caption{Evolución del score híbrido ($S = 0{,}7 \cdot \text{mAP} + 0{,}3 \cdot \text{Recall}_\text{crítico}$) durante el entrenamiento multimodal de Fase~2. El descenso continuo confirma que ningún checkpoint supera al modelo unimodal de referencia.}
+    \label{fig:fase2_composite}
+\end{figure}
+
+La conclusión técnica es que los prompts textuales no aportan señal ortogonal respecto a las representaciones de DINOv3, que ya captura características de muy alto nivel semántico. La ambigüedad residual entre categorías es una limitación intrínseca de la resolución visual o del etiquetado del dataset, no de la arquitectura. Estos resultados, aunque negativos para la hipótesis de mejora inmediata, tienen valor científico propio: validan por vía negativa la robustez y completitud de la arquitectura unimodal, y confirman que el techo de rendimiento actual está limitado por los datos, no por el modelo.
+
+\subsection{Líneas de mejora sobre la preparación del dataset}
+
+Una vía de mejora con alto potencial de impacto es la ampliación y refinamiento del dataset. Con 1{,}022 imágenes, el conjunto actual es suficiente para validar la comparativa arquitectural, pero insuficiente para explotar plenamente la capacidad de generalización de modelos de la escala de DINOv3. Las líneas concretas incluyen:
+
+\begin{itemize}
+    \item Incorporar fuentes adicionales de datos industriales públicas (p.\ ej., PCB-DSLR, DAGM, Steel Defects Dataset) para ampliar la diversidad de componentes y defectos.
+    \item Revisar y refinar el etiquetado en las dos categorías semánticamente más ambiguas del dataset (\mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS}) para reducir la ambigüedad de las anotaciones.
+    \item Explorar técnicas de augmentación sintética más agresivas, como \textit{CutMix}, \textit{Copy-Paste} y generación de defectos sintéticos mediante modelos difusos para las clases con menor representación.
+\end{itemize}
+
+\subsection{Exploración de modelos de Visión-Lenguaje (VLMs)}
+
+La línea de investigación futura con mayor potencial transformador es la exploración de modelos de visión-lenguaje (\acrfull{VLM}) como arquitectura base para la detección de anomalías industriales. A diferencia del enfoque multimodal adoptado en la Fase 2 —que fusiona un detector visual ya entrenado con un encoder textual—, los VLMs modernos integran de forma nativa y masiva las modalidades visual y lingüística desde el preentrenamiento, desarrollando una comprensión multimodal fundamentalmente diferente y más potente.
+
+\paragraph{Qwen3-VL como línea principal.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=1.8cm]{diagramas-arquitectura/qwen3vl-logo.png}
+\caption{Logotipo de Qwen3-VL, modelo de visión-lenguaje de código abierto propuesto como principal línea de investigación futura para la detección de anomalías industriales con capacidades multimodales nativas.}
+\label{fig:logo-qwen3vl}
+\end{figure}
+
+Entre los VLMs de código abierto de referencia se encuentra Qwen3-VL~\cite{bai2025qwen3vl}, que introduce tres avances arquitecturales fundamentales: (1) embeddings de posición rotacional intercalados (\textit{interleaved MRoPE}) para modelado espaciotemporal robusto en imágenes y vídeo; (2) integración \textit{DeepStack} para aprovechar características ViT multi-nivel y mejorar la alineación visión-lenguaje; y (3) alineación temporal textual para vídeo. El modelo soporta contextos intercalados de hasta 256K tokens y está disponible en variantes densas (2B/8B/32B parámetros) y mezcla de expertos (235B-A22B parámetros), lo que permite adaptarlo a diferentes restricciones computacionales.
+
+La característica más relevante para el dominio industrial es la capacidad de Qwen3-VL de razonar sobre imágenes a nivel semántico profundo: ante una imagen de componente electrónico con un defecto, el modelo puede no solo detectar y localizar la anomalía mediante \textit{grounding} visual, sino también generar una descripción textual de la naturaleza del defecto, su posible causa y su criticidad —funcionalidades de alto valor para operadores industriales que necesitan tomar decisiones a partir de las alertas del sistema.
+
+\paragraph{Ventajas sobre el paradigma actual.}
+
+Los VLMs presentan ventajas específicas para el problema abordado en este TFG:
+
+\begin{itemize}
+    \item \textbf{Comprensión semántica profunda}: pueden distinguir entre \mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS} no por similitud visual de píxeles, sino por comprensión del contexto físico del defecto.
+    \item \textbf{Capacidad de generalización zero-shot}: con un prompt adecuado, el modelo puede detectar tipos de defectos no vistos durante el ajuste fino, algo crítico en entornos industriales donde surgen nuevas anomalías.
+    \item \textbf{Explicabilidad}: los VLMs pueden generar justificaciones textuales de sus predicciones, aumentando la confianza del operador en el sistema.
+    \item \textbf{Flexibilidad de dominio}: el mismo modelo puede adaptarse a diferentes tipos de componentes industriales con modificaciones mínimas del prompt o ajuste fino ligero (\textit{LoRA}, \textit{instruction tuning}).
+\end{itemize}
+
+\paragraph{Desafíos y consideraciones.}
+
+No obstante, la adopción de VLMs en entornos industriales presenta desafíos significativos. Los modelos de mayor capacidad (32B+ parámetros) requieren infraestructuras GPU de alto coste que pueden ser inaccesibles en contextos de pequeña escala. Las variantes más ligeras (2B-8B) podrían adaptarse a recursos disponibles con técnicas de cuantización de bajo rango, aunque requieren validación de que la compresión no degrada el rendimiento en detección de anomalías finas. La latencia de inferencia de modelos generativos es también superior a la de detectores especializados como DEIMv2, lo que puede ser incompatible con requisitos de tiempo real en líneas de producción.
+
+En consecuencia, el camino recomendado para futuros trabajos es un estudio comparativo sistemático de las variantes más ligeras de Qwen3-VL~\cite{bai2025qwen3vl} frente a DEIMv2, evaluando no solo métricas de detección (mAP, AP por clase) sino también latencia de inferencia, requisitos de memoria y capacidad de generalización a nuevos tipos de defectos sin reentrenamiento.
+
+\subsection{Ampliación de la validación experimental}
+
+Una limitación reconocida del presente trabajo es que toda la validación se realizó sobre un único dataset curado, aunque éste integre dos fuentes. Para fortalecer la generalidad de las conclusiones, sería necesario:
+
+\begin{itemize}
+    \item Validar DEIMv2 en datasets industriales completamente independientes y sin overlap de dominio con los datos de entrenamiento actuales.
+    \item Implementar y evaluar técnicas de \textit{domain adaptation} para estudiar cómo el modelo se comporta cuando se enfrenta a componentes industriales de tipología diferente a la vista durante el entrenamiento.
+    \item Realizar un estudio de ablación sobre el tamaño del dataset: ¿cuántas imágenes se necesitan mínimamente para obtener un rendimiento aceptable con DINOv3? Esta pregunta es relevante para la práctica industrial, donde la captura y anotación de datos puede ser costosa.
+\end{itemize}
+
+\subsection{Integración en sistema de producción}
+
+Desde una perspectiva de ingeniería aplicada, el prototipo funcional desarrollado (sistema de inferencia + \textit{dashboard} Streamlit) constituye un punto de partida para la integración en un entorno de producción real. Las líneas de trabajo para esta transición incluyen: optimización de la latencia de inferencia mediante cuantización INT8/FP16, diseño de un protocolo de actualización continua del modelo a medida que se acumulan nuevas imágenes etiquetadas, e integración con sistemas \textit{SCADA} o \textit{MES} industriales para automatizar el cierre de bucles de control de calidad.

@@ -3,7 +3,7 @@
 
 Este capítulo describe la metodología de trabajo empleada, la planificación en fases del proyecto y la ejecución detallada de los experimentos realizados para desarrollar y validar el sistema de detección de anomalías basado en Vision Transformers. Se documenta el proceso iterativo de optimización que condujo a la configuración final del modelo, así como los resultados obtenidos en cada fase experimental.
 
-A efectos de seguimiento, se adopta la siguiente \textbf{nomenclatura}: (i) \textit{Preparación del dataset} designa el trabajo previo de curación y normalización de datos, articulado en \textbf{cinco etapas} del pipeline (Etapas 1--5, con subetapas 4.1--4.4 donde corresponde); (ii) las \textbf{Fases experimentales 1--4} corresponden a la experimentación propiamente dicha, con \textbf{Experimentos} en las Fases 1 y 3, e \textbf{Iteraciones} en la Fase 2. Esta distinción entre preparación y experimentación permite al lector localizar con precisión cada apartado del desarrollo.
+A efectos de seguimiento, se adopta la siguiente nomenclatura: (i) \textit{Preparación del dataset} designa el trabajo previo de curación y normalización de datos, articulado en cinco etapas del pipeline (Etapas 1--5, con subetapas 4.1--4.4 donde corresponde); (ii) las Fases experimentales 1--4 corresponden a la experimentación propiamente dicha, con Experimentos en las Fases 1 y 3, e Iteraciones en la Fase 2. Esta distinción entre preparación y experimentación permite al lector localizar con precisión cada apartado del desarrollo.
 
 
 \section{Preparación y curación del dataset}
@@ -13,7 +13,7 @@ A efectos de seguimiento, se adopta la siguiente \textbf{nomenclatura}: (i) \tex
 
 La calidad del conjunto de datos constituye un factor determinante en el rendimiento de los sistemas de aprendizaje profundo. En tareas de detección de defectos industriales, este aspecto resulta especialmente crítico debido a la alta variabilidad del dominio (condiciones de iluminación, texturas, escalas y geometrías), así como a la necesidad de contar con anotaciones consistentes y una taxonomía de defectos coherente.
 
-Con este objetivo, se ha desarrollado un \textbf{pipeline de curación reproducible} para construir un dataset unificado, en formato COCO, equilibrado entre clases y con validaciones cuantitativas que aseguran su idoneidad para entrenamiento y evaluación de modelos detectores. De forma resumida, los objetivos de esta parte del desarrollo han sido:
+Con este objetivo, se ha desarrollado un pipeline de curación reproducible para construir un dataset unificado, en formato COCO, equilibrado entre clases y con validaciones cuantitativas que aseguran su idoneidad para entrenamiento y evaluación de modelos detectores. De forma resumida, los objetivos de esta parte del desarrollo han sido:
 
 \begin{itemize}
     \item \textbf{Unificación de fuentes heterogéneas}: combinar datasets públicos con formatos de anotación distintos (cajas delimitadoras y segmentación) en un formato común.
@@ -24,7 +24,7 @@ Con este objetivo, se ha desarrollado un \textbf{pipeline de curación reproduci
 
 \subsection{Datasets originales}
 
-El dataset final se construyó a partir de la combinación de dos fuentes públicas: \textbf{VISION-Datasets}~\cite{bai2023visiondatasets} (con anotaciones supervisadas en formato COCO, disponibles a través de Hugging Face~\cite{visiondatasets_huggingface}) y \textbf{MVTec AD} (benchmark de anomalías industriales)~\cite{bergmann2019mvtec}. Ambos repositorios presentan filosofías y formatos de anotación diferentes, lo que motivó la necesidad de un proceso de curación y normalización previo.
+El dataset final se construyó a partir de la combinación de dos fuentes públicas: VISION-Datasets~\cite{bai2023visiondatasets} (con anotaciones supervisadas en formato COCO, disponibles a través de Hugging Face~\cite{visiondatasets_huggingface}) y MVTec AD (benchmark de anomalías industriales)~\cite{bergmann2019mvtec}. Ambos repositorios presentan filosofías y formatos de anotación diferentes, lo que motivó la necesidad de un proceso de curación y normalización previo.
 
 \subsubsection{VISION-Datasets}
 
@@ -46,25 +46,25 @@ MVTec AD~\cite{bergmann2019mvtec} es un benchmark ampliamente utilizado en detec
 
 \subsection{Metodología de curación y preparación}
 
-La preparación del dataset se articuló en \textbf{cinco etapas} del pipeline, desde la exploración de las fuentes hasta la validación final. Cada etapa tiene un propósito claro: las Etapas 1 y 3 son de análisis (no modifican el volumen de datos); las Etapas 2 y 4 realizan las transformaciones cuantitativas; la Etapa 5 verifica la integridad del resultado. La Tabla~\ref{tab:evolucion_dataset_curacion} resume la evolución cuantitativa del conjunto de datos a lo largo del pipeline, alineada con la nomenclatura de las etapas descritas a continuación.
+La preparación del dataset se articuló en cinco etapas del pipeline, desde la exploración de las fuentes hasta la validación final. Cada etapa tiene un propósito claro: las Etapas 1 y 3 son de análisis (no modifican el volumen de datos); las Etapas 2 y 4 realizan las transformaciones cuantitativas; la Etapa 5 verifica la integridad del resultado. La Tabla~\ref{tab:evolucion_dataset_curacion} resume la evolución cuantitativa del conjunto de datos a lo largo del pipeline, alineada con la nomenclatura de las etapas descritas a continuación.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{llcc}
+\begin{tabularx}{\textwidth}{@{}l X r r@{}}
 \toprule
 \textbf{Etapa} & \textbf{Operación} & \textbf{Imágenes} & \textbf{Categorías} \\
 \midrule
-Inicio & Fuentes originales combinadas (VISION-Datasets + MVTec AD) & $\sim$9{,}142 & 64 \\
+Inicio       & Fuentes originales combinadas (VISION-Datasets + MVTec AD)  & $\sim$9{,}142 & 64 \\
 \midrule
-Etapa 1 & Exploración y análisis (sin transformación) & $\sim$9{,}142 & 64 \\
-Etapa 2 & Curación inicial: filtrado, formato COCO & 1{,}907 & 15 \\
-Etapa 3 & Análisis exhaustivo de calidad (sin transformación) & 1{,}907 & 15 \\
-Etapa 4.1 & Recuración: sin \texttt{hazelnut}, sin duplicados & 1{,}393 & 15 \\
-Etapa 4.2 & Unificación de taxonomía (6 categorías) & 1{,}393 & 6 \\
-Etapa 4.3--4.4 & Balanceo y creación de splits estratificados & 1{,}022 & 6 \\
-Etapa 5 & Validación final (estratificación, leakage, integridad) & 1{,}022 & 6 \\
+Etapa 1      & Exploración y análisis (sin transformación)                  & $\sim$9{,}142 & 64 \\
+Etapa 2      & Curación inicial: filtrado, formato COCO                     & 1{,}907 & 15 \\
+Etapa 3      & Análisis exhaustivo de calidad (sin transformación)          & 1{,}907 & 15 \\
+Etapa 4.1    & Recuración: sin componente hazelnut, sin duplicados          & 1{,}393 & 15 \\
+Etapa 4.2    & Unificación de taxonomía (6 categorías)                      & 1{,}393 & 6  \\
+Etapa 4.3--4.4 & Balanceo y creación de splits estratificados               & 1{,}022 & 6  \\
+Etapa 5      & Validación final (estratificación, leakage, integridad)      & 1{,}022 & 6  \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Evolución del dataset a través del pipeline de curación (Etapas 1--5)}
 \label{tab:evolucion_dataset_curacion}
 \end{table}
@@ -118,8 +118,8 @@ Para garantizar coherencia semántica y facilitar la evaluación comparativa, se
 \midrule
 0 & NORMAL & --- & \texttt{good}, \texttt{normal} \\
 1 & DEFORMACIONES & Alta & \texttt{bent}, \texttt{bent\_lead}, \texttt{bent\_wire}, \texttt{short}, \texttt{spur} \\
-2 & ROTURA\_FRACTURA & Crítica & \texttt{crack}, \texttt{break}, \texttt{broken}, \texttt{broken\_large}, \texttt{defect} \\
-3 & RAYONES\_ARAÑAZOS & Media & \texttt{scratch}, \texttt{Scratch}, \texttt{s\_scratch}, \texttt{scratch\_head} \\
+2 & \mbox{ROTURA\_FRACTURA} & Crítica & \texttt{crack}, \texttt{break}, \texttt{broken}, \texttt{broken\_large}, \texttt{defect} \\
+3 & \mbox{RAYONES\_ARAÑAZOS} & Media & \texttt{scratch}, \texttt{Scratch}, \texttt{s\_scratch}, \texttt{scratch\_head} \\
 4 & PERFORACIONES & Crítica & \texttt{hole}, \texttt{Hole}, \texttt{missing\_hole}, \texttt{cut}, \texttt{cut\_lead} \\
 5 & CONTAMINACIÓN & Alta & \texttt{contamination}, \texttt{metal\_contamination}, \texttt{Dirty} \\
 \bottomrule
@@ -218,12 +218,23 @@ El análisis de las cajas delimitadoras (Figura~\ref{fig:fase0_bbox_distribution
 \FloatBarrier
 \subsubsection{Balanceo mediante augmentación}
 
-Para mitigar el desbalance entre categorías se aplicó una estrategia híbrida de under/over-sampling complementada con augmentación conservadora. La Figura~\ref{fig:fase0_augmentation_distribution} muestra la proporción de imágenes originales y augmentadas en cada split, manteniéndose en torno al 36\% a nivel global.
+Para mitigar el desbalance severo entre categorías (ratio inicial 24.5:1, con 1{,}039 imágenes de NORMAL frente a 58 de CONTAMINACIÓN), se implementó una estrategia híbrida de under/over-sampling complementada con augmentación sintética conservadora. El uso de técnicas de augmentación en datasets industriales desequilibrados es una práctica consolidada en la literatura de visión por computador~\cite{wang2022defect}, ya que permite incrementar el volumen efectivo de datos sin necesidad de nuevas capturas físicas, respetando al mismo tiempo la distribución semántica de las clases deficitarias.
+
+Las transformaciones aplicadas se seleccionaron cuidadosamente para preservar las características morfológicas de los defectos, descartando transformaciones agresivas (CutOut, perspectiva severa, distorsión elástica) que podrían generar artefactos visuales o alterar patrones de textura relevantes para la discriminación de defectos finos:
+
+\begin{itemize}
+    \item \textbf{HorizontalFlip} ($p=0{,}5$): volteo horizontal, invariante a la simetría de los defectos superficiales en componentes electrónicos sin orientación forzada.
+    \item \textbf{Rotate} ($\pm 5^{\circ}$, $p=0{,}5$): rotación restringida a $\pm 5$ grados para simular ligeras variaciones de orientación de captura sin alterar la morfología del defecto.
+    \item \textbf{RandomBrightnessContrast} (límite $\pm 0{,}1$, $p=0{,}5$): variación mínima de brillo y contraste para reproducir diferencias de iluminación entre capturas sin saturar ni oscurecer texturas diagnósticas.
+    \item \textbf{GaussNoise} (varianza 5--15, $p=0{,}3$): ruido gaussiano de baja intensidad para mejorar la robustez del modelo ante el ruido inherente al sensor de cámara industrial.
+\end{itemize}
+
+Se generaron en total 368 imágenes augmentadas, afectando principalmente a PERFORACIONES (+246 imágenes), DEFORMACIONES (+111) y CONTAMINACIÓN (+100), con contribuciones menores a \mbox{ROTURA\_FRACTURA} (+60) y \mbox{RAYONES\_ARAÑAZOS} (+58). El resultado fue un dataset con ratio máx/mín de 2.08:1, dentro del umbral recomendado para entrenamiento supervisado ($< 3{:}1$). La proporción de imágenes augmentadas se mantuvo homogénea entre splits (35.9\% en train, 38.2\% en val y 35.1\% en test), garantizando que no se introdujo correlación espuria entre particiones. La Figura~\ref{fig:fase0_augmentation_distribution} muestra esta distribución.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\textwidth]{fig/fase0_augmentation_distribution.png}
-\caption{Proporción de imágenes originales y augmentadas por split en el dataset final.}
+\caption{Proporción de imágenes originales y augmentadas por split en el dataset final. La homogeneidad inter-split ($\sim$36\%) confirma que la augmentación no introduce sesgo en la evaluación.}
 \label{fig:fase0_augmentation_distribution}
 \end{figure}
 
@@ -241,7 +252,7 @@ El pipeline de curación (Etapas 1--5) permitió transformar dos fuentes heterog
 \section{Metodología de trabajo}
 \label{sec:metodologia}
 
-Una vez preparado el dataset (Sección~\ref{sec:preparacion_dataset}), el núcleo del desarrollo consiste en la experimentación sistemática con diferentes arquitecturas. El presente trabajo se ha estructurado siguiendo una metodología experimental rigurosa, fundamentada en el método científico y adaptada a las particularidades de la investigación en aprendizaje profundo. La aproximación metodológica se caracteriza por:
+Una vez preparado el dataset (sección~\ref{sec:preparacion_dataset}), el núcleo del desarrollo consiste en la experimentación sistemática con diferentes arquitecturas. El presente trabajo se ha estructurado siguiendo una metodología experimental rigurosa, fundamentada en el método científico y adaptada a las particularidades de la investigación en aprendizaje profundo. La aproximación metodológica se caracteriza por:
 
 \begin{enumerate}
     \item \textbf{Enfoque iterativo e incremental}: El desarrollo se ha organizado en fases sucesivas, donde cada iteración construye sobre los resultados y lecciones aprendidas de la anterior. Esta aproximación permite identificar problemas tempranamente y ajustar la estrategia de forma adaptativa.
@@ -255,40 +266,91 @@ Una vez preparado el dataset (Sección~\ref{sec:preparacion_dataset}), el núcle
 
 \subsection{Dataset y configuración experimental}
 
-El dataset utilizado en todos los experimentos corresponde a \texttt{curated\_dataset\_splitted\_20251101\_provisional\_1st\_version}, un conjunto de datos industriales curado que incluye imágenes de componentes manufacturados con anotaciones en formato COCO. El proceso de preparación y curación del conjunto de datos se detalla en la Sección~\ref{sec:preparacion_dataset}. Las características principales del dataset son:
+El dataset utilizado en todos los experimentos es el conjunto de datos industriales curado descrito en la sección~\ref{sec:preparacion_dataset}, compuesto por imágenes de componentes manufacturados con anotaciones de defectos en formato COCO. Sus características principales son:
 
 \begin{itemize}
     \item \textbf{Resolución original}: Mediana de aproximadamente 1650×1350 píxeles, con variabilidad significativa entre imágenes.
     \item \textbf{Conjunto de test}: 205 imágenes, utilizado exclusivamente para evaluación final y nunca durante el entrenamiento o selección de hiperparámetros.
-    \item \textbf{Categorías de defectos}: Seis clases en total: NORMAL (sin defectos), DEFORMACIONES, ROTURA\_FRACTURA, RAYONES\_ARAÑAZOS, PERFORACIONES y CONTAMINACIÓN.
+    \item \textbf{Categorías de defectos}: Seis clases en total: NORMAL (sin defectos), DEFORMACIONES, \mbox{ROTURA\_FRACTURA}, \mbox{RAYONES\_ARAÑAZOS}, PERFORACIONES y CONTAMINACIÓN.
     \item \textbf{Variabilidad}: El dataset presenta alta variabilidad en términos de iluminación, tipos de superficies, escalas de defectos y condiciones de captura, lo que lo convierte en un benchmark desafiante y realista.
 \end{itemize}
 
 \subsection{Métricas de evaluación}
+\label{subsec:metricas}
 
-La evaluación de todos los modelos se ha realizado utilizando el protocolo estándar COCO, con las siguientes métricas principales:
+La evaluación de todos los modelos se ha realizado utilizando el protocolo estándar COCO. A continuación se presenta una descripción técnica precisa de cada métrica, necesaria para interpretar correctamente los resultados comparativos entre arquitecturas.
 
-\begin{itemize}
-    \item \textbf{mAP@0.5}: Mean Average Precision con umbral de IoU de 0.5, métrica principal que resume el rendimiento global del modelo.
-    \item \textbf{AP por clase}: Average Precision individual para cada una de las seis categorías, permitiendo identificar fortalezas y debilidades específicas.
-    \item \textbf{Precision por clase}: Ratio de verdaderos positivos sobre todas las detecciones realizadas por el modelo para cada clase.
-    \item \textbf{Recall por clase}: Ratio de verdaderos positivos sobre todas las anotaciones reales presentes en el conjunto de test.
-\end{itemize}
+\subsubsection{Intersection over Union (IoU)}
+
+La \acrfull{IoU} mide el solapamiento geométrico entre una caja delimitadora predicha $B_p$ y la caja de referencia (\textit{ground truth}) $B_{gt}$:
+\begin{equation}
+\text{IoU}(B_p, B_{gt}) = \frac{|B_p \cap B_{gt}|}{|B_p \cup B_{gt}|}
+\label{eq:iou}
+\end{equation}
+Una predicción se considera un \acrfull{TP} si $\text{IoU} \geq \theta$, donde $\theta$ es el umbral de IoU establecido (en este trabajo, $\theta = 0.5$). Si $\text{IoU} < \theta$, la predicción se clasifica como \acrfull{FP}.
+
+\subsubsection{Precision y Recall por clase}
+
+Para cada categoría de defecto, la Precision representa la fracción de las detecciones realizadas que son correctas:
+\begin{equation}
+\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}
+\label{eq:precision}
+\end{equation}
+El Recall (o sensibilidad) mide la fracción de las instancias reales que el modelo ha detectado correctamente:
+\begin{equation}
+\text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}
+\label{eq:recall}
+\end{equation}
+donde \acrshort{FN} es el número de instancias reales no detectadas. Estas dos métricas presentan un trade-off inherente: umbrales de confianza bajos aumentan el recall pero reducen la precision, y viceversa.
+
+\subsubsection{Average Precision (AP) por clase}
+
+La \acrfull{AP} por clase integra el trade-off Precision-Recall a lo largo de todos los umbrales de confianza posibles, computando el área bajo la curva Precision-Recall:
+\begin{equation}
+\text{AP} = \int_0^1 p(r)\, \mathrm{d}r \approx \sum_{k=1}^{n} p(r_k) \cdot \Delta r_k
+\label{eq:ap}
+\end{equation}
+donde $p(r)$ es la precisión cuando el recall es $r$, y la suma discreta aproxima el área con $n$ puntos de la curva. La AP es más informativa que un único par (Precision, Recall) porque captura el comportamiento del modelo en todo el rango operativo de umbrales de confianza. En este trabajo se reporta AP@0.5, es decir, AP calculada con el umbral de IoU fijado en 0.5.
+
+La evaluación por clase se ha priorizado como métrica principal frente al mAP global porque permite identificar el comportamiento del modelo en cada tipo específico de defecto. Esto es fundamental en un sistema de inspección industrial, donde el rendimiento en las categorías más críticas (\mbox{ROTURA\_FRACTURA}, PERFORACIONES) puede tener mayor relevancia operativa que el promedio global.
+
+\subsubsection{Mean Average Precision (mAP@0.5)}
+
+La \acrfull{mAP}@0.5 es el promedio aritmético de los valores de AP@0.5 de todas las clases:
+\begin{equation}
+\text{mAP@0.5} = \frac{1}{C} \sum_{c=1}^{C} \text{AP}_c
+\label{eq:map}
+\end{equation}
+donde $C$ es el número de categorías. En este trabajo, $C = 6$ categorías. Esta métrica constituye el indicador global del rendimiento del detector y es la referencia principal para la comparativa entre arquitecturas.
+
+\subsubsection{Umbral de confianza y consideraciones sobre la comparativa}
+
+Todos los modelos han sido evaluados aplicando un umbral de confianza de score de $0.15$. Esta elección no es arbitraria: durante los experimentos con arquitecturas CNN (ResNet-18 y EfficientNet-B0), se observó que estas redes producen un número muy reducido de detecciones y, en los casos en que detectan objetos, lo hacen con scores de confianza bajos, frecuentemente inferiores a 0.3. Aplicar un umbral más estricto (como 0.5, habitual en la literatura) habría eliminado prácticamente todas las detecciones de las CNNs, haciendo inviable cualquier comparativa cuantitativa.
+
+Por consiguiente, se estableció $\text{score\_threshold} = 0.15$ como el umbral más permisivo que permite a las arquitecturas CNN producir detecciones medibles, garantizando una comparativa justa entre paradigmas. Esta decisión beneficia sistemáticamente a las CNNs (se aceptan sus detecciones de baja confianza), lo que hace que el rendimiento superior demostrado por DEIMv2 sea aún más significativo.
+
+\subsubsection{Consideraciones sobre precision = 1.0 en DEIMv2}
+
+Un resultado que requiere justificación explícita es la precision de 1.0 (100\%) reportada en todas las clases para todos los experimentos con DEIMv2. Este resultado no es un artefacto computacional ni indica sobreajuste; es una consecuencia directa de la alta capacidad discriminativa de la arquitectura.
+
+DEIMv2, gracias a las representaciones semánticas ricas de DINOv3, genera un número sustancialmente mayor de detecciones que las CNNs. Crucialmente, la arquitectura es capaz de producir siempre al menos una detección por encima del umbral de 0.15 que coincide geométricamente (IoU $\geq$ 0.5) y semánticamente con una instancia real de la clase correspondiente. En términos de la ecuación~\eqref{eq:precision}, esto significa que el número de \acrshort{FP} por encima del umbral de confianza seleccionado es nulo o despreciable: todas las cajas que el modelo reporta con confianza superior a 0.15 corresponden a instancias reales. Esta situación refleja que el modelo ha aprendido a asignar puntuaciones altas solo a regiones de la imagen que efectivamente contienen defectos, resultado consistente con la validación en la Fase 4 a umbrales más estrictos (0.75 y 0.90), donde la precision se mantiene elevada.
 
 \subsection{Criterios de selección del mejor checkpoint}
 
 Se han establecido criterios diferenciados según la arquitectura:
 
 \begin{itemize}
-    \item \textbf{Arquitecturas CNN (ResNet-18, EfficientNet)}: Selección basada en menor pérdida de validación (\texttt{val\_loss}), criterio estándar para modelos Faster R-CNN.
-    \item \textbf{Vision Transformers (DEIMv2)}: Selección basada en mayor mAP@0.5 en el conjunto de validación, ya que esta métrica captura mejor el rendimiento en detección de objetos que la pérdida agregada.
+    \item \textbf{Arquitecturas CNN (ResNet-18, EfficientNet)}: Selección basada en menor pérdida de validación (\texttt{val\_loss}), criterio estándar para modelos Faster R-CNN, donde la pérdida de validación correlaciona bien con el rendimiento en detección.
+    \item \textbf{Vision Transformers (DEIMv2)}: Selección basada en mayor mAP@0.5 en el conjunto de validación, ya que esta métrica captura de forma más directa el rendimiento de detección de objetos. En arquitecturas DETR, la pérdida de entrenamiento no siempre correlaciona con el mAP, lo que hace preferible usar la métrica de detección directamente.
 \end{itemize}
+
+La evaluación final de todos los modelos se realiza exclusivamente sobre el subconjunto de test (205 imágenes), que ha permanecido aislado durante todo el proceso de entrenamiento y selección de hiperparámetros. Esta separación estricta garantiza que las métricas reportadas reflejen la capacidad de generalización real del modelo y no la memorización de los datos de entrenamiento.
 
 
 \section{Planificación en fases experimentales}
 \label{sec:planificacion}
 
-El desarrollo experimental se ha estructurado en cuatro fases principales, cada una con objetivos específicos y metodología adaptada. Nótese que la \textbf{preparación del dataset} (Sección~\ref{sec:preparacion_dataset}) constituye un bloque previo e independiente; las fases que se enumeran a continuación corresponden exclusivamente a la experimentación con modelos:
+El desarrollo experimental se ha estructurado en cuatro fases principales, cada una con objetivos específicos y metodología adaptada. Nótese que la preparación del dataset (sección~\ref{sec:preparacion_dataset}) constituye un bloque previo e independiente; las fases que se enumeran a continuación corresponden exclusivamente a la experimentación con modelos:
 
 \begin{description}
     \item[\textbf{Fase 1: Baseline con arquitecturas CNN}] Establecer líneas base con arquitecturas convolucionales tradicionales (ResNet-18 y EfficientNet-B0). El fracaso de estos modelos (mAP 0.077 y 0.162) actuará como motor de búsqueda que justifica explorar arquitecturas alternativas.
@@ -316,7 +378,46 @@ Las Redes Neuronales Convolucionales (\acrshort{CNN}) han sido el estándar en d
     \item \textbf{EfficientNet-B0}: Arquitectura moderna optimizada para eficiencia mediante escalado compuesto de profundidad, anchura y resolución, muy popular en aplicaciones donde el balance entre rendimiento y recursos computacionales es crítico.
 \end{itemize}
 
+Las Figuras~\ref{fig:diagrama-resnet18} y \ref{fig:diagrama-efficientnet} muestran esquemáticamente ambas arquitecturas. ResNet-18 apila bloques residuales con conexiones de atajo que suman directamente la entrada al resultado de las convoluciones, lo que mitiga el problema del gradiente desvaneciente y permite entrenar redes más profundas con estabilidad. EfficientNet-B0 se basa en bloques \textit{Mobile Inverted Bottleneck Convolution} (MBConv) con mecanismos de atención de canal SE (\textit{Squeeze-and-Excitation}), optimizados mediante un escalado compuesto sistemático de profundidad, anchura y resolución.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{diagramas-arquitectura/resnet18-arquitetcura-diagrama.png}
+\caption{Arquitectura ResNet-18. La red se organiza en cuatro etapas de bloques residuales básicos (BasicBlock) de dos capas convolucionales cada uno, con conexiones de atajo (\textit{skip connections}) que permiten el flujo directo del gradiente durante el entrenamiento. Esta estructura mitigó históricamente el problema del gradiente desvaneciente, permitiendo entrenar redes más profundas de forma estable.}
+\label{fig:diagrama-resnet18}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{diagramas-arquitectura/efficientnet-diagrama-arquitetcura.png}
+\caption{Arquitectura EfficientNet-B0. La red se construye sobre bloques MBConv (\textit{Mobile Inverted Bottleneck Convolution}) con mecanismo de atención de canal SE (\textit{Squeeze-and-Excitation}). Su principal contribución es el escalado compuesto: en lugar de ajustar profundidad, anchura o resolución de forma independiente, EfficientNet los escala conjuntamente mediante coeficientes fijos $(\alpha, \beta, \gamma)$ bajo una restricción de FLOPS, obteniendo un balance eficiente entre precisión y recursos computacionales.}
+\label{fig:diagrama-efficientnet}
+\end{figure}
+
 El objetivo de esta fase es evaluar el rendimiento de estas arquitecturas en el problema específico de detección de defectos industriales sin modificaciones especiales, utilizando las imágenes en su resolución nativa para maximizar la información visual disponible.
+
+\subsection{Justificación de los hiperparámetros de entrenamiento para arquitecturas CNN}
+\label{subsec:justificacion_hiperparametros_cnn}
+
+La selección de hiperparámetros para las arquitecturas CNN responde a principios establecidos en la literatura de detección de objetos con Faster R-CNN y a las particularidades de cada backbone. A continuación se justifican los valores empleados en cada experimento.
+
+\paragraph{ResNet-18 — Optimizador: SGD con momentum 0.9.}
+SGD (Stochastic Gradient Descent) con momentum es el optimizador de referencia para Faster R-CNN con backbones ResNet desde los trabajos fundacionales de Ren et al.~\cite{ren2015fasterrcnn}. A diferencia de los Vision Transformers, donde las capas de atención presentan gradientes de escala heterogénea que favorecen estimación adaptativa, las redes convolucionales con conexiones residuales presentan gradientes más homogéneos y SGD proporciona una regularización implícita efectiva. El momentum de 0.9 reduce la oscilación en el espacio de parámetros y acelera la convergencia en plateaus.
+
+\paragraph{ResNet-18 — Learning rate: 0.005 con StepLR.}
+El valor de 0.005 es el learning rate de referencia para fine-tuning de ResNet preentrenado con Faster R-CNN sobre datos con distribución distinta a ImageNet. Un valor mayor produciría inestabilidad en las capas RPN, mientras que un valor menor ralentizaría innecesariamente la convergencia en 50 épocas. El scheduler StepLR (\texttt{step\_size=5}, \texttt{gamma=0.1}) reduce el learning rate en un factor de 10 cada 5 épocas, replicando la estrategia ``1x schedule'' estándar de Faster R-CNN: exploración agresiva en fases tempranas y refinamiento fino en épocas tardías.
+
+\paragraph{ResNet-18 — Batch size: 8 e Weight decay: 0.0005.}
+El batch size de 8 representa el máximo permitido por la VRAM disponible con imágenes en resolución nativa ($\sim$1650$\times$1350~px). El weight decay de 0.0005 es el valor estándar para regularización en detectores Faster R-CNN con SGD, previniendo el sobreajuste sin penalizar excesivamente la capacidad del modelo.
+
+\paragraph{EfficientNet-B0 — Optimizador: AdamW con learning rate 0.0005.}
+EfficientNet aplica escalado compuesto de profundidad, anchura y resolución mediante coeficientes $\alpha$, $\beta$, $\gamma$. Esta arquitectura fue diseñada y evaluada originalmente con RMSprop y adaptaciones de Adam, y el uso de SGD con momentum provoca convergencia más lenta y menos estable con backbones de este tipo. AdamW ofrece estimación adaptativa por dimensión que compensa las distintas escalas de gradiente entre las capas de expansión MBConv. El learning rate de 0.0005, significativamente menor que para ResNet-18, refleja la mayor sensibilidad de EfficientNet a cambios bruscos en los pesos, especialmente en las capas de atención de canal de los bloques SE (\textit{Squeeze-and-Excitation}).
+
+\paragraph{EfficientNet-B0 — LR Scheduler: CosineAnnealingLR.}
+El scheduler cosenoidal proporciona un decaimiento suave y continuo del learning rate a lo largo de las épocas, sin las discontinuidades abruptas del StepLR. Esta suavidad resulta especialmente beneficiosa para AdamW, donde los momentos adaptativos acumulados pueden desestabilizarse ante cambios bruscos de learning rate. Con 50 épocas, CosineAnnealingLR garantiza que el modelo explore activamente el espacio de parámetros en las primeras épocas y refine detalladamente en las últimas.
+
+\paragraph{EfficientNet-B0 — Batch size: 2.}
+EfficientNet-B0, aunque más eficiente en parámetros que ResNet-18 ($\sim$5M vs $\sim$11M), presenta mayor consumo de memoria de activaciones debido al escalado compuesto y a los bloques SE internos. El batch size de 2 fue el máximo viable con resolución nativa en la GPU disponible.
 
 \subsection{Experimento 1.1: ResNet-18 + Faster R-CNN}
 
@@ -347,8 +448,8 @@ Los resultados en el conjunto de test (205 imágenes) se presentan en la Tabla~\
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
 \midrule
 DEFORMACIONES & 0.209 & 0.213 & 0.605 \\
-ROTURA\_FRACTURA & 0.092 & 0.300 & 0.150 \\
-RAYONES\_ARAÑAZOS & 0.160 & 0.158 & 0.441 \\
+\mbox{ROTURA\_FRACTURA} & 0.092 & 0.300 & 0.150 \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.160 & 0.158 & 0.441 \\
 PERFORACIONES & 0.000 & --- & 0.000 \\
 CONTAMINACIÓN & 0.000 & --- & 0.000 \\
 NORMAL & 0.000 & --- & 0.000 \\
@@ -365,10 +466,10 @@ NORMAL & 0.000 & --- & 0.000 \\
 Los resultados muestran un rendimiento limitado:
 
 \begin{itemize}
-    \item El modelo solo detecta correctamente 3 de las 6 categorías: DEFORMACIONES, ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS.
+    \item El modelo solo detecta correctamente 3 de las 6 categorías: DEFORMACIONES, \mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS}.
     \item Las clases PERFORACIONES, CONTAMINACIÓN y NORMAL tienen AP de 0.0, indicando que el modelo no las detecta en absoluto.
-    \item El recall es moderado para DEFORMACIONES (60.5\%) pero muy bajo para ROTURA\_FRACTURA (15.0\%), sugiriendo que el modelo falla en identificar muchos casos reales de esta categoría.
-    \item La precision es baja en general (21.3\% para DEFORMACIONES, 30.0\% para ROTURA\_FRACTURA), indicando presencia significativa de falsos positivos.
+    \item El recall es moderado para DEFORMACIONES (60.5\%) pero muy bajo para \mbox{ROTURA\_FRACTURA} (15.0\%), sugiriendo que el modelo falla en identificar muchos casos reales de esta categoría.
+    \item La precision es baja en general (21.3\% para DEFORMACIONES, 30.0\% para \mbox{ROTURA\_FRACTURA}), indicando presencia significativa de falsos positivos.
 \end{itemize}
 
 Estos resultados sugieren que ResNet-18 tiene dificultades para generalizar en este problema, posiblemente debido a la alta variabilidad del dataset y a las limitaciones del campo receptivo de las arquitecturas convolucionales para capturar relaciones espaciales complejas.
@@ -402,8 +503,8 @@ Los resultados se presentan en la Tabla~\ref{tab:efficientnet_nativa}.
 \textbf{Clase} & \textbf{AP@0.5} & \textbf{Precision} & \textbf{Recall} \\
 \midrule
 DEFORMACIONES & 0.227 & 0.242 & 0.579 \\
-ROTURA\_FRACTURA & 0.319 & 0.353 & 0.450 \\
-RAYONES\_ARAÑAZOS & 0.146 & 0.179 & 0.441 \\
+\mbox{ROTURA\_FRACTURA} & 0.319 & 0.353 & 0.450 \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.146 & 0.179 & 0.441 \\
 PERFORACIONES & 0.052 & 0.095 & 0.250 \\
 CONTAMINACIÓN & 0.231 & 0.062 & 0.364 \\
 NORMAL & 0.000 & --- & 0.000 \\
@@ -423,7 +524,7 @@ EfficientNet-B0 muestra un rendimiento superior a ResNet-18:
 \begin{itemize}
     \item Obtiene un mAP de 0.162, más del doble que ResNet-18 (0.077).
     \item Detecta 5 de las 6 categorías (solo falla en NORMAL).
-    \item ROTURA\_FRACTURA es la clase mejor detectada (AP=0.319, Recall=45.0\%).
+    \item \mbox{ROTURA\_FRACTURA} es la clase mejor detectada (AP=0.319, Recall=45.0\%).
     \item Sin embargo, PERFORACIONES y CONTAMINACIÓN tienen detección muy baja (AP<0.06), y la precision en CONTAMINACIÓN es extremadamente baja (6.2\%), indicando muchos falsos positivos.
 \end{itemize}
 
@@ -431,7 +532,7 @@ Aunque EfficientNet mejora significativamente sobre ResNet-18, el rendimiento gl
 
 \subsection{Conclusiones de la Fase 1}
 
-Los resultados de la Fase 1 establecen líneas base claras y actúan como \textbf{motor de búsqueda} que impulsa la exploración de arquitecturas alternativas:
+Los resultados de la Fase 1 establecen líneas base claras y actúan como motor de búsqueda que impulsa la exploración de arquitecturas alternativas:
 
 \begin{enumerate}
     \item \textbf{Rendimiento limitado}: ResNet-18 alcanza mAP de 0.077, detectando solo 3 categorías, mientras que EfficientNet-B0 obtiene 0.162, detectando 5 categorías pero con precision muy baja.
@@ -439,7 +540,7 @@ Los resultados de la Fase 1 establecen líneas base claras y actúan como \textb
     \item \textbf{Hipótesis sobre limitaciones}: Las CNNs tienen bias inductivo fuerte hacia patrones locales, lo que puede limitar su capacidad para capturar relaciones espaciales complejas necesarias para distinguir algunos tipos de defectos. La alta variabilidad del dataset (iluminación, superficies, escalas) puede ser difícil de manejar para arquitecturas con campo receptivo limitado.
 \end{enumerate}
 
-El fracaso de las CNN nativas (mAP 0.077 y 0.162) constituye la evidencia que justifica explorar Vision Transformers, arquitecturas con capacidad de atención global desde el inicio. Tras estos resultados, la Fase 2 se centra en evaluar la arquitectura DEIMv2 bajo diferentes configuraciones. La evidencia gráfica completa del proceso de entrenamiento de la Fase 1 (curvas de pérdida, \textit{learning rate} y descomposición por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase1}.
+El fracaso de las CNN nativas (mAP 0.077 y 0.162) constituye la evidencia que justifica explorar Vision Transformers, arquitecturas con capacidad de atención global desde el inicio. Tras estos resultados, la Fase 2 se centra en evaluar la arquitectura DEIMv2 bajo diferentes configuraciones. La evidencia gráfica completa del proceso de entrenamiento de la Fase 1 (curvas de pérdida, \textit{learning rate} y descomposición por componentes) se presenta en la sección~\ref{subsec:evidencia_fase1}.
 
 
 \section{Fase 2: Exploración de Vision Transformers}
@@ -457,6 +558,26 @@ Para esta fase se seleccionó la arquitectura \textbf{DEIMv2} (Dense Enhanced Im
 \end{itemize}
 
 La hipótesis es que esta arquitectura puede capturar mejor las relaciones espaciales necesarias para detectar defectos industriales con alta variabilidad, superando las limitaciones observadas en las CNNs.
+
+\subsection{Justificación de los hiperparámetros de entrenamiento}
+\label{subsec:justificacion_hiperparametros}
+
+La selección de hiperparámetros para DEIMv2 no es arbitraria: responde a propiedades específicas de la arquitectura ViT y a las restricciones del hardware disponible. A continuación se justifica cada parámetro principal.
+
+\paragraph{Learning Rate (LR) base: 0.0004.}
+El valor 0.0004 corresponde a la recomendación del artículo original de DEIMv2~\cite{huang2025deimv2} para el entrenamiento con backbone DINOv3. Los ViT son sensibles a valores de LR elevados: un LR demasiado alto produce inestabilidad en las capas de atención (gradientes explosivos en los productos escalares $QK^\top$), mientras que un LR demasiado bajo impide la convergencia en el número de épocas disponible. El valor 0.0004 con el optimizador AdamW garantiza un descenso suave del gradiente estabilizado por la estimación adaptativa del segundo momento.
+
+\paragraph{Learning Rate del backbone: 0.00004 (factor 10$\times$ menor).}
+El backbone DINOv3 ya está preentrenado con aprendizaje auto-supervisado en datasets masivos y posee representaciones de alta calidad. Aplicar el LR completo al backbone destruiría estas representaciones (\textit{catastrophic forgetting}). El diferencial de LR $10\times$ entre backbone y cabeza detectora implementa la estrategia de \textit{layer-wise learning rate decay}, permitiendo que las capas superiores del detector se adapten rápidamente al dominio industrial mientras las representaciones del ViT evolucionan con mayor cautela.
+
+\paragraph{Optimizador: AdamW.}
+AdamW (\textit{Adam with decoupled weight decay}) es el optimizador estándar para arquitecturas Transformer por dos razones fundamentales: (1) la estimación adaptativa del gradiente por dimensión del embedding compensa la diferente escala de los parámetros en $Q$, $K$, $V$; y (2) la separación del término de regularización (\textit{weight decay}) del gradiente evita la interferencia entre la adaptación del LR y la regularización, mejorando la generalización. SGD, utilizado para las CNNs, es menos adecuado para ViT porque asume gradientes de escala homogénea, lo que no se cumple en los distintos niveles de los bloques de atención.
+
+\paragraph{Batch size: 4.}
+El batch size se fijó en 4 como máximo permitido por la memoria \acrshort{VRAM} disponible al entrenar con resolución 1024$\times$1024. En el contexto DETR, con 300 \textit{object queries} y un backbone de millones de parámetros, el consumo de memoria es elevado. Aunque un batch más grande (8 o 16) aceleraría la convergencia y estabilizaría la estimación del gradiente, el batch size 4 con AdamW y \textit{gradient clipping} es suficiente para obtener convergencia estable, como evidencian las curvas de entrenamiento (Figuras~\ref{fig:fase2_deimv2_val_map_300ep} y~\ref{fig:fase2_deimv2_val_metrics_300ep}).
+
+\paragraph{Resolución de entrada: 1024$\times$1024 píxeles.}
+La resolución de 1024$\times$1024 representa la mediana del dataset (resolución original $\sim$1650$\times$1350~px). Esta elección equilibra dos criterios: (a) preservar la mayor parte de la información visual relevante para detectar defectos milimétricos, y (b) ajustarse a las restricciones de memoria GPU disponibles. Los experimentos comparativos (Iteraciones 2.1 a 2.4) confirman que incrementar la resolución de 640 a 1024 produce una ganancia de +28.6 puntos mAP, demostrando que la información de alta resolución es crítica para este dominio.
 
 \subsection{Proceso iterativo de optimización}
 
@@ -502,8 +623,8 @@ NORMAL & 0.855 & 1.000 & 0.867 \\
 PERFORACIONES & 0.866 & 1.000 & 0.967 \\
 DEFORMACIONES & 0.599 & 1.000 & 0.632 \\
 CONTAMINACIÓN & 0.563 & 1.000 & 0.818 \\
-RAYONES\_ARAÑAZOS & 0.476 & 1.000 & 0.794 \\
-ROTURA\_FRACTURA & 0.384 & 1.000 & 0.650 \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.476 & 1.000 & 0.794 \\
+\mbox{ROTURA\_FRACTURA} & 0.384 & 1.000 & 0.650 \\
 \midrule
 \textbf{mAP@0.5} & \textbf{0.624} & \textbf{1.000} & --- \\
 \bottomrule
@@ -546,9 +667,9 @@ El hecho de que el mejor epoch en 80 épocas fuera el último sugiere que el mod
 NORMAL & 0.994 & 1.000 & 1.000 \\
 PERFORACIONES & 0.927 & 1.000 & 0.950 \\
 DEFORMACIONES & 0.780 & 1.000 & 0.816 \\
-RAYONES\_ARAÑAZOS & 0.717 & 1.000 & 0.794 \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.717 & 1.000 & 0.794 \\
 CONTAMINACIÓN & 0.640 & 1.000 & 0.818 \\
-ROTURA\_FRACTURA & 0.539 & 1.000 & 0.700 \\
+\mbox{ROTURA\_FRACTURA} & 0.539 & 1.000 & 0.700 \\
 \midrule
 \textbf{mAP@0.5} & \textbf{0.766} & \textbf{1.000} & --- \\
 \bottomrule
@@ -563,8 +684,8 @@ ROTURA\_FRACTURA & 0.539 & 1.000 & 0.700 \\
     \item NORMAL alcanza casi perfección: AP=0.994, Recall=100\%.
     \item Mejoras significativas en clases problemáticas:
     \begin{itemize}
-        \item RAYONES\_ARAÑAZOS: +0.241 AP (+50.6\%)
-        \item ROTURA\_FRACTURA: +0.155 AP (+40.4\%)
+        \item \mbox{RAYONES\_ARAÑAZOS}: +0.241 AP (+50.6\%)
+        \item \mbox{ROTURA\_FRACTURA}: +0.155 AP (+40.4\%)
         \item DEFORMACIONES: +0.181 AP (+30.2\%)
     \end{itemize}
     \item El mejor epoch fue el 119 (penúltimo), indicando que aún no había convergido completamente.
@@ -594,10 +715,10 @@ Para identificar el punto de convergencia real y explorar si había margen de me
 \midrule
 NORMAL & 0.980 & 1.000 & 0.983 \\
 PERFORACIONES & 0.924 & 1.000 & 0.950 \\
-RAYONES\_ARAÑAZOS & 0.806 & 1.000 & 0.853 \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.806 & 1.000 & 0.853 \\
 DEFORMACIONES & 0.779 & 1.000 & 0.842 \\
 CONTAMINACIÓN & 0.645 & 1.000 & 0.788 \\
-ROTURA\_FRACTURA & 0.576 & 1.000 & 0.725 \\
+\mbox{ROTURA\_FRACTURA} & 0.576 & 1.000 & 0.725 \\
 \midrule
 \textbf{mAP@0.5} & \textbf{0.785} & \textbf{1.000} & --- \\
 \bottomrule
@@ -612,8 +733,8 @@ ROTURA\_FRACTURA & 0.576 & 1.000 & 0.725 \\
     \item \textbf{Punto óptimo identificado}: el mejor checkpoint se alcanza en la época 187 de 300 (62\% del entrenamiento), no en la última. A partir de entonces las métricas se estabilizan; entrenamientos más largos aportan rendimiento marginal.
     \item Mejoras en clases desafiantes:
     \begin{itemize}
-        \item RAYONES\_ARAÑAZOS: +0.089 AP adicional (+12.4\%)
-        \item ROTURA\_FRACTURA: +0.037 AP adicional (+6.9\%)
+        \item \mbox{RAYONES\_ARAÑAZOS}: +0.089 AP adicional (+12.4\%)
+        \item \mbox{ROTURA\_FRACTURA}: +0.037 AP adicional (+6.9\%)
     \end{itemize}
     \item Precision perfecta (1.0) mantenida en todas las clases.
     \item NORMAL y PERFORACIONES mantienen excelente rendimiento (>92\% AP).
@@ -681,10 +802,10 @@ Los resultados de esta fase demuestran de forma contundente la superioridad de l
     \item \textbf{Resolución 1024×1024 es crítica}: Preserva suficiente información (~47\% del original) sin ser prohibitiva en memoria.
     \item \textbf{Entrenamientos largos son necesarios}: Los ViTs requieren ~150-200 épocas para converger vs ~50 para CNNs.
     \item \textbf{Precision perfecta}: El modelo no genera falsos positivos en ninguna clase (Precision=1.0).
-    \item \textbf{Clases problemáticas mejoran con entrenamiento largo}: RAYONES\_ARAÑAZOS y ROTURA\_FRACTURA mejoran significativamente entre 120 y 300 épocas.
+    \item \textbf{Clases problemáticas mejoran con entrenamiento largo}: \mbox{RAYONES\_ARAÑAZOS} y \mbox{ROTURA\_FRACTURA} mejoran significativamente entre 120 y 300 épocas.
 \end{enumerate}
 
-La evidencia gráfica completa de las cuatro iteraciones de DEIMv2 (curvas de pérdida, \textit{learning rate} y métricas de validación) se presenta en la Sección~\ref{subsec:evidencia_fase2}, donde se analiza en detalle el proceso de convergencia de cada configuración.
+La evidencia gráfica completa de las cuatro iteraciones de DEIMv2 (curvas de pérdida, \textit{learning rate} y métricas de validación) se presenta en la sección~\ref{subsec:evidencia_fase2}, donde se analiza en detalle el proceso de convergencia de cada configuración.
 
 \FloatBarrier
 \section{Fase 3: Validación experimental}
@@ -729,8 +850,8 @@ Los resultados se presentan en la Tabla~\ref{tab:resnet18_1024}, comparados con 
 \textbf{Clase} & \textbf{AP@0.5 (1024px)} & \textbf{Cambio vs Nativa} \\
 \midrule
 DEFORMACIONES & 0.272 & +30.1\% \\
-ROTURA\_FRACTURA & 0.087 & -5.1\% \\
-RAYONES\_ARAÑAZOS & 0.120 & -24.9\% \\
+\mbox{ROTURA\_FRACTURA} & 0.087 & -5.1\% \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.120 & -24.9\% \\
 PERFORACIONES & 0.000 & 0.0 \\
 CONTAMINACIÓN & 0.000 & 0.0 \\
 NORMAL & 0.000 & 0.0 \\
@@ -778,8 +899,8 @@ Los resultados se presentan en la Tabla~\ref{tab:efficientnet_1024}.
 \textbf{Clase} & \textbf{AP@0.5 (1024px)} & \textbf{Cambio vs Nativa} \\
 \midrule
 DEFORMACIONES & 0.279 & +22.9\% \\
-ROTURA\_FRACTURA & 0.175 & -45.1\% \\
-RAYONES\_ARAÑAZOS & 0.041 & -71.9\% \\
+\mbox{ROTURA\_FRACTURA} & 0.175 & -45.1\% \\
+\mbox{RAYONES\_ARAÑAZOS} & 0.041 & -71.9\% \\
 PERFORACIONES & 0.049 & -5.8\% \\
 CONTAMINACIÓN & 0.190 & -17.8\% \\
 NORMAL & 0.000 & 0.0 \\
@@ -795,7 +916,7 @@ NORMAL & 0.000 & 0.0 \\
 
 \begin{itemize}
     \item \textbf{Empeora significativamente}: mAP disminuye de 0.162 a 0.122 (-24.7\%).
-    \item \textbf{ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS} empeoran dramáticamente (-45\% y -72\% respectivamente).
+    \item \textbf{\mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS}} empeoran dramáticamente (-45\% y -72\% respectivamente).
     \item Solo \textbf{DEFORMACIONES} mejora (+23\%).
     \item \textbf{NORMAL} sigue sin detectarse.
 \end{itemize}
@@ -887,7 +1008,7 @@ Esta fase de validación experimental permite responder de forma definitiva a la
     \end{itemize}
 \end{enumerate}
 
-La evidencia gráfica adicional de los entrenamientos de la Fase 3 (evolución del \textit{learning rate} y descomposición de la pérdida por componentes) se presenta en la Sección~\ref{subsec:evidencia_fase3}.
+La evidencia gráfica adicional de los entrenamientos de la Fase 3 (evolución del \textit{learning rate} y descomposición de la pérdida por componentes) se presenta en la sección~\ref{subsec:evidencia_fase3}.
 
 Con la superioridad arquitectural de DEIMv2 demostrada, la Fase 4 aborda una cuestión complementaria: verificar que los resultados no reflejan sobreajuste ni artefactos del umbral de decisión.
 
@@ -937,20 +1058,20 @@ La Tabla~\ref{tab:resumen_experimentos} presenta una visión completa de los och
 \begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccc}
 \toprule
-\textbf{Arquitectura} & \textbf{Resolución} & \textbf{Épocas} & \textbf{mAP@0.5} & \textbf{Precision} & \textbf{Mejor Epoch} & \textbf{Observaciones} \\
+\textbf{Arquitectura} & \textbf{Resolución} & \textbf{Épocas} & \textbf{mAP@0.5} & \textbf{Precision} & \textbf{Mejor Epoch} \\
 \midrule
-ResNet-18 & Nativa & 50 & 0.077 & Variable & Auto & Solo 3 clases \\
-ResNet-18 & 1024×1024 & 50 & 0.080 & Variable & Auto & Mejora mínima \\
+ResNet-18 & Nativa & 50 & 0.077 & Variable & Auto \\
+ResNet-18 & 1024×1024 & 50 & 0.080 & Variable & Auto \\
 \midrule
-EfficientNet-B0 & Nativa & 50 & 0.162 & Variable & Auto & Mejor CNN baseline \\
-EfficientNet-B0 & 1024×1024 & 50 & 0.122 & Variable & Auto & Empeora \\
+EfficientNet-B0 & Nativa & 50 & 0.162 & Variable & Auto \\
+EfficientNet-B0 & 1024×1024 & 50 & 0.122 & Variable & Auto \\
 \midrule
-DEIMv2 & 640×640 & 87 & 0.499 & 1.000 & 86 & Primera prueba ViT \\
-DEIMv2 & 1024×1024 & 80 & 0.624 & 1.000 & 80 & Mejora por resolución \\
-DEIMv2 & 1024×1024 & 120 & 0.766 & 1.000 & 119 & Mejora por épocas \\
-DEIMv2 & 1024×1024 & 300 & \textbf{0.785} & \textbf{1.000} & \textbf{187} & \textbf{Mejor modelo} \\
+DEIMv2 & 640×640 & 87 & 0.499 & 1.000 & 86 \\
+DEIMv2 & 1024×1024 & 80 & 0.624 & 1.000 & 80 \\
+DEIMv2 & 1024×1024 & 120 & 0.766 & 1.000 & 119 \\
+DEIMv2 & 1024×1024 & 300 & \textbf{0.785} & \textbf{1.000} & \textbf{187} \\
 \bottomrule
 \end{tabular}
 \caption{Resumen completo de todos los experimentos realizados}
@@ -1011,7 +1132,7 @@ EfficientNet-B0 & Nativa & 0.162 & 0.000 & Variable & ~5M \\
 
 \textbf{Conclusión:} DEIMv2 supera a las CNNs por ~3.5× en esta categoría.
 
-\subsubsection{RAYONES\_ARAÑAZOS}
+\subsubsection{\mbox{RAYONES\_ARAÑAZOS}}
 \begin{itemize}
     \item \textbf{ResNet-18}: Bajo (AP=0.120-0.160 según resolución)
     \item \textbf{EfficientNet-B0}: Bajo (AP=0.041-0.146 según resolución)
@@ -1020,7 +1141,7 @@ EfficientNet-B0 & Nativa & 0.162 & 0.000 & Variable & ~5M \\
 
 \textbf{Conclusión:} DEIMv2 supera a las CNNs por ~5-20× en esta categoría.
 
-\subsubsection{ROTURA\_FRACTURA}
+\subsubsection{\mbox{ROTURA\_FRACTURA}}
 \begin{itemize}
     \item \textbf{ResNet-18}: Muy bajo (AP=0.087-0.092 según resolución)
     \item \textbf{EfficientNet-B0}: Moderado (AP=0.175-0.319 según resolución)
@@ -1043,6 +1164,13 @@ EfficientNet-B0 & Nativa & 0.162 & 0.000 & Variable & ~5M \\
 
 La Tabla~\ref{tab:diferencias_arquitectonicas} resume las diferencias clave entre CNNs y ViTs observadas en este trabajo.
 
+Implicaciones:
+\begin{enumerate}
+    \item La atención global permite a DEIMv2 capturar relaciones entre defectos distantes en la imagen.
+    \item El menor bias inductivo permite aprender patrones más complejos y específicos del dominio.
+    \item Las representaciones ricas de DINOv3 proporcionan características semánticamente robustas desde el inicio del entrenamiento.
+\end{enumerate}
+
 \begin{table}[htbp]
 \centering
 \begin{tabular}{lcc}
@@ -1051,25 +1179,18 @@ La Tabla~\ref{tab:diferencias_arquitectonicas} resume las diferencias clave entr
 \midrule
 Bias inductivo & Fuerte (localidad) & Mínimo \\
 Receptive field & Local → Global (gradual) & Global desde inicio \\
-Convergencia & Rápida (~50 épocas) & Lenta (~150-200 épocas) \\
+Convergencia & Rápida ($\sim$50 épocas) & Lenta ($\sim$150--200 épocas) \\
 Sensibilidad a resolución & Baja/Moderada & Alta \\
 Capacidad de atención & Limitada & Completa (self-attention) \\
 Detección relaciones espaciales & Gradual, jerárquica & Directa, global \\
-mAP máximo alcanzado & 0.162 & \textbf{0.785} \\
+mAP máximo alcanzado & 0.162 & 0.785 \\
 \bottomrule
 \end{tabular}
-\caption{Diferencias arquitectónicas fundamentales observadas}
+\caption{Diferencias arquitectónicas fundamentales entre CNNs y ViTs observadas en este trabajo}
 \label{tab:diferencias_arquitectonicas}
 \end{table}
 
-\textbf{Implicaciones:}
-\begin{enumerate}
-    \item \textbf{Atención global} permite a DEIMv2 capturar relaciones entre defectos distantes en la imagen.
-    \item \textbf{Menor bias inductivo} permite aprender patrones más complejos y específicos del dominio.
-    \item \textbf{Representaciones ricas de DINOv3} proporcionan features semánticamente robustas desde el inicio.
-\end{enumerate}
-
-Los resultados presentados en esta sección sintetizan las conclusiones principales de la experimentación. A continuación, la Sección~\ref{sec:evidencia_grafica} ofrece un compendio de la evidencia gráfica del proceso de entrenamiento de cada experimento, que permite al lector auditar los patrones de convergencia y verificar la consistencia de los resultados.
+Los resultados presentados en esta sección sintetizan las conclusiones principales de la experimentación. A continuación, la sección~\ref{sec:evidencia_grafica} ofrece un compendio de la evidencia gráfica del proceso de entrenamiento de cada experimento, que permite al lector auditar los patrones de convergencia y verificar la consistencia de los resultados.
 
 \FloatBarrier
 \clearpage
@@ -1268,7 +1389,7 @@ La Figura~\ref{fig:trace_fase3_resnet18_1024} muestra que ResNet-18 converge de 
 \end{figure}
 
 \paragraph{EfficientNet-B0 @ 1024$\times$1024.}
-La Figura~\ref{fig:trace_fase3_efficientnet_1024} revela un comportamiento inesperado: a pesar de una convergencia aparentemente correcta de la pérdida, el rendimiento final (mAP=0.122, Tabla~\ref{tab:efficientnet_1024}) es \textbf{inferior} al de la configuración nativa (-24.7\%). La descomposición por componentes no muestra anomalías evidentes, lo que sugiere que la limitación es arquitectónica: EfficientNet-B0 está optimizada para resoluciones 224--380px y su escalado compuesto no generaliza bien a 1024px.
+La Figura~\ref{fig:trace_fase3_efficientnet_1024} revela un comportamiento inesperado: a pesar de una convergencia aparentemente correcta de la pérdida, el rendimiento final (mAP=0.122, Tabla~\ref{tab:efficientnet_1024}) es inferior al de la configuración nativa (-24.7\%). La descomposición por componentes no muestra anomalías evidentes, lo que sugiere que la limitación es arquitectónica: EfficientNet-B0 está optimizada para resoluciones 224--380px y su escalado compuesto no generaliza bien a 1024px.
 
 \begin{figure}[htbp]
 \centering

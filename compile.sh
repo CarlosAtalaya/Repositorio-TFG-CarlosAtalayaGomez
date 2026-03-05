@@ -54,7 +54,18 @@ else
 fi
 echo ""
 
-# Paso 3: Procesar bibliografía con biber
+# Paso 3: Procesar glosario/acrónimos con makeglossaries
+if [ -f "TFG.aux" ]; then
+    print_info "Procesando glosario y acrónimos con makeglossaries..."
+    if makeglossaries TFG > /dev/null 2>&1; then
+        print_success "Glosario/acrónimos procesados correctamente"
+    else
+        print_warning "makeglossaries completado (algunos warnings pueden ser normales)"
+    fi
+    echo ""
+fi
+
+# Paso 4: Procesar bibliografía con biber
 if [ -f "TFG.bcf" ]; then
     print_info "Procesando bibliografía con biber..."
     if biber TFG > /dev/null 2>&1; then
@@ -68,7 +79,7 @@ else
     echo ""
 fi
 
-# Paso 4: Recompilar para incluir bibliografía
+# Paso 5: Recompilar para incluir bibliografía y glosario
 print_info "Recompilando para incluir bibliografía y resolver referencias..."
 if latexmk -pdf -interaction=nonstopmode TFG.tex > /dev/null 2>&1; then
     print_success "Recompilación completada"
@@ -77,7 +88,7 @@ else
 fi
 echo ""
 
-# Paso 5: Compilación final forzada para resolver todas las referencias
+# Paso 6: Compilación final forzada para resolver todas las referencias
 print_info "Compilación final (resolviendo referencias cruzadas)..."
 if latexmk -pdf -f -interaction=nonstopmode TFG.tex > /dev/null 2>&1; then
     print_success "Compilación final completada"

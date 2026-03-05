@@ -1,6 +1,13 @@
 \chapter{Anexos técnicos}
 \label{ch:anexos}
 
-El material técnico complementario de este proyecto ---código fuente, configuraciones experimentales, scripts de preprocesamiento, resultados detallados y documentación adicional--- se encuentra disponible en el repositorio del proyecto: \thegitrepo{}.
+El material técnico complementario de este proyecto se encuentra disponible en el repositorio \thegitrepo{}. El contenido del repositorio está organizado en los siguientes bloques:
 
-Dicho material ha sido desarrollado durante la ejecución de la investigación y permite la reproducibilidad completa de los experimentos descritos en esta memoria.
+\begin{itemize}
+    \item \textbf{Módulos de entrenamiento y evaluación}: código fuente estructurado en clases y módulos reutilizables para el entrenamiento de los modelos DEIMv2, ResNet-18 y EfficientNet-B0, incluyendo los scripts de evaluación sobre el conjunto de test.
+    \item \textbf{Pipeline de curación del dataset}: scripts correspondientes a las cinco etapas de preparación del dataset (exploración, curación inicial, análisis de calidad, recuración y splits estratificados).
+    \item \textbf{Aplicación de análisis comparativo}: código completo de la aplicación Streamlit para la visualización interactiva de predicciones, comparativa de experimentos y análisis de umbrales de confianza.
+    \item \textbf{Configuraciones experimentales}: ficheros de configuración (\texttt{YAML}) para cada experimento, que permiten reproducir exactamente las condiciones de entrenamiento descritas en el Capítulo~\ref{ch:desarrollo}.
+\end{itemize}
+
+Todo el código está documentado y estructurado para facilitar la reproducibilidad completa de los experimentos y posibilitar extensiones futuras del trabajo.

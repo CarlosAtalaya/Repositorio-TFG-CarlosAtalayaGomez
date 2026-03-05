@@ -15,21 +15,27 @@ La arquitectura DEIMv2 (1024$\times$1024, 300 épocas) alcanza un mAP@0.5 de 0.7
 
 \subsection{Validación experimental: arquitectura frente a resolución}
 
-La Fase~3 de la sección de Desarrollo respondió a la pregunta crítica: \textit{¿La mejora se debe a la arquitectura \acrshort{ViT} o simplemente a la resolución 1024$\times$1024?} Re-entrenando las CNNs bajo las mismas condiciones que DEIMv2, se demostró que ResNet-18 mejora apenas 0.003 puntos de mAP y EfficientNet-B0 \textbf{empeora} 0.04 puntos. La superioridad se atribuye de forma inequívoca a la arquitectura Vision Transformer.
+La Fase~3 de la sección de Desarrollo respondió a la pregunta crítica: \textit{¿La mejora se debe a la arquitectura \acrshort{ViT} o simplemente a la resolución 1024$\times$1024?} Re-entrenando las CNNs bajo las mismas condiciones que DEIMv2, se demostró que ResNet-18 mejora apenas 0.003 puntos de mAP y EfficientNet-B0 empeora 0.04 puntos. La superioridad se atribuye de forma inequívoca a la arquitectura Vision Transformer.
 
 \subsection{Clases críticas y patrones de confusión}
 
-DEIMv2 detecta correctamente las seis categorías del dataset curado (NORMAL, DEFORMACIONES, ROTURA\_FRACTURA, RAYONES\_ARAÑAZOS, PERFORACIONES, CONTAMINACIÓN), incluidas aquellas que las CNNs no detectan en absoluto (NORMAL, PERFORACIONES) o detectan con rendimiento muy bajo (CONTAMINACIÓN). Las clases RAYONES\_ARAÑAZOS y ROTURA\_FRACTURA, semánticamente próximas por asociarse ambas a discontinuidades superficiales del material, presentan mayor dificultad para todas las arquitecturas; no obstante, DEIMv2 mantiene ventaja sustancial. Esta distinción cualitativa solo pudo validarse posteriormente mediante la herramienta de análisis visual descrita en la Sección~\ref{sec:herramienta_analisis}.
+DEIMv2 detecta correctamente las seis categorías del dataset curado (NORMAL, DEFORMACIONES, \mbox{ROTURA\_FRACTURA}, \mbox{RAYONES\_ARAÑAZOS}, PERFORACIONES, CONTAMINACIÓN), incluidas aquellas que las CNNs no detectan en absoluto (NORMAL, PERFORACIONES) o detectan con rendimiento muy bajo (CONTAMINACIÓN). Las clases \mbox{RAYONES\_ARAÑAZOS} y \mbox{ROTURA\_FRACTURA}, semánticamente próximas por asociarse ambas a discontinuidades superficiales del material, presentan mayor dificultad para todas las arquitecturas; no obstante, DEIMv2 mantiene ventaja sustancial. Esta distinción cualitativa solo pudo validarse posteriormente mediante la herramienta de análisis visual descrita en la sección~\ref{sec:herramienta_analisis}.
 
 
 \section{Herramienta de análisis e interpretabilidad}
 \label{sec:herramienta_analisis}
 
-Las métricas cuantitativas (mAP, AP por clase, precision, recall) documentadas en la sección de Desarrollo resultaban insuficientes para comprender el \textbf{comportamiento cualitativo} de cada arquitectura. En particular, la confusión semántica entre ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS, ambas asociadas a discontinuidades en la superficie del material, no era explicable únicamente mediante números. Se hacía necesario un recurso que permitiera: (1) contrastar visualmente las predicciones de cada modelo frente al \textit{ground truth}; (2) analizar métricas por experimento, por clase y en función del umbral de confianza; y (3) auditar la evolución del rendimiento ante diferentes score thresholds. Con estos objetivos, se desarrolló una herramienta de análisis interactiva que ha resultado de \textbf{gran utilidad} para la validación posterior y la distinción clara del funcionamiento de cada modelo con cada arquitectura.
+Las métricas cuantitativas (mAP, AP por clase, precision, recall) documentadas en la sección de Desarrollo resultaban insuficientes para comprender el comportamiento cualitativo de cada arquitectura. En particular, la confusión semántica entre \mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS}, ambas asociadas a discontinuidades en la superficie del material, no era explicable únicamente mediante números. Se hacía necesario un recurso que permitiera:
+\begin{enumerate}[label=(\arabic*)]
+    \item contrastar visualmente las predicciones de cada modelo frente al \textit{ground truth};
+    \item analizar métricas por experimento, por clase y en función del umbral de confianza;
+    \item auditar la evolución del rendimiento ante diferentes score thresholds.
+\end{enumerate}
+Con estos objetivos, se desarrolló una herramienta de análisis interactiva que ha resultado de gran utilidad para la validación posterior y la distinción clara del funcionamiento de cada modelo con cada arquitectura.
 
 \subsection{Diseño y tecnología}
 
-La herramienta se implementó como un \textit{dashboard} web basado en \acrfull{Streamlit}~\cite{streamlit2024}, framework Python que permite crear aplicaciones interactivas de ciencia de datos con bajo esfuerzo de desarrollo y alto grado de interactividad. El diseño priorizó la \textbf{autocontenibilidad}: la herramienta puede exportarse como paquete independiente sin dependencias del proyecto principal, facilitando su uso en contextos académicos o industriales externos.
+La herramienta se implementó como un \textit{dashboard} web basado en \acrfull{Streamlit}~\cite{streamlit2024}, framework Python que permite crear aplicaciones interactivas de ciencia de datos con bajo esfuerzo de desarrollo y alto grado de interactividad. El diseño priorizó la autocontenibilidad: la herramienta puede exportarse como paquete independiente sin dependencias del proyecto principal, facilitando su uso en contextos académicos o industriales externos.
 
 La arquitectura técnica del \textit{dashboard} se apoya en los siguientes componentes:
 
@@ -56,7 +62,7 @@ La vista \textit{Línea temporal} muestra la evolución cronológica del proceso
 
 \subsubsection{Explorador}
 
-El \textbf{Explorador} constituye una de las vistas más valiosas para el análisis detallado. Permite seleccionar cualquier experimento de la lista completa y consultar:
+El Explorador constituye una de las vistas más valiosas para el análisis detallado. Permite seleccionar cualquier experimento de la lista completa y consultar:
 
 \begin{itemize}
     \item \textbf{Configuración}: Arquitectura, backbone, detector, resolución, épocas, \textit{batch size}, \textit{learning rate}, optimizador y criterio de selección del mejor checkpoint.
@@ -69,7 +75,7 @@ Esta vista ha sido esencial para contrastar el rendimiento de cada modelo de for
 
 \subsubsection{Comparativa}
 
-La vista \textbf{Comparativa} ofrece una comparación directa entre todos los experimentos. Incluye:
+La vista Comparativa ofrece una comparación directa entre todos los experimentos. Incluye:
 
 \begin{itemize}
     \item Gráfico de mAP global (barras o líneas) con todos los experimentos, con opción de filtrar por fase o incluir el análisis de thresholds para DEIMv2.
@@ -81,7 +87,7 @@ La opción de incluir análisis de thresholds permite visualizar en una única v
 
 \subsubsection{Visualizaciones}
 
-La vista \textbf{Visualizaciones} es la más relevante para la interpretabilidad cualitativa. Permite comparar \textit{ground truth} y predicciones de ResNet-18, EfficientNet-B0 y DEIMv2 sobre las mismas imágenes del conjunto de test. El usuario puede:
+La vista Visualizaciones es la más relevante para la interpretabilidad cualitativa. Permite comparar \textit{ground truth} y predicciones de ResNet-18, EfficientNet-B0 y DEIMv2 sobre las mismas imágenes del conjunto de test. El usuario puede:
 
 \begin{itemize}
     \item Seleccionar la arquitectura cuyas predicciones desea visualizar.
@@ -97,7 +103,14 @@ La última vista muestra una tabla resumen de los mejores modelos por arquitectu
 
 \subsection{Valor de la herramienta para la validación}
 
-La herramienta ha demostrado su utilidad en múltiples dimensiones: (1) \textbf{Reproducibilidad}: permite verificar los resultados sin acceder al código de entrenamiento; (2) \textbf{Interpretabilidad}: la vista de Visualizaciones ha permitido validar cualitativamente la superioridad del \acrshort{ViT} más allá de las métricas numéricas; (3) \textbf{Auditoría de robustez}: el análisis de umbrales integrado en el Explorador y la Comparativa ha facilitado la validación de la Fase~4; (4) \textbf{Documentación viva}: el \textit{dashboard} sirve como documentación interactiva del histórico completo de experimentación. Las gráficas exportadas desde la interfaz Plotly se han incorporado al presente documento para ilustrar los hallazgos.
+La herramienta ha demostrado su utilidad en múltiples dimensiones:
+\begin{enumerate}[label=(\arabic*)]
+    \item Reproducibilidad: permite verificar los resultados sin acceder al código de entrenamiento.
+    \item Interpretabilidad: la vista de Visualizaciones ha permitido validar cualitativamente la superioridad del \acrshort{ViT} más allá de las métricas numéricas.
+    \item Auditoría de robustez: el análisis de umbrales integrado en el Explorador y la Comparativa ha facilitado la validación de la Fase~4.
+    \item Documentación viva: el \textit{dashboard} sirve como documentación interactiva del histórico completo de experimentación.
+\end{enumerate}
+Las gráficas exportadas desde la interfaz Plotly se han incorporado al presente documento para ilustrar los hallazgos.
 
 
 \section{Evidencia visual desde el \textit{dashboard}}
@@ -231,9 +244,9 @@ Las Figuras~\ref{fig:resultados_Recall_deim_th015}, \ref{fig:resultados_Recall_d
 
 La vista \textit{Visualizaciones} del \textit{dashboard} permite contrastar \textit{ground truth} y predicciones por arquitectura. A continuación se presentan las capturas representativas organizadas por tipo de defecto. Estas imágenes ilustran la superioridad del \acrshort{ViT} y los casos donde las CNNs fallan o confunden clases.
 
-\subsubsection{RAYONES\_ARAÑAZOS}
+\subsubsection{\mbox{RAYONES\_ARAÑAZOS}}
 
-La Figura~\ref{fig:pred_arannazo} compara las predicciones para RAYONES\_ARAÑAZOS sobre la misma imagen del conjunto de test. DEIMv2 detecta correctamente el defecto; EfficientNet-B0 también lo consigue en este caso; ResNet-18 no identifica el arañazo. Este caso evidencia la limitación de ResNet-18 para capturar patrones sutiles de discontinuidad superficial, atribuible a su campo receptivo más restringido en las capas iniciales.
+La Figura~\ref{fig:pred_arannazo} compara las predicciones para \mbox{RAYONES\_ARAÑAZOS} sobre la misma imagen del conjunto de test. DEIMv2 detecta correctamente el defecto; EfficientNet-B0 también lo consigue en este caso; ResNet-18 no identifica el arañazo. Este caso evidencia la limitación de ResNet-18 para capturar patrones sutiles de discontinuidad superficial, atribuible a su campo receptivo más restringido en las capas iniciales.
 
 \begin{figure}[htbp]
 \centering
@@ -252,13 +265,13 @@ La Figura~\ref{fig:pred_arannazo} compara las predicciones para RAYONES\_ARAÑAZ
 \includegraphics[width=\textwidth]{fig/resultados_predicciones/Best-Resnet18-arañazo-incorrecto-imagen1.png}
 \caption*{ResNet-18: incorrecto}
 \end{minipage}
-\caption{RAYONES\_ARAÑAZOS (imagen 1). DEIMv2 y EfficientNet detectan correctamente; ResNet-18 no identifica el defecto.}
+\caption{\mbox{RAYONES\_ARAÑAZOS} (imagen 1). DEIMv2 y EfficientNet detectan correctamente; ResNet-18 no identifica el defecto.}
 \label{fig:pred_arannazo}
 \end{figure}
 
-\subsubsection{ROTURA\_FRACTURA}
+\subsubsection{\mbox{ROTURA\_FRACTURA}}
 
-Las clases ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS comparten características visuales (discontinuidades en la superficie), lo que genera confusión en modelos con capacidad limitada de modelar contexto global. La Figura~\ref{fig:pred_rotura1} muestra un primer caso: DEIMv2 detecta correctamente la rotura; EfficientNet-B0 falla en la clasificación. La distinción entre una grieta que compromete la integridad estructural y un arañazo superficial requiere integración de información a largo alcance, precisamente la fortaleza del mecanismo de atención del \acrshort{ViT}.
+Las clases \mbox{ROTURA\_FRACTURA} y \mbox{RAYONES\_ARAÑAZOS} comparten características visuales (discontinuidades en la superficie), lo que genera confusión en modelos con capacidad limitada de modelar contexto global. La Figura~\ref{fig:pred_rotura1} muestra un primer caso: DEIMv2 detecta correctamente la rotura; EfficientNet-B0 falla en la clasificación. La distinción entre una grieta que compromete la integridad estructural y un arañazo superficial requiere integración de información a largo alcance, precisamente la fortaleza del mecanismo de atención del \acrshort{ViT}.
 
 \begin{figure}[htbp]
 \centering
@@ -272,7 +285,7 @@ Las clases ROTURA\_FRACTURA y RAYONES\_ARAÑAZOS comparten características visu
 \includegraphics[width=\textwidth]{fig/resultados_predicciones/Best-Efiicientnet-rotura-incorrecto-imagen2.png}
 \caption*{EfficientNet: incorrecto}
 \end{minipage}
-\caption{ROTURA\_FRACTURA (caso 1). DEIMv2 detecta correctamente; EfficientNet-B0 falla en la clasificación.}
+\caption{\mbox{ROTURA\_FRACTURA} (caso 1). DEIMv2 detecta correctamente; EfficientNet-B0 falla en la clasificación.}
 \label{fig:pred_rotura1}
 \end{figure}
 
@@ -287,10 +300,10 @@ La Figura~\ref{fig:pred_rotura2} presenta un segundo caso, en el que la anotaci�
 \end{minipage}\hfill
 \begin{minipage}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/resultados_predicciones/Best-Efiicientnet-rotura-etiquetaimagencompleta-incorrecto-imagen5.png}
+\includegraphics[width=\textwidth]{fig/resultados_predicciones/Best-Efiicientnet-normal-etiquetacompleta-incorrecto-imagen5.png}
 \caption*{EfficientNet: incorrecto}
 \end{minipage}
-\caption{ROTURA\_FRACTURA (imagen 5, etiqueta de imagen completa). DEIMv2 correcto; EfficientNet-B0 incorrecto.}
+\caption{\mbox{ROTURA\_FRACTURA} (imagen 5, etiqueta de imagen completa). DEIMv2 correcto; EfficientNet-B0 incorrecto.}
 \label{fig:pred_rotura2}
 \end{figure}
 
@@ -339,7 +352,7 @@ En las categorías PERFORACIONES y CONTAMINACIÓN, tanto DEIMv2 como EfficientNe
 \end{minipage}\hfill
 \begin{minipage}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{fig/resultados_predicciones/Best-Efiicientnet-normal-etiquetacompleta-incorrecto-imagen6.png}
+\includegraphics[width=\textwidth]{fig/resultados_predicciones/Best-Efiicientnet-rotura-etiquetaimagencompleta-incorrecto-imagen6.png}
 \caption*{EfficientNet: incorrecto}
 \end{minipage}
 \caption{NORMAL (caso 6, sin defectos). DEIMv2 clasifica correctamente como normal; EfficientNet-B0 clasifica erróneamente como defectuosa. Ninguna CNN del estudio alcanza AP$>$0 en la clase NORMAL.}
@@ -350,7 +363,7 @@ En las categorías PERFORACIONES y CONTAMINACIÓN, tanto DEIMv2 como EfficientNe
 \section{Interpretación de la robustez}
 \label{sec:interpretacion_robustez}
 
-La Fase~4 de la sección de Desarrollo (Sección~\ref{sec:fase4}) documenta la validación con umbrales de confianza estrictos. La Tabla~\ref{tab:fase4_robustez} resume que, con umbral 0.75, el mAP desciende solo un 1.9\% respecto al umbral original (0.15), y con umbral 0.90 la caída es del 10.2\% pero el mAP se mantiene en 0.705, muy por encima de las CNNs.
+La Fase~4 de la sección de Desarrollo (sección~\ref{sec:fase4}) documenta la validación con umbrales de confianza estrictos. La Tabla~\ref{tab:fase4_robustez} resume que, con umbral 0.75, el mAP desciende solo un 1.9\% respecto al umbral original (0.15), y con umbral 0.90 la caída es del 10.2\% pero el mAP se mantiene en 0.705, muy por encima de las CNNs.
 
 \textbf{Interpretación:} La precisión perfecta (1.0) observada en todas las clases con umbral 0.15 no es un artefacto de un umbral demasiado permisivo. Con umbrales más estrictos, el modelo filtra detecciones de confianza media, reduciendo el recall de forma esperada, pero sin introducir falsos positivos: la precisión permanece en 1.0. Esto descarta la hipótesis de overfitting y confirma que las predicciones de DEIMv2 son genuinamente calibradas. Las Figuras~\ref{fig:resultados_mAP_thresholds}, \ref{fig:resultados_AP_deim_th075}, \ref{fig:resultados_AP_deim_th09} y las de Recall correspondientes refuerzan esta conclusión de forma visual.
 
