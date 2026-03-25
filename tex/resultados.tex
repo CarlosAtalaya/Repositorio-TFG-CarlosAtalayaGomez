@@ -45,7 +45,7 @@ La herramienta se implementó como un \textit{dashboard} web basado en \acrfull{
 La arquitectura técnica del \textit{dashboard} se apoya en los siguientes componentes:
 
 \begin{itemize}
-    \item Inventario de metadatos que describe cada experimento (arquitectura, resolución, épocas, criterio de selección del mejor checkpoint).
+    \item Inventario de metadatos que describe cada experimento (arquitectura, resolución, épocas, criterio de selección del mejor modelo guardado).
     \item Resultados de evaluación en formato estándar por experimento.
     \item Análisis de umbrales para el mejor modelo DEIMv2.
     \item Imágenes de predicciones y \textit{ground truth} para la vista de visualización.
@@ -70,7 +70,7 @@ La vista \textit{Línea temporal} muestra la evolución cronológica del proceso
 El Explorador constituye una de las vistas más valiosas para el análisis detallado. Permite seleccionar cualquier experimento de la lista completa y consultar:
 
 \begin{itemize}
-    \item \textbf{Configuración}: Arquitectura, backbone, detector, resolución, épocas, \textit{batch size}, \textit{learning rate}, optimizador y criterio de selección del mejor checkpoint.
+    \item \textbf{Configuración}: Arquitectura, backbone, detector, resolución, épocas, \textit{batch size}, \textit{learning rate}, optimizador y criterio de selección del mejor modelo guardado.
     \item \textbf{Resultados de evaluación}: mAP@0.5, número de imágenes de test, y selector de métrica (AP, Precision o Recall) con gráfico de barras interactivo por clase.
     \item \textbf{Análisis de umbrales} (solo para DEIMv2): Cuando el experimento incluye análisis de robustez, el Explorador permite seleccionar el score threshold (0.15, 0.75 o 0.90) y visualizar cómo varían las métricas. Incluye gráfico de evolución de mAP vs threshold, tabla comparativa y análisis de AP por clase para cada umbral.
     \item \textbf{Métricas de entrenamiento}: Pestaña que carga representaciones estáticas de las curvas de entrenamiento (Total Loss, Classification Loss, Learning Rate, Loss Components, Validation mAP), permitiendo auditar la convergencia de cada experimento.

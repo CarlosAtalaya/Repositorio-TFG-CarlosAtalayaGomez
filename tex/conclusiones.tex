@@ -36,7 +36,7 @@ El backbone \acrshort{DINOv3}~\cite{simeoni2025dinov3}, preentrenado mediante ap
 
 La Fase 4 del trabajo evaluó la robustez de DEIMv2 bajo umbrales de confianza más estrictos (0.75 y 0.90), obteniendo resultados que descartan sobreajuste y confirman la solidez del modelo. El rendimiento se mantiene por encima de valores competitivos incluso con estos filtros de alta confianza, lo que indica que el modelo no depende de detecciones marginales para obtener sus métricas.
 
-Más allá de los umbrales de confianza, el dataset presentó condiciones adversas naturales: alta variabilidad de iluminación, superficies heterogéneas, defectos de tamaño muy variable (desde milimétricos hasta ocupar una fracción significativa de la imagen) y geometrías complejas. En todos estos escenarios, DEIMv2 mantuvo un comportamiento consistente, con recalls superiores al 72\% en todas las categorías en el mejor checkpoint.
+Más allá de los umbrales de confianza, el dataset presentó condiciones adversas naturales: alta variabilidad de iluminación, superficies heterogéneas, defectos de tamaño muy variable (desde milimétricos hasta ocupar una fracción significativa de la imagen) y geometrías complejas. En todos estos escenarios, DEIMv2 mantuvo un comportamiento consistente, con recalls superiores al 72\% en todas las categorías en el mejor modelo guardado.
 
 \subsection{Síntesis}
 
@@ -77,7 +77,7 @@ Las Figuras~\ref{fig:fase2_loss}, \ref{fig:fase2_metrics} y \ref{fig:fase2_compo
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{fase2/fase2_composite_score.png}
-    \caption{Evolución del score híbrido ($S = 0{,}7 \cdot \text{mAP} + 0{,}3 \cdot \text{Recall}_\text{crítico}$) durante el entrenamiento multimodal de Fase~2. El descenso continuo confirma que ningún checkpoint supera al modelo unimodal de referencia.}
+    \caption{Evolución del score híbrido ($S = 0{,}7 \cdot \text{mAP} + 0{,}3 \cdot \text{Recall}_\text{crítico}$) durante el entrenamiento multimodal de Fase~2. El descenso continuo confirma que ningún modelo guardado supera al modelo unimodal de referencia.}
     \label{fig:fase2_composite}
 \end{figure}
 

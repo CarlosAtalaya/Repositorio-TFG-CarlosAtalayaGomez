@@ -1,0 +1,137 @@
+================================================================================
+PROMPT PARA GENERACIÓN DE DIAGRAMA DE FASES — CAPÍTULO 4 (TFG ViT)
+================================================================================
+Herramienta objetivo: Napkin AI / Nana Banana / Gemini (diagram generation)
+Formato de salida deseado: SVG o PNG de alta resolución (mínimo 2000px ancho),
+fondo blanco, apto para incluir en documento académico en LaTeX.
+================================================================================
+
+CONTEXTO DEL DIAGRAMA
+──────────────────────
+El diagrama debe aparecer en la página de apertura del Capítulo 4 ("Desarrollo
+del TFG") de una memoria académica de Trabajo Fin de Grado sobre Vision
+Transformers para detección de defectos industriales. Su función es dar al
+lector una visión de pájaro de toda la estructura del capítulo ANTES de entrar
+en el detalle, distinguiendo claramente dos bloques diferenciados:
+
+  BLOQUE A — PREPARACIÓN DEL DATASET (Etapas 1 a 5, con subetapas 4.1–4.4)
+  BLOQUE B — EXPERIMENTACIÓN (Fases 1, 2, 3 y 4)
+
+El lector puede ser un ingeniero industrial que no conoce Machine Learning en
+profundidad, por lo que el diagrama debe ser intuitivo y autoexplicativo.
+
+================================================================================
+ESTRUCTURA EXACTA DEL DIAGRAMA
+================================================================================
+
+El diagrama debe mostrar DOS carriles (swimlanes) horizontales o verticales,
+uno por bloque, con los nodos que se describen a continuación.
+
+────────────────────────────────────────────────────────────────────────────────
+CARRIL 1 — "PREPARACIÓN DEL DATASET"
+(color de acento sugerido: azul marino o teal oscuro)
+────────────────────────────────────────────────────────────────────────────────
+
+Nodo E1: "Etapa 1 — Exploración"
+  Subtexto: "Análisis exploratorio de VISION-Datasets (44 categorías, 3.788 imágenes)
+             y MVTec AD (49 tipos de defecto, 5.354 imágenes). Sin transformación."
+
+Nodo E2: "Etapa 2 — Curación inicial"
+  Subtexto: "Filtrado de categorías relevantes, homogeneización a PNG y
+             exportación a formato COCO. Resultado: 1.907 imágenes, 15 etiquetas."
+
+Nodo E3: "Etapa 3 — Análisis de calidad"
+  Subtexto: "Detección de duplicados (49 pares), verificación de integridad
+             y análisis de variabilidad de resolución. Sin transformación."
+
+Nodo E4: "Etapa 4 — Recuración final" (nodo expandido con 4 subetapas)
+  Subetapa 4.1: "Eliminación de hazelnut y duplicados → 1.393 imágenes"
+  Subetapa 4.2: "Unificación semántica → 6 categorías"
+  Subetapa 4.3: "Balanceo mediante submuestreo y sobremuestreo → ratio 2.08:1"
+  Subetapa 4.4: "Particiones train/val/test estratificadas (70/10/20)"
+
+Nodo E5: "Etapa 5 — Validación final"
+  Subtexto: "Test Chi-cuadrado (p=0.999), verificación de fugas (0 imágenes
+             compartidas), integridad 100%. Dataset final: 1.022 imágenes,
+             1.354 anotaciones, 6 categorías."
+
+────────────────────────────────────────────────────────────────────────────────
+CARRIL 2 — "EXPERIMENTACIÓN"
+(color de acento sugerido: naranja o rojo corporativo)
+────────────────────────────────────────────────────────────────────────────────
+
+Nodo F1: "Fase 1 — Baseline CNN (Experimentos 1 y 2)"
+  Subtexto: "ResNet-18 + Faster R-CNN y EfficientNet-B0 + Faster R-CNN.
+             Resolución nativa (~1650×1350 px). Resultados: mAP 0.077 y 0.162."
+
+Nodo F2: "Fase 2 — DEIMv2 con DINOv3 (Iteraciones 1–4)"
+  Subtexto: "4 configuraciones: 640px/87ep, 1024px/80ep, 1024px/120ep,
+             1024px/300ep. Mejor resultado: mAP 0.785 (300 épocas, 1024px)."
+
+Nodo F3: "Fase 3 — Validación arquitectura vs. resolución (Experimentos 3 y 4)"
+  Subtexto: "Re-entrenamiento de CNNs a 1024×1024 px. ResNet-18: mAP 0.080.
+             EfficientNet-B0: mAP 0.122. La ventaja del ViT es arquitectural."
+
+Nodo F4: "Fase 4 — Análisis de robustez"
+  Subtexto: "Evaluación del mejor DEIMv2 con umbrales de confianza 0.75 y 0.90.
+             mAP con umbral 0.75: 0.770. Con umbral 0.90: 0.705. Sin sobreajuste."
+
+────────────────────────────────────────────────────────────────────────────────
+CONEXIÓN ENTRE CARRILES
+────────────────────────────────────────────────────────────────────────────────
+
+Entre los dos carriles debe haber una flecha o conector que indique que el
+DATASET FINAL (salida de E5) alimenta TODAS LAS FASES de experimentación.
+Etiqueta del conector: "Dataset curado (1.022 imágenes, 6 categorías)"
+
+================================================================================
+ESTILO VISUAL
+================================================================================
+
+- Estilo general: limpio, minimalista, apto para publicación académica.
+  No usar fondos degradados intensos; preferir tonos planos suaves.
+- Tipografía: sans-serif moderna (Arial, Inter o similar), cuerpo principal 12pt,
+  subtextos 10pt.
+- Flechas de flujo entre nodos: dirección de arriba a abajo (top-to-bottom) o
+  de izquierda a derecha (left-to-right) dentro de cada carril.
+- Nodos: rectángulos con esquinas ligeramente redondeadas.
+- Subetapas de la Etapa 4: mostrarlas como nodos anidados o como lista dentro
+  del nodo padre, con fondo ligeramente más claro.
+- El conector entre carriles debe ser visualmente prominente (flecha gruesa o
+  doble, con fondo de etiqueta).
+- Resolución de exportación: mínimo 2000 píxeles de ancho, fondo blanco puro
+  (#FFFFFF), formato PNG o SVG.
+
+================================================================================
+TEXTO ADICIONAL DE CONTEXTO PARA EL MODELO (si el generador acepta descripción
+libre además del prompt estructurado)
+================================================================================
+
+"Genera un diagrama de flujo para la apertura del Capítulo 4 de una memoria
+académica de TFG de ingeniería. El diagrama tiene dos carriles paralelos:
+izquierda = PREPARACIÓN DEL DATASET (5 etapas secuenciales, la Etapa 4 con
+4 subetapas), derecha = EXPERIMENTACIÓN (4 Fases secuenciales). Una flecha
+gruesa horizontal en el centro conecta la salida del carril izquierdo
+(Dataset curado, 1.022 imágenes) con la entrada del carril derecho.
+Estilo académico minimalista, colores corporativos discretos, tipografía
+sans-serif, fondo blanco. El objetivo es que un ingeniero sin experiencia
+en Machine Learning entienda de un vistazo la organización del capítulo."
+
+================================================================================
+INSTRUCCIONES DE INSERCIÓN EN LATEX (para cuando tengas el fichero generado)
+================================================================================
+
+Una vez tengas el fichero del diagrama generado (p. ej. diagrama_fases_desarrollo.png
+o diagrama_fases_desarrollo.pdf), indícame:
+
+  1) La ruta donde lo has guardado (p. ej. fig/diagrama_fases_desarrollo.png)
+  2) Si es PNG o PDF/SVG
+
+Con esa información insertaré el código LaTeX correspondiente en desarrollo.tex,
+sustituyendo el marcador TEMA actual (línea 6) por la figura correctamente
+etiquetada con \label{fig:diagrama-fases-desarrollo}, \caption{} descriptivo
+y la referencia cruzada adecuada en el párrafo introductorio del capítulo.
+
+================================================================================
+FIN DEL PROMPT
+================================================================================
