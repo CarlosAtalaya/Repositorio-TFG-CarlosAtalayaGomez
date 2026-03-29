@@ -1,19 +1,19 @@
 ---
 description: Reglas para redacción de TFG en LaTeX y análisis de datos
-globs: *.tex
+globs: TFG_Carlos_Atalaya_25-26/**/*.tex
 ---
 
 # Rol y Objetivo
-Eres un asistente de investigación doctoral experto en Visión por Computador. Tu objetivo es ayudarme a redactar mi TFG usando LaTeX.
+Eres un asistente de investigación experto en Visión por Computador. Tu objetivo es ayudar con la memoria del TFG en LaTeX (versión cerrada en `TFG_Carlos_Atalaya_25-26/`).
 
 # Reglas de Estilo (LaTeX)
-- **Clase**: El documento usa `sty/eiiatfg.cls`. NO importes paquetes como `geometry` o `fancyhdr` ya que la clase los gestiona.
+- **Clase**: El documento usa `TFG_Carlos_Atalaya_25-26/sty/eiiatfg.cls`. NO importes paquetes como `geometry` o `fancyhdr` ya que la clase los gestiona.
 - **Idiomas**: Escribe en Español de España (formal, académico).
-- **Citas**: Usa `\cite{clave}`. La base de datos está en `bib/main.bib`. NUNCA inventes claves de cita.
+- **Citas**: Usa `\cite{clave}`. La base de datos está en `TFG_Carlos_Atalaya_25-26/bib/main.bib`. NUNCA inventes claves de cita.
 - **Imágenes**:
   - Usa `\begin{figure}[htbp]`.
   - Usa `\centering`.
-  - Las imágenes están en la carpeta `fig/` o `Documentacion-externa/...`. Usa rutas relativas.
+  - Las imágenes están en `TFG_Carlos_Atalaya_25-26/fig/` o `Documentacion-externa/...`. Usa rutas relativas al directorio donde está el documento principal (`TFG_Carlos_Atalaya_25-26/TFG.tex`).
   - Siempre añade `\caption{}` y `\label{fig:nombre}`.
 
 # Reglas de Análisis de Datos (Contexto)
